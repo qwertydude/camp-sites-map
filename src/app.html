@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en" class="light">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script>
+			// Theme initialization script
+			const getOSTheme = () => 
+				window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+			
+			const savedTheme = localStorage.getItem('app-theme');
+			const initialTheme = savedTheme === 'system' ? getOSTheme() : 
+								 (savedTheme === 'dark' ? 'dark' : 'light');
+			
+			document.documentElement.classList.remove('light', 'dark');
+			document.documentElement.classList.add(initialTheme);
+		</script>
+		%sveltekit.head%
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">%sveltekit.body%</div>
+	</body>
+</html>

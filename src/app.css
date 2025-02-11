@@ -1,0 +1,203 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Make sure the map container is full size */
+html, 
+body {
+    @apply h-full w-full m-0 p-0;
+}
+
+/* Custom styles for Leaflet that shouldn't be affected by Tailwind */
+.map-container {
+    height: 100vh;
+    width: 100vw;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+}
+
+.leaflet-control-container .leaflet-top,
+.leaflet-control-container .leaflet-bottom {
+    z-index: 999;
+}
+
+/* Popup styles */
+.add-site-popup {
+    padding: 1rem;
+}
+
+.site-input {
+    width: 100%;
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+}
+
+textarea.site-input {
+    height: 5rem;
+    resize: vertical;
+}
+
+.popup-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.confirm-btn, .cancel-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.confirm-btn {
+    background: #4CAF50;
+    color: white;
+}
+
+.cancel-btn {
+    background: #f44336;
+    color: white;
+}
+
+/* User location marker */
+.user-location-marker {
+    background: transparent;
+    border: none;
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 10px;
+}
+
+.spinner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 400;
+}
+
+/* Dark theme styles */
+body.dark {
+    color-scheme: dark;
+
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+.dark .bg-white {
+    background-color: #1e1e1e;
+}
+
+.dark .text-gray-700,
+.dark .text-gray-800,
+.dark .text-gray-600 {
+    color: #e0e0e0;
+}
+
+.dark .text-gray-500 {
+    color: #a0a0a0;
+}
+
+.dark .border,
+.dark .border-gray-300,
+.dark .border-b {
+    border-color: #3c3c3c;
+}
+
+.dark .bg-gray-50 {
+    background-color: #2c2c2c;
+}
+
+
+.dark .hover\:bg-gray-50:hover,
+.dark .hover\:bg-gray-100:hover {
+    background-color: #2a2a2a;
+}
+
+.dark .hover\:bg-gray-50:hover input,
+.dark .hover\:bg-gray-100:hover input {
+    background-color: transparent;
+}
+
+.dark .bg-gray-200 {
+    background-color: #2c2c2c;
+}
+
+.dark .hover\:bg-gray-200:hover {
+    background-color: #7b7b7b;
+}
+
+.dark .hover\:text-gray-800:hover {
+    color: #e0e0e0;
+}
+
+.dark input,
+.dark select {
+    background-color: transparent;
+    border-color: #3c3c3c;
+    color: #e0e0e0;
+}
+
+.dark .divide-y > * {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Site item hover styles */
+.hover\:bg-gray-50:hover,
+.hover\:bg-gray-50:hover * {
+    cursor: pointer;
+}
+
+.dark input:focus,
+.dark select:focus {
+    border-color: #4a4a4a;
+    outline: none;
+    ring-color: #4a4a4a;
+}
+
+.dark .shadow-lg {
+    --tw-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.25);
+}
+
+.dark button.text-blue-600 {
+    color: #60a5fa;
+}
+
+.dark button.text-red-600 {
+    color: #f87171;
+}
+
+.dark button.hover\:text-blue-800:hover {
+    color: #93c5fd;
+}
+
+.dark button.hover\:text-red-800:hover {
+    color: #fca5a5;
+}
+
+.dark svg[stroke="#1a1a1a"] {
+    stroke: #e0e0e0;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
