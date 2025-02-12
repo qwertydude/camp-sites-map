@@ -60,7 +60,7 @@
 
       console.log('Adding tile layer');
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
+        attribution: ' OpenStreetMap contributors'
       }).addTo(map);
 
       // Add user location marker if we have it
@@ -225,15 +225,81 @@
   });
 </script>
 
-<div id="map" class="map-container"></div>
-
 <style>
   .map-container {
-    height: 100%;
     width: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    background: #f0f0f0;
+    height: 100%;
+  }
+
+  .add-site-popup {
+    @apply bg-white dark:bg-gray-800 
+           text-gray-900 dark:text-gray-100 
+           p-4 rounded-lg;
+  }
+
+  .add-site-popup h3 {
+    @apply text-lg font-semibold 
+           text-gray-800 dark:text-gray-200 
+           mb-3;
+  }
+
+  .site-input {
+    @apply w-full px-3 py-2 mb-3 
+           border border-gray-300 dark:border-gray-600 
+           rounded-md 
+           bg-white dark:bg-gray-700 
+           text-gray-900 dark:text-gray-100 
+           focus:outline-none focus:ring-2 focus:ring-blue-500;
+  }
+
+  .popup-buttons {
+    @apply flex justify-between mt-3;
+  }
+
+  .confirm-btn {
+    @apply px-4 py-2 
+           bg-blue-600 dark:bg-blue-700 
+           text-white 
+           rounded-md 
+           hover:bg-blue-700 dark:hover:bg-blue-800;
+  }
+
+  .cancel-btn {
+    @apply px-4 py-2 
+           bg-gray-200 dark:bg-gray-600 
+           text-gray-800 dark:text-gray-200 
+           rounded-md 
+           hover:bg-gray-300 dark:hover:bg-gray-500;
+  }
+
+  /* Leaflet dark mode adjustments */
+  :global(.leaflet-control) {
+    @apply bg-white dark:bg-gray-800 
+           text-gray-900 dark:text-gray-100 
+           border border-gray-200 dark:border-gray-600 
+           shadow-md;
+  }
+
+  :global(.leaflet-bar a) {
+    @apply bg-white dark:bg-gray-700 
+           text-gray-900 dark:text-gray-100 
+           border-b border-gray-200 dark:border-gray-600;
+  }
+
+  :global(.leaflet-bar a:hover) {
+    @apply bg-gray-100 dark:bg-gray-600;
+  }
+
+  :global(.leaflet-popup-content-wrapper) {
+    @apply bg-white dark:bg-gray-800 
+           text-gray-900 dark:text-gray-100 
+           rounded-lg 
+           shadow-lg;
+  }
+
+  :global(.leaflet-popup-tip) {
+    @apply bg-white dark:bg-gray-800;
   }
 </style>
+
+<div id="map" class="map-container"></div>
