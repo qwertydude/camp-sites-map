@@ -91,6 +91,11 @@
       map.on('click', async (e) => {
         console.log('Map clicked at:', e.latlng);
         
+        // Check if command/ctrl key is pressed
+        if (!e.originalEvent.metaKey && !e.originalEvent.ctrlKey) {
+          return; // Do nothing if command/ctrl is not pressed
+        }
+        
         const currentZoom = map.getZoom();
         if (currentZoom < 14) {
           L.popup({
@@ -101,6 +106,7 @@
               '<div class="add-site-popup dark:bg-gray-800 dark:text-gray-100">' +
               '<p>Please zoom in closer to add a camp site (zoom level must be 14 or greater)</p>' +
               '<p>Current zoom level: ' + Math.floor(currentZoom) + '</p>' +
+              '<p>Tip: Use Cmd/Ctrl + Click to add a site</p>' +
               '</div>'
             )
             .openOn(map);
