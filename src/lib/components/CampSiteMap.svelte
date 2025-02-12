@@ -93,10 +93,12 @@
         
         const currentZoom = map.getZoom();
         if (currentZoom < 14) {
-          L.popup()
+          L.popup({
+            className: 'dark:bg-gray-800 dark:text-gray-100'
+          })
             .setLatLng(e.latlng)
             .setContent(
-              '<div class="add-site-popup">' +
+              '<div class="add-site-popup dark:bg-gray-800 dark:text-gray-100">' +
               '<p>Please zoom in closer to add a camp site (zoom level must be 14 or greater)</p>' +
               '<p>Current zoom level: ' + Math.floor(currentZoom) + '</p>' +
               '</div>'
@@ -108,19 +110,27 @@
         // Create a popup for input
         const popupContent = document.createElement('div');
         popupContent.innerHTML = `
-          <div class="add-site-popup">
-            <h3>Add New Camp Site</h3>
-            <input type="text" id="site-title" placeholder="Site Title" class="site-input">
-            <textarea id="site-description" placeholder="Site Description" class="site-input"></textarea>
+          <div class="add-site-popup dark:bg-gray-800 dark:text-gray-100">
+            <h3 class="dark:text-gray-200">Add New Camp Site</h3>
+            <input type="text" id="site-title" placeholder="Site Title" 
+              class="site-input dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
+            <textarea id="site-description" placeholder="Site Description" 
+              class="site-input dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"></textarea>
             <div class="popup-buttons">
-              <button id="confirm-add" class="confirm-btn">Add Site</button>
-              <button id="cancel-add" class="cancel-btn">Cancel</button>
+              <button id="confirm-add" 
+                class="confirm-btn dark:bg-blue-700 dark:hover:bg-blue-800">Add Site</button>
+              <button id="cancel-add" 
+                class="cancel-btn dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">Cancel</button>
             </div>
           </div>
         `;
 
         // Add event listeners to the buttons
-        const popup = L.popup()
+        const popup = L.popup({
+          className: 'dark:bg-gray-800 dark:text-gray-100',
+          minWidth: 250,
+          maxWidth: 300
+        })
           .setLatLng(e.latlng)
           .setContent(popupContent)
           .openOn(map);
@@ -232,23 +242,19 @@
   }
 
   .add-site-popup {
-    @apply bg-white dark:bg-gray-800 
-           text-gray-900 dark:text-gray-100 
-           p-4 rounded-lg;
+    @apply bg-white text-gray-900 p-4 rounded-lg;
   }
 
   .add-site-popup h3 {
-    @apply text-lg font-semibold 
-           text-gray-800 dark:text-gray-200 
-           mb-3;
+    @apply text-lg font-semibold text-gray-800 mb-3;
   }
 
   .site-input {
     @apply w-full px-3 py-2 mb-3 
-           border border-gray-300 dark:border-gray-600 
+           border border-gray-300 
            rounded-md 
-           bg-white dark:bg-gray-700 
-           text-gray-900 dark:text-gray-100 
+           bg-white 
+           text-gray-900 
            focus:outline-none focus:ring-2 focus:ring-blue-500;
   }
 
@@ -258,47 +264,28 @@
 
   .confirm-btn {
     @apply px-4 py-2 
-           bg-blue-600 dark:bg-blue-700 
+           bg-blue-600 
            text-white 
            rounded-md 
-           hover:bg-blue-700 dark:hover:bg-blue-800;
+           hover:bg-blue-700;
   }
 
   .cancel-btn {
     @apply px-4 py-2 
-           bg-gray-200 dark:bg-gray-600 
-           text-gray-800 dark:text-gray-200 
+           bg-gray-200 
+           text-gray-800 
            rounded-md 
-           hover:bg-gray-300 dark:hover:bg-gray-500;
+           hover:bg-gray-300;
   }
 
   /* Leaflet dark mode adjustments */
-  :global(.leaflet-control) {
-    @apply bg-white dark:bg-gray-800 
-           text-gray-900 dark:text-gray-100 
-           border border-gray-200 dark:border-gray-600 
-           shadow-md;
+  :global(.leaflet-popup.dark) {
+    --tw-bg-opacity: 1;
+    background-color: rgb(31 41 55 / var(--tw-bg-opacity));
   }
 
-  :global(.leaflet-bar a) {
-    @apply bg-white dark:bg-gray-700 
-           text-gray-900 dark:text-gray-100 
-           border-b border-gray-200 dark:border-gray-600;
-  }
-
-  :global(.leaflet-bar a:hover) {
-    @apply bg-gray-100 dark:bg-gray-600;
-  }
-
-  :global(.leaflet-popup-content-wrapper) {
-    @apply bg-white dark:bg-gray-800 
-           text-gray-900 dark:text-gray-100 
-           rounded-lg 
-           shadow-lg;
-  }
-
-  :global(.leaflet-popup-tip) {
-    @apply bg-white dark:bg-gray-800;
+  :global(.leaflet-popup.dark .leaflet-popup-content) {
+    color: rgb(229 231 235 / var(--tw-text-opacity));
   }
 </style>
 
