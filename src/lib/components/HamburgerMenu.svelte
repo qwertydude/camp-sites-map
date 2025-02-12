@@ -21,9 +21,10 @@
   <input id="menu-drawer" type="checkbox" class="hidden" bind:checked={isOpen} />
   
   <div class="relative">
-    <label for="menu-drawer" class="btn btn-ghost absolute top-2 left-2 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600 bg-gray-200 dark:bg-gray-800 rounded-md">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+    <label for="menu-drawer" class="btn btn-ghost absolute top-2 left-2 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600 bg-gray-200 dark:bg-gray-700 rounded-md">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" 
+              class="dark:stroke-white stroke-black" />
       </svg>
     </label>
   </div>
