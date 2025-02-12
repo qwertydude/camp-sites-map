@@ -255,6 +255,15 @@ body.dark {
     stroke: #e0e0e0;
 }
 
+/* Hover stroke colors for hamburger icon */
+.hover\:stroke-gray-300:hover {
+    stroke: #D1D5DB; /* gray-300 */
+}
+
+.dark\:hover\:stroke-gray-400:hover {
+    stroke: #9CA3AF; /* gray-400 */
+}
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
