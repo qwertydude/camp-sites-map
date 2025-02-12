@@ -59,18 +59,18 @@
 						<p>Distance: ${distanceKm} km</p>
 						<p>Duration: ~${duration} minutes</p>
 						<div class="travel-modes">
-							<button class="travel-mode-btn" on:click="{() => setTravelMode('foot')}" style="font-size: 1.5em;">
-								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<button class="travel-mode-btn" on:click="{() => setTravelMode('foot')}">
+								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
 									<path d="M16 2l-2 4h-2l-2 4h-2l-2 4h2l-2 4h2l2-4h2l2-4h2l2-4h-2l2-4h-2z" />
 								</svg>
 							</button>
-							<button class="travel-mode-btn" on:click="{() => setTravelMode('bike')}" style="font-size: 1.5em;">
-								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<button class="travel-mode-btn" on:click="{() => setTravelMode('bike')}">
+								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
 									<path d="M16 2l-2 4h-2l-2 4h-2l-2 4h2l-2 4h2l2-4h2l2-4h2l2-4h-2l2-4h-2z" />
 								</svg>
 							</button>
-							<button class="travel-mode-btn" on:click="{() => setTravelMode('car')}" style="font-size: 1.5em;">
-								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<button class="travel-mode-btn" on:click="{() => setTravelMode('car')}">
+								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
 									<path d="M16 2l-2 4h-2l-2 4h-2l-2 4h2l-2 4h2l2-4h2l2-4h2l2-4h-2l2-4h-2z" />
 								</svg>
 							</button>
