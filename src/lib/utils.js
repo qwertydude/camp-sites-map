@@ -1,20 +1,4 @@
-export function getCurrentLocationv2(map) {
-    return new Promise((resolve, reject) => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((position) => {
-                const { latitude, longitude } = position.coords;
-                map.setView([latitude, longitude], 14);
-                resolve({ latitude, longitude });
-            }, (error) => {
-                reject('Unable to retrieve your location.');
-            });
-        } else {
-            reject('Geolocation is not supported by this browser.');
-        }
-    });
-}
-
-export async function getCurrentLocation(map) {
+export async function getCurrentLocation(map, settings) {
     if (!map) {
         console.error('Map not available');
         return;
@@ -63,7 +47,7 @@ export async function getCurrentLocation(map) {
         const { latitude, longitude } = position.coords;
         localStorage.setItem('lastKnownLocation', JSON.stringify({ latitude, longitude }));
 
-        map.setView([latitude, longitude], $settings.app.focusZoomLevel, {
+        map.setView([latitude, longitude], settings.app.focusZoomLevel, {
             animate: true,
             duration: 1
         });
