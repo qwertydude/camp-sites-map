@@ -172,8 +172,8 @@
 						})
 					})
 						.addTo(map)
-						.bindPopup('Your location')
-						.openPopup();
+						// .bindPopup('Your location')
+						// .openPopup();
 				}
 
 				// Initialize markers layer
@@ -390,6 +390,8 @@
 			});
 		}
 	});
+
+
 </script>
 
 <div id="map" class="map-container" class:add-site-mode={isAddSiteMode}></div>
@@ -437,5 +439,9 @@
 
 	:global(.leaflet-popup.dark .leaflet-popup-content) {
 		color: rgb(229 231 235 / var(--tw-text-opacity));
+	}
+
+	.home-button {
+		@apply absolute top-4 left-4 bg-gray-200 rounded-md p-2 text-gray-800 hover:bg-gray-300;
 	}
 </style>

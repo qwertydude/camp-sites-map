@@ -58,12 +58,13 @@ export async function getCurrentLocation(map, settings) {
         console.log('getCurrentLocation error:', error);
 
         if (map) {
-            L.popup()
-                .setLatLng(map.getCenter())
-                .setContent(
-                    'Cannot get location. Check your browser address bar if location permission required and try again'
-                )
-                .openOn(map);
+            alert('Cannot get location. Check your browser address bar if location permission required and try again')
+            // L.popup()
+            //     .setLatLng(map.getCenter())
+            //     .setContent(
+            //         'Cannot get location. Check your browser address bar if location permission required and try again'
+            //     )
+            //     .openOn(map);
         } else {
             console.error('Map is not defined, cannot show popup.');
         }
