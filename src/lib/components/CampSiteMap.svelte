@@ -11,6 +11,7 @@
   let map;
   let markersLayer;
   let unsubscribe;
+  let isAddSiteMode = false;
 
   async function loadLeaflet() {
     if (browser) {
@@ -217,6 +218,34 @@
         initializeMap();
       }
     }, 100);
+
+    // Add global keydown and keyup event listeners
+    const handleKeyDown = (e) => {
+      if (e.metaKey || e.ctrlKey) {
+        isAddSiteMode = true;
+        if (map) {
+          map.getContainer().style.cursor = 'crosshair';
+        }
+      }
+    };
+
+    const handleKeyUp = (e) => {
+      if (!e.metaKey && !e.ctrlKey) {
+        isAddSiteMode = false;
+        if (map) {
+          map.getContainer().style.cursor = '';
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    // Clean up event listeners
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
   });
 
   onDestroy(() => {
@@ -245,6 +274,11 @@
   .map-container {
     width: 100%;
     height: 100%;
+    cursor: default;
+  }
+
+  .map-container.add-site-mode {
+    cursor: crosshair;
   }
 
   .add-site-popup {
@@ -295,4 +329,4 @@
   }
 </style>
 
-<div id="map" class="map-container"></div>
+<div id="map" class="map-container {isAddSiteMode ? 'add-site-mode' : ''}"></div>
