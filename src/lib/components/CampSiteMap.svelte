@@ -329,4 +329,4 @@
   }
 </style>
 
-<div id="map" class="map-container {isAddSiteMode ? 'add-site-mode' : ''}"></div>
+<div id="map" class={`map-container ${isAddSiteMode ? 'add-site-mode' : ''}`}></div>
