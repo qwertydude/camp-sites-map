@@ -5,6 +5,7 @@ export async function getCurrentLocation(map, settings) {
     }
 
     console.log('Map object:', map); // Log the map object to inspect it
+    console.log('Settings object:', settings); // Log the settings object to inspect it
 
     // Check if geolocation is available
     if (!navigator.geolocation) {
@@ -54,6 +55,7 @@ export async function getCurrentLocation(map, settings) {
         removeOverlay();
     } catch (error) {
         removeOverlay();
+        console.log('getCurrentLocation error:', error);
 
         if (map) {
             L.popup()
