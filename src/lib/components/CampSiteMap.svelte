@@ -12,55 +12,68 @@
 	let markersLayer;
 	let unsubscribe;
 	let isAddSiteMode = false;
-let selectedSites = [];
-let routeLayer;
+	let selectedSites = [];
+	let routeLayer;
+	let travelMode = 'foot';
 
-async function calculateRoute(start, end) {
-  const url = `https://router.project-osrm.org/route/v1/foot/${start.lng},${start.lat};${end.lng},${end.lat}?overview=full&geometries=geojson`;
-  
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
-    
-    if (data.code !== 'Ok') {
-      throw new Error('Unable to calculate route');
-    }
-    
-    // Clear existing route
-    if (routeLayer) {
-      routeLayer.remove();
-    }
-    
-    // Draw the new route
-    routeLayer = L.geoJSON(data.routes[0].geometry, {
-      style: {
-        color: '#4A90E2',
-        weight: 4,
-        opacity: 0.7
-      }
-    }).addTo(map);
-    
-    // Calculate distance in kilometers
-    const distanceKm = (data.routes[0].distance / 1000).toFixed(2);
-    const duration = Math.round(data.routes[0].duration / 60); // Convert seconds to minutes
-    
-    // Show the route information in a popup
-    L.popup()
-      .setLatLng([(start.lat + end.lat) / 2, (start.lng + end.lng) / 2])
-      .setContent(
-        `<div class="route-info dark:bg-gray-800 dark:text-gray-100">
-          <h3 class="font-semibold">Walking Route</h3>
-          <p>Distance: ${distanceKm} km</p>
-          <p>Duration: ~${duration} minutes</p>
-        </div>`
-      )
-      .openOn(map);
-      
-  } catch (error) {
-    console.error('Error calculating route:', error);
-    alert('Unable to calculate walking route. Please try again.');
-  }
-}
+	async function calculateRoute(start, end) {
+		const url = `https://router.project-osrm.org/route/v1/${travelMode}/${start.lng},${start.lat};${end.lng},${end.lat}?overview=full&geometries=geojson`;
+		
+		try {
+			const response = await fetch(url);
+			const data = await response.json();
+			
+			if (data.code !== 'Ok') {
+				throw new Error('Unable to calculate route');
+			}
+			
+			// Clear existing route
+			if (routeLayer) {
+				routeLayer.remove();
+			}
+			
+			// Draw the new route
+			routeLayer = L.geoJSON(data.routes[0].geometry, {
+				style: {
+					color: '#4A90E2',
+					weight: 4,
+					opacity: 0.7
+				}
+			}).addTo(map);
+			
+			// Calculate distance in kilometers
+			const distanceKm = (data.routes[0].distance / 1000).toFixed(2);
+			const duration = Math.round(data.routes[0].duration / 60); // Convert seconds to minutes
+			
+			// Show the route information in a popup
+			L.popup()
+				.setLatLng([(start.lat + end.lat) / 2, (start.lng + end.lng) / 2])
+				.setContent(
+					`<div class="route-info dark:bg-gray-800 dark:text-gray-100">
+						<h3 class="font-semibold">Route Information</h3>
+						<p>Distance: ${distanceKm} km</p>
+						<p>Duration: ~${duration} minutes</p>
+						<div class="travel-modes">
+							<button class="travel-mode-btn" onclick="setTravelMode('foot')">🚶</button>
+							<button class="travel-mode-btn" onclick="setTravelMode('bike')">🚴</button>
+							<button class="travel-mode-btn" onclick="setTravelMode('car')">🚗</button>
+						</div>
+					</div>`
+				)
+				.openOn(map);
+				
+		} catch (error) {
+			console.error('Error calculating route:', error);
+			alert('Unable to calculate route. Please try again.');
+		}
+	}
+
+	function setTravelMode(mode) {
+		travelMode = mode;
+		if (selectedSites.length === 2) {
+			calculateRoute(selectedSites[0], selectedSites[1]);
+		}
+	}
 
 	async function loadLeaflet() {
 		if (browser) {
