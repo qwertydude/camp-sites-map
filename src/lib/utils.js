@@ -20,6 +20,8 @@ export async function getCurrentLocation(map) {
         return;
     }
 
+    console.log('Map object:', map); // Log the map object to inspect it
+
     // Check if geolocation is available
     if (!navigator.geolocation) {
         alert('Location services are not supported by your browser');
