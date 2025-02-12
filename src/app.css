@@ -23,9 +23,39 @@ body {
     z-index: 999;
 }
 
+/* Dark mode overrides for Leaflet components */
+:root[class~="dark"] .leaflet-popup-content-wrapper,
+:root[class~="dark"] .leaflet-popup-tip {
+    background-color: rgb(31 41 55); /* bg-gray-800 */
+    color: rgb(243 244 246); /* text-gray-100 */
+}
+
+:root[class~="dark"] .leaflet-container {
+    background: rgb(17 24 39); /* bg-gray-900 */
+}
+
+:root[class~="dark"] .leaflet-bar a {
+    background-color: rgb(31 41 55); /* bg-gray-800 */
+    color: rgb(243 244 246); /* text-gray-100 */
+    border-color: rgb(75 85 99); /* border-gray-600 */
+}
+
+:root[class~="dark"] .leaflet-bar a:hover {
+    background-color: rgb(55 65 81); /* bg-gray-700 */
+}
+
 /* Popup styles */
 .add-site-popup {
     padding: 1rem;
+}
+
+:root[class~="dark"] .add-site-popup {
+    background-color: rgb(31 41 55); /* bg-gray-800 */
+    color: rgb(243 244 246); /* text-gray-100 */
+}
+
+:root[class~="dark"] .add-site-popup h3 {
+    color: rgb(229 231 235); /* text-gray-200 */
 }
 
 .site-input {
@@ -34,6 +64,16 @@ body {
     padding: 0.5rem;
     border: 1px solid #ccc;
     border-radius: 0.25rem;
+}
+
+:root[class~="dark"] .site-input {
+    background-color: rgb(55 65 81); /* bg-gray-700 */
+    color: rgb(243 244 246); /* text-gray-100 */
+    border-color: rgb(75 85 99); /* border-gray-600 */
+}
+
+:root[class~="dark"] .site-input::placeholder {
+    color: rgb(156 163 175); /* text-gray-400 */
 }
 
 textarea.site-input {
@@ -49,6 +89,36 @@ textarea.site-input {
 
 .confirm-btn, .cancel-btn {
     padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+}
+
+.confirm-btn {
+    background-color: rgb(37 99 235); /* bg-blue-600 */
+    color: white;
+}
+
+:root[class~="dark"] .confirm-btn {
+    background-color: rgb(29 78 216); /* bg-blue-700 */
+}
+
+:root[class~="dark"] .confirm-btn:hover {
+    background-color: rgb(30 64 175); /* bg-blue-800 */
+}
+
+.cancel-btn {
+    background-color: rgb(229 231 235); /* bg-gray-200 */
+    color: rgb(17 24 39); /* text-gray-900 */
+}
+
+:root[class~="dark"] .cancel-btn {
+    background-color: rgb(75 85 99); /* bg-gray-600 */
+    color: rgb(229 231 235); /* text-gray-200 */
+}
+
+:root[class~="dark"] .cancel-btn:hover {
+    background-color: rgb(107 114 128); /* bg-gray-500 */
+}
     border: none;
     border-radius: 0.25rem;
     cursor: pointer;
