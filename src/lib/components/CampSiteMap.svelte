@@ -59,9 +59,9 @@
 						<p>Distance: ${distanceKm} km</p>
 						<p>Duration: ~${duration} minutes</p>
 						<div class="travel-modes">
-							<button class="travel-mode-btn" on:click="{() => setTravelMode('foot')}" style="font-size: 1.5em;"><img src="/path/to/walk-icon.png" alt="Walk" /></button>
-							<button class="travel-mode-btn" on:click="{() => setTravelMode('bike')}" style="font-size: 1.5em;"><img src="/path/to/bike-icon.png" alt="Bike" /></button>
-							<button class="travel-mode-btn" on:click="{() => setTravelMode('car')}" style="font-size: 1.5em;"><img src="/path/to/car-icon.png" alt="Car" /></button>
+							<button class="travel-mode-btn" on:click="{() => setTravelMode('foot')}" style="font-size: 1.5em;"><img src="/lib/assets/icons/walk-icon.svg" alt="Walk" /></button>
+							<button class="travel-mode-btn" on:click="{() => setTravelMode('bike')}" style="font-size: 1.5em;"><img src="/lib/assets/icons/ride-icon.svg" alt="Ride" /></button>
+							<button class="travel-mode-btn" on:click="{() => setTravelMode('car')}" style="font-size: 1.5em;"><img src="/lib/assets/icons/drive-icon.svg" alt="Drive" /></button>
 						</div>
 					</div>`
 				)
