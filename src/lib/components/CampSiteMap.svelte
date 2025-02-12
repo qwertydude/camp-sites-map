@@ -57,13 +57,17 @@
 						<p>Distance: ${distanceKm} km</p>
 						<p>Duration: ~${duration} minutes</p>
 						<div class="travel-modes">
-							<button class="travel-mode-btn" on:click={() => setTravelMode('foot')} style="font-size: 1.5em;">🚶</button>
-							<button class="travel-mode-btn" on:click={() => setTravelMode('bike')} style="font-size: 1.5em;">🚴</button>
-							<button class="travel-mode-btn" on:click={() => setTravelMode('car')} style="font-size: 1.5em;">🚗</button>
+							<button class="travel-mode-btn" on:click="{() => setTravelMode('foot')}" style="font-size: 1.5em;">🚶</button>
+							<button class="travel-mode-btn" on:click="{() => setTravelMode('bike')}" style="font-size: 1.5em;">🚴</button>
+							<button class="travel-mode-btn" on:click="{() => setTravelMode('car')}" style="font-size: 1.5em;">🚗</button>
 						</div>
 					</div>`
 				)
 				.openOn(map);
+				
+			// Add markers for start and end points with appropriate colors
+			L.marker([start.lat, start.lng], { icon: L.divIcon({ html: '<div style="background-color: green; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>', className: 'start-marker' }) }).addTo(map);
+			L.marker([end.lat, end.lng], { icon: L.divIcon({ html: '<div style="background-color: red; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>', className: 'end-marker' }) }).addTo(map);
 				
 		} catch (error) {
 			console.error('Error calculating route:', error);
