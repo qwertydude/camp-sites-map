@@ -4,6 +4,8 @@
   import { getCurrentLocation } from '$lib/utils.js'; // Import the utility function
 
   export let isOpen = false;
+  export let map;
+
   const dispatch = createEventDispatcher();
 
   function handleManageSites() {
@@ -15,7 +17,11 @@
   }
 
   function gotoCurrentLocation() {
-    getCurrentLocation(map, settings); // Call the utility function with map and settings
+    getCurrentLocation(map, $settings); // Call the utility function with map and settings
+  }
+
+  function closeMenu() {
+    isOpen = false; // Set the menu state to closed
   }
 </script>
 
@@ -59,6 +65,7 @@
       <!-- Header -->
       <div class="flex items-center justify-between border-b bg-gray-50 dark:bg-gray-900 px-4 py-3">
         <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Menu</h2>
+        <button class="close-button" on:click={closeMenu}>×</button> <!-- Close button -->
       </div>
       <!-- Menu Items -->
       <ul class="menu p-4 space-y-2">
@@ -69,7 +76,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-400" viewBox="0 0 20 20" fill="currentColor">
               <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 01-1 1H9a1 1 0 000-2h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 001 1v2a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 01-1 1H11a1 1 0 000-2h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-2" />
             </svg>
-            <span class="ml-3">Go to Current Location</span>
+            <span class="ml-3">Current Location</span>
           </button>
         </li>
         <li>
@@ -98,3 +105,12 @@
     </div>
   </div>
 </div>
+
+<style>
+.close-button {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+}
+</style>
