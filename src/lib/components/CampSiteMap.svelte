@@ -223,30 +223,12 @@
     const handleKeyDown = (e) => {
       if (e.metaKey || e.ctrlKey) {
         isAddSiteMode = true;
-        const mapContainer = document.getElementById('map');
-        if (mapContainer) {
-          // Preserve existing classes and add add-site-mode
-          mapContainer.classList.add('add-site-mode');
-          
-          if (map && map.getContainer()) {
-            map.getContainer().style.cursor = 'crosshair';
-          }
-        }
       }
     };
 
     const handleKeyUp = (e) => {
       if (!e.metaKey && !e.ctrlKey) {
         isAddSiteMode = false;
-        const mapContainer = document.getElementById('map');
-        if (mapContainer) {
-          // Remove only the add-site-mode class
-          mapContainer.classList.remove('add-site-mode');
-          
-          if (map && map.getContainer()) {
-            map.getContainer().style.cursor = '';
-          }
-        }
       }
     };
 
@@ -341,4 +323,4 @@
   }
 </style>
 
-<div id="map" class={`map-container ${isAddSiteMode ? 'add-site-mode' : ''}`}></div>
+<div id="map" class="map-container" class:add-site-mode={isAddSiteMode}></div>
