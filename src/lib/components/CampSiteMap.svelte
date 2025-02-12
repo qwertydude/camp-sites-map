@@ -15,6 +15,8 @@
 	let selectedSites = [];
 	let routeLayer;
 	let travelMode = 'foot';
+	let startMarker;
+	let endMarker;
 
 	async function calculateRoute(start, end) {
 		const url = `https://router.project-osrm.org/route/v1/${travelMode}/${start.lng},${start.lat};${end.lng},${end.lat}?overview=full&geometries=geojson`;
@@ -66,13 +68,12 @@
 				.openOn(map);
 				
 			// Change existing markers for start and end points with appropriate colors
-			markersLayer.clearLayers(); // Clear existing markers
-
-			const startMarker = L.marker([start.lat, start.lng], { icon: L.divIcon({ html: '<div style="background-color: green; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>', className: 'start-marker' }) });
-			const endMarker = L.marker([end.lat, end.lng], { icon: L.divIcon({ html: '<div style="background-color: red; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>', className: 'end-marker' }) });
-
-			startMarker.addTo(map);
-			endMarker.addTo(map);
+			if (startMarker) {
+				startMarker.setIcon(L.divIcon({ html: '<div style="background-color: green; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>', className: 'start-marker' }));
+			}
+			if (endMarker) {
+				endMarker.setIcon(L.divIcon({ html: '<div style="background-color: red; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>', className: 'end-marker' }));
+			}
 				
 		} catch (error) {
 			console.error('Error calculating route:', error);
