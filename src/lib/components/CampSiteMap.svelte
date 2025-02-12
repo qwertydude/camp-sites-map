@@ -223,8 +223,14 @@
     const handleKeyDown = (e) => {
       if (e.metaKey || e.ctrlKey) {
         isAddSiteMode = true;
-        if (map) {
-          map.getContainer().style.cursor = 'crosshair';
+        const mapContainer = document.getElementById('map');
+        if (mapContainer) {
+          // Preserve existing classes and add add-site-mode
+          mapContainer.classList.add('add-site-mode');
+          
+          if (map && map.getContainer()) {
+            map.getContainer().style.cursor = 'crosshair';
+          }
         }
       }
     };
@@ -232,8 +238,14 @@
     const handleKeyUp = (e) => {
       if (!e.metaKey && !e.ctrlKey) {
         isAddSiteMode = false;
-        if (map) {
-          map.getContainer().style.cursor = '';
+        const mapContainer = document.getElementById('map');
+        if (mapContainer) {
+          // Remove only the add-site-mode class
+          mapContainer.classList.remove('add-site-mode');
+          
+          if (map && map.getContainer()) {
+            map.getContainer().style.cursor = '';
+          }
         }
       }
     };
