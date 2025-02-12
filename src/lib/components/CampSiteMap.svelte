@@ -57,9 +57,9 @@
 						<p>Distance: ${distanceKm} km</p>
 						<p>Duration: ~${duration} minutes</p>
 						<div class="travel-modes">
-							<button class="travel-mode-btn" onclick="setTravelMode('foot')" style="font-size: 2em;">🚶</button>
-							<button class="travel-mode-btn" onclick="setTravelMode('bike')" style="font-size: 2em;">🚴</button>
-							<button class="travel-mode-btn" onclick="setTravelMode('car')" style="font-size: 2em;">🚗</button>
+							<button class="travel-mode-btn" on:click={() => setTravelMode('foot')} style="font-size: 1.5em;">🚶</button>
+							<button class="travel-mode-btn" on:click={() => setTravelMode('bike')} style="font-size: 1.5em;">🚴</button>
+							<button class="travel-mode-btn" on:click={() => setTravelMode('car')} style="font-size: 1.5em;">🚗</button>
 						</div>
 					</div>`
 				)
