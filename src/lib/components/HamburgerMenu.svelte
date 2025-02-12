@@ -1,6 +1,7 @@
 <script>
   import { createEventDispatcher } from 'svelte';
   import { settings } from '$lib/stores/settings.js';
+  import { gotoCurrentLocation } from './SitePanel.svelte'; // Import the function to go to current location
 
   export let isOpen = false;
   const dispatch = createEventDispatcher();
@@ -22,7 +23,10 @@
       for="menu-drawer" 
       class="absolute top-2 left-2 p-2 rounded-md 
              bg-gray-200 hover:bg-gray-300 
-             dark:bg-gray-800 dark:hover:bg-gray-700 
+             dark:bg-gray-800 
+             dark:hover:bg-gray-700 
+             hover:stroke-gray-300 
+             dark:hover:stroke-gray-400
              transition-colors duration-200 
              flex items-center justify-center"
     >
@@ -30,7 +34,9 @@
         xmlns="http://www.w3.org/2000/svg" 
         class="h-6 w-6 
                text-gray-700 dark:text-white 
-               stroke-current"
+               stroke-current 
+               dark:hover:stroke-gray-400
+               "
         fill="none" 
         viewBox="0 0 24 24" 
         stroke-width="2"
@@ -49,11 +55,6 @@
       <!-- Header -->
       <div class="flex items-center justify-between border-b bg-gray-50 dark:bg-gray-900 px-4 py-3">
         <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Menu</h2>
-        <label for="menu-drawer" class="btn btn-ghost btn-sm btn-circle">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-700 dark:text-white" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-          </svg>
-        </label>
       </div>
       <!-- Menu Items -->
       <ul class="menu p-4 space-y-2">
@@ -77,6 +78,16 @@
               <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
             </svg>
             <span class="ml-3">Settings</span>
+          </button>
+        </li>
+        <li on:click={gotoCurrentLocation}>
+          <button
+            class="w-full flex items-center px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-150"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 01-1 1H9a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 001 1v2a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 01-1 1H11a1 1 0 000-2h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 01-1 1H9a1 1 0 000-2h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-2" />
+            </svg>
+            <span class="ml-3">Go to Current Location</span>
           </button>
         </li>
       </ul>
