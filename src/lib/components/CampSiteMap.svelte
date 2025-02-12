@@ -41,6 +41,9 @@
 				}
 			}).addTo(map);
 			
+			// Zoom to the route when generated
+			map.fitBounds(routeLayer.getBounds());
+			
 			// Calculate distance in kilometers
 			const distanceKm = (data.routes[0].distance / 1000).toFixed(2);
 			const duration = Math.round(data.routes[0].duration / 60); // Convert seconds to minutes
