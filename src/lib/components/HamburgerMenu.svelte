@@ -1,7 +1,7 @@
 <script>
   import { createEventDispatcher } from 'svelte';
   import { settings } from '$lib/stores/settings.js';
-  import { gotoCurrentLocation } from './SitePanel.svelte'; // Import the function to go to current location
+  import { getCurrentLocation } from '$lib/utils.js'; // Import the utility function
 
   export let isOpen = false;
   const dispatch = createEventDispatcher();
@@ -12,6 +12,10 @@
 
   function handleSettings() {
     dispatch('openSettings');
+  }
+
+  function gotoCurrentLocation() {
+    getCurrentLocation(); // Call the utility function
   }
 </script>
 
@@ -85,7 +89,7 @@
             class="w-full flex items-center px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-150"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 01-1 1H9a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 001 1v2a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 01-1 1H11a1 1 0 000-2h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 01-1 1H9a1 1 0 000-2h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-2" />
+              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 01-1 1H9a1 1 0 000-2h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 001 1v2a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 01-1 1H11a1 1 0 000-2h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-2" />
             </svg>
             <span class="ml-3">Go to Current Location</span>
           </button>
