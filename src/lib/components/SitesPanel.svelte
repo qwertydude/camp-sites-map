@@ -1,6 +1,7 @@
 <script>
 	import { campSitesStore } from '$lib/stores/campSites';
 	import { settings } from '$lib/stores/settings.js';
+  import { getCurrentLocation } from '$lib/utils.js'; // Import the utility function
 
 	export let isOpen = false;
 	export let map;
@@ -9,69 +10,6 @@
 		isOpen = false;
 	}
 
-	async function getCurrentLocation() {
-		if (!map) {
-			console.error('Map not available');
-			return;
-		}
-
-		// Check if geolocation is available
-		if (!navigator.geolocation) {
-			alert('Location services are not supported by your browser');
-			return;
-		}
-
-		// Add an overlay spinner
-		let overlay = document.createElement('div');
-		overlay.className = 'spinner-overlay';
-		overlay.innerHTML = '<div class="loading-spinner">Getting your location...</div>';
-		document.body.appendChild(overlay);
-
-		// When location is found or error occurs, remove the overlay
-		function removeOverlay() {
-			if (overlay && document.body.contains(overlay)) {
-				document.body.removeChild(overlay);
-			}
-		}
-
-		// Set a timeout for 5 seconds
-		const timeoutPromise = new Promise((_, reject) => {
-			setTimeout(() => {
-				reject(new Error('timeout'));
-				removeOverlay();
-			}, 5000);
-		});
-
-		try {
-			const locationPromise = new Promise((resolve, reject) => {
-				navigator.geolocation.getCurrentPosition(resolve, reject, {
-					enableHighAccuracy: true,
-					timeout: 5000,
-					maximumAge: 0
-				});
-			});
-
-			const position = await Promise.race([locationPromise, timeoutPromise]);
-
-			const { latitude, longitude } = position.coords;
-			localStorage.setItem('lastKnownLocation', JSON.stringify({ latitude, longitude }));
-
-			map.setView([latitude, longitude], $settings.app.focusZoomLevel, {
-				animate: true,
-				duration: 1
-			});
-			removeOverlay();
-		} catch (error) {
-			removeOverlay();
-
-			L.popup()
-				.setLatLng(map.getCenter())
-				.setContent(
-					'Cannot get location. Check your browser address bar if location permission required and try again'
-				)
-				.openOn(map);
-		}
-	}
 
 	function focusOnSite(site) {
 		if (!map) return;
@@ -117,6 +55,10 @@
 			await campSitesStore.updateSite(site.id, { name: newName });
 		}
 	}
+
+	async function handleCurrentLocation() {
+		await getCurrentLocation(map, settings); // Call the utility function with map and settings
+	}
 </script>
 
 <div
@@ -130,7 +72,7 @@
 			<div class="flex items-center justify-between border-b bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 px-4 py-3">
 				<h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Camp Sites</h2>
 				<div class="flex items-center space-x-2">
-					<button class="p-1 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-300" on:click={getCurrentLocation}>
+					<button class="p-1 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-300" on:click={handleCurrentLocation}>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							class="h-5 w-5"
