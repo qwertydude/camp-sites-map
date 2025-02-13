@@ -50,10 +50,15 @@ ion-icon {
     font-size:32px;
 }
 
-ion-icon.start{
+.site-pip ion-icon {
+    color:#3498db;
+}
+
+.site-pip.start ion-icon{
     color:green;
 }
-ion-icon.end{
+
+.site-pip.end ion-icon{
     color:red;
 }
 

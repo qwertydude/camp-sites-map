@@ -52,11 +52,10 @@
 				shadowSize: [41, 41]
 			};
 
-      const sitePip = L.divIcon({
-        className: 'site-pip',
-        html: '<ion-icon name="location" style="color:blue"></ion-icon>'
-      });
-
+			const sitePip = L.divIcon({
+				className: 'site-pip',
+				html: '<ion-icon name="location" ></ion-icon>'
+			});
 
 			L.Marker.prototype.options.icon = sitePip;
 
@@ -135,20 +134,20 @@
 				// Create a popup for input
 				const popupContent = document.createElement('div');
 				popupContent.innerHTML = `
-          <div class="add-site-popup dark:bg-gray-800 dark:text-gray-100">
-            <h3 class="dark:text-gray-200">Add New Camp Site</h3>
-            <input type="text" id="site-title" placeholder="Site Title" 
-              class="site-input dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
-            <textarea id="site-description" placeholder="Site Description" 
-              class="site-input dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"></textarea>
-            <div class="popup-buttons">
-              <button id="confirm-add" 
-                class="confirm-btn dark:bg-blue-700 dark:hover:bg-blue-800">Add Site</button>
-              <button id="cancel-add" 
-                class="cancel-btn dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">Cancel</button>
-            </div>
-          </div>
-        `;
+					<div class="add-site-popup dark:bg-gray-800 dark:text-gray-100">
+						<h3 class="dark:text-gray-200">Add New Camp Site</h3>
+						<input type="text" id="site-title" placeholder="Site Title" 
+						class="site-input dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
+						<textarea id="site-description" placeholder="Site Description" 
+						class="site-input dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"></textarea>
+						<div class="popup-buttons">
+						<button id="confirm-add" 
+							class="confirm-btn dark:bg-blue-700 dark:hover:bg-blue-800">Add Site</button>
+						<button id="cancel-add" 
+							class="cancel-btn dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">Cancel</button>
+						</div>
+					</div>
+					`;
 
 				// Add event listeners to the buttons
 				const popup = L.popup({
@@ -293,6 +292,7 @@
 								const isSelected = selectedSites.some((s) => s.id === site.id);
 								if (isSelected) {
 									selectedSites = selectedSites.filter((s) => s.id !== site.id);
+									marker.getElement().classList.remove('start', 'end'); // Changed layer to marker
 								} else {
 									if (selectedSites.length >= 2) {
 										selectedSites.shift(); // Remove the first site if we already have 2
@@ -301,6 +301,13 @@
 										...selectedSites,
 										{ id: site.id, lat: site.latitude, lng: site.longitude }
 									];
+
+									// Add start or end class based on selection
+									if (selectedSites.length === 1) {
+										marker.getElement().classList.add('start'); // Changed layer to marker
+									} else if (selectedSites.length === 2) {
+										marker.getElement().classList.add('end'); // Changed layer to marker
+									}
 								}
 
 								// If we have 2 sites selected, calculate the route
@@ -419,6 +426,7 @@
 
 	function setTravelMode(mode) {
 		travelMode = mode;
+
 		if (selectedSites.length === 2) {
 			calculateRoute(selectedSites[0], selectedSites[1]);
 		}
