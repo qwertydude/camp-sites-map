@@ -292,8 +292,22 @@
 								const isSelected = selectedSites.some((s) => s.id === site.id);
 								if (isSelected) {
 									selectedSites = selectedSites.filter((s) => s.id !== site.id);
-									marker.getElement().classList.remove('start', 'end'); // Changed layer to marker
+									marker.getElement().classList.remove('start', 'end');
 								} else {
+									// Clear existing route and markers if we already have a route
+									if (selectedSites.length === 2) {
+										// Clear the route
+										if (routeLayer) {
+											routeLayer.remove();
+										}
+										// Clear all start/end classes
+										document.querySelectorAll('.site-pip').forEach(pip => {
+											pip.classList.remove('start', 'end');
+										});
+										// Reset selected sites
+										selectedSites = [];
+									}
+
 									if (selectedSites.length >= 2) {
 										selectedSites.shift(); // Remove the first site if we already have 2
 									}
