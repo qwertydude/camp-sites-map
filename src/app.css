@@ -71,6 +71,13 @@ ion-icon {
     color:red;
 }
 
+.travel-mode-btn ion-icon {
+    color: gray;
+    font-size:16px;
+}
+.travel-mode-btn:hover ion-icon {
+    color: white;
+}
 
 /* Popup styles */
 .add-site-popup {
