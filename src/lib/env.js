@@ -1,2 +1,3 @@
 export const PUBLIC_SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
 export const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+export const PUBLIC_MAPBOX_ACCESS_TOKEN = import.meta.env.PUBLIC_MAPBOX_ACCESS_TOKEN;

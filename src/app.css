@@ -264,6 +264,11 @@ body.dark {
     stroke: #9CA3AF; /* gray-400 */
 }
 
+.dark\:hover\:bg-gray-700:hover {
+    background-color: #374151; /* gray-700 */
+}
+
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }

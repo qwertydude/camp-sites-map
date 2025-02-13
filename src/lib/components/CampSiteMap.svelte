@@ -6,6 +6,7 @@
 	import { settings } from '$lib/stores/settings.js';
 
 	const dispatch = createEventDispatcher();
+  const mapboxToken= import.meta.env.PUBLIC_MAPBOX_ACCESS_TOKEN;
 
 	let L;
 	let map;
@@ -18,22 +19,29 @@
 	let startMarker;
 	let endMarker;
 
+
 	async function calculateRoute(start, end) {
-		const url = `https://router.project-osrm.org/route/v1/${travelMode}/${start.lng},${start.lat};${end.lng},${end.lat}?overview=full&geometries=geojson`;
-		
+		const mapboxProfile = {
+			'foot': 'walking',
+			'bike': 'cycling',
+			'car': 'driving'
+		}[travelMode];
+
+		const url = `https://api.mapbox.com/directions/v5/mapbox/${mapboxProfile}/${start.lng},${start.lat};${end.lng},${end.lat}?geometries=geojson&access_token=${mapboxToken}`;
+
 		try {
 			const response = await fetch(url);
 			const data = await response.json();
-			
-			if (data.code !== 'Ok') {
-				throw new Error('Unable to calculate route');
+
+			if (data.routes.length === 0) {
+				throw new Error('No routes found');
 			}
-			
+
 			// Clear existing route
 			if (routeLayer) {
 				routeLayer.remove();
 			}
-			
+
 			// Draw the new route
 			routeLayer = L.geoJSON(data.routes[0].geometry, {
 				style: {
@@ -42,51 +50,68 @@
 					opacity: 0.7
 				}
 			}).addTo(map);
-			
+
 			// Zoom to the route when generated
 			map.fitBounds(routeLayer.getBounds());
-			
+
 			// Calculate distance in kilometers
 			const distanceKm = (data.routes[0].distance / 1000).toFixed(2);
 			const duration = Math.round(data.routes[0].duration / 60); // Convert seconds to minutes
-			
+
 			// Show the route information in a popup
+			const popupContent = document.createElement('div');
+			popupContent.innerHTML = `
+				<div class="route-info bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+					<h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">Route Information</h3>
+					<p class="text-gray-700 dark:text-gray-300">Distance: ${distanceKm} km</p>
+					<p class="text-gray-700 dark:text-gray-300 mb-3">Duration: ~${duration} minutes</p>
+					<div class="travel-modes flex gap-2 mt-2">
+						<button class="travel-mode-btn p-1.5 rounded-md ${travelMode === 'foot' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors" data-mode="foot">
+							<img src="/icons/walk-icon.svg" alt="Walk" class="w-7 h-7 ${travelMode === 'foot' ? 'brightness-200' : ''}" />
+						</button>
+						<button class="travel-mode-btn p-1.5 rounded-md ${travelMode === 'bike' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors" data-mode="bike">
+							<img src="/icons/ride-icon.svg" alt="Bike" class="w-7 h-7 ${travelMode === 'bike' ? 'brightness-200' : ''}" />
+						</button>
+						<button class="travel-mode-btn p-1.5 rounded-md ${travelMode === 'car' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors" data-mode="car">
+							<img src="/icons/drive-icon.svg" alt="Drive" class="w-7 h-7 ${travelMode === 'car' ? 'brightness-200' : ''}" />
+						</button>
+					</div>
+				</div>
+			`;
+
+			// Add event listeners to the buttons
+			const buttons = popupContent.querySelectorAll('.travel-mode-btn');
+			buttons.forEach((button) => {
+				button.addEventListener('click', () => {
+					const mode = button.dataset.mode;
+					console.log('Setting travel mode to:', mode);
+					setTravelMode(mode);
+				});
+			});
+
+			// Create and open the popup
 			L.popup()
 				.setLatLng([(start.lat + end.lat) / 2, (start.lng + end.lng) / 2])
-				.setContent(
-					`<div class="route-info dark:bg-gray-800 dark:text-gray-100">
-						<h3 class="font-semibold">Route Information</h3>
-						<p>Distance: ${distanceKm} km</p>
-						<p>Duration: ~${duration} minutes</p>
-						<div class="travel-modes">
-							<button class="travel-mode-btn" on:click="{() => setTravelMode('foot')}">
-								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
-									<path d="M16 2l-2 4h-2l-2 4h-2l-2 4h2l-2 4h2l2-4h2l2-4h2l2-4h-2l2-4h-2z" />
-								</svg>
-							</button>
-							<button class="travel-mode-btn" on:click="{() => setTravelMode('bike')}">
-								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
-									<path d="M16 2l-2 4h-2l-2 4h-2l-2 4h2l-2 4h2l2-4h2l2-4h2l2-4h-2l2-4h-2z" />
-								</svg>
-							</button>
-							<button class="travel-mode-btn" on:click="{() => setTravelMode('car')}">
-								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
-									<path d="M16 2l-2 4h-2l-2 4h-2l-2 4h2l-2 4h2l2-4h2l2-4h2l2-4h-2l2-4h-2z" />
-								</svg>
-							</button>
-						</div>
-					</div>`
-				)
+				.setContent(popupContent)
 				.openOn(map);
-				
+
 			// Change existing markers for start and end points with appropriate colors
 			if (startMarker) {
-				startMarker.setIcon(L.divIcon({ html: '<div style="background-color: green; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>', className: 'start-marker' }));
+				startMarker.setIcon(
+					L.divIcon({
+						html: '<div style="background-color: green; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>',
+						className: 'start-marker'
+					})
+				);
 			}
 			if (endMarker) {
-				endMarker.setIcon(L.divIcon({ html: '<div style="background-color: red; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>', className: 'end-marker' }));
+				endMarker.setIcon(
+					L.divIcon({
+						html: '<div style="background-color: red; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>',
+						className: 'end-marker'
+					})
+				);
 			}
-				
 		} catch (error) {
 			console.error('Error calculating route:', error);
 			alert('Unable to calculate route. Please try again.');
@@ -170,10 +195,9 @@
 							html: '<div style="background-color: #4A90E2; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>',
 							className: 'user-location-marker'
 						})
-					})
-						.addTo(map)
-						// .bindPopup('Your location')
-						// .openPopup();
+					}).addTo(map);
+					// .bindPopup('Your location')
+					// .openPopup();
 				}
 
 				// Initialize markers layer
@@ -353,45 +377,46 @@
             <small>Added: ${new Date(site.created_at).toLocaleString()}</small>
             <br>
             <button class="select-site-btn mt-2 px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700">
-              ${selectedSites.some(s => s.id === site.id) ? 'Deselect' : 'Select for Route'}
+              ${selectedSites.some((s) => s.id === site.id) ? 'Deselect' : 'Select for Route'}
             </button>
           `
 					)
 					.addTo(markersLayer);
 
-        // Add click handler for the select button
-        marker.on('popupopen', () => {
-          setTimeout(() => {
-            const btn = document.querySelector('.select-site-btn');
-            if (btn) {
-              btn.addEventListener('click', () => {
-                const isSelected = selectedSites.some(s => s.id === site.id);
-                if (isSelected) {
-                  selectedSites = selectedSites.filter(s => s.id !== site.id);
-                } else {
-                  if (selectedSites.length >= 2) {
-                    selectedSites.shift(); // Remove the first site if we already have 2
-                  }
-                  selectedSites = [...selectedSites, { id: site.id, lat: site.latitude, lng: site.longitude }];
-                }
-                
-                // If we have 2 sites selected, calculate the route
-                if (selectedSites.length === 2) {
-                  calculateRoute(selectedSites[0], selectedSites[1]);
-                } else if (routeLayer) {
-                  routeLayer.remove(); // Clear the route if we have fewer than 2 sites
-                }
-                
-                marker.closePopup();
-              });
-            }
-          }, 0);
-        });
+				// Add click handler for the select button
+				marker.on('popupopen', () => {
+					setTimeout(() => {
+						const btn = document.querySelector('.select-site-btn');
+						if (btn) {
+							btn.addEventListener('click', () => {
+								const isSelected = selectedSites.some((s) => s.id === site.id);
+								if (isSelected) {
+									selectedSites = selectedSites.filter((s) => s.id !== site.id);
+								} else {
+									if (selectedSites.length >= 2) {
+										selectedSites.shift(); // Remove the first site if we already have 2
+									}
+									selectedSites = [
+										...selectedSites,
+										{ id: site.id, lat: site.latitude, lng: site.longitude }
+									];
+								}
+
+								// If we have 2 sites selected, calculate the route
+								if (selectedSites.length === 2) {
+									calculateRoute(selectedSites[0], selectedSites[1]);
+								} else if (routeLayer) {
+									routeLayer.remove(); // Clear the route if we have fewer than 2 sites
+								}
+
+								marker.closePopup();
+							});
+						}
+					}, 0);
+				});
 			});
 		}
 	});
-
-
 </script>
 
 <div id="map" class="map-container" class:add-site-mode={isAddSiteMode}></div>
@@ -442,6 +467,6 @@
 	}
 
 	.home-button {
-		@apply absolute top-4 left-4 bg-gray-200 rounded-md p-2 text-gray-800 hover:bg-gray-300;
+		@apply absolute left-4 top-4 rounded-md bg-gray-200 p-2 text-gray-800 hover:bg-gray-300;
 	}
 </style>
