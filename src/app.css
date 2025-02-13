@@ -58,6 +58,15 @@ ion-icon {
     color:green;
 }
 
+.button-label.start:after {
+    content:"Start route here";
+}
+
+.button-label.end:after {
+    content:"End route here";
+}
+
+
 .site-pip.end ion-icon{
     color:red;
 }

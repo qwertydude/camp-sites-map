@@ -272,71 +272,89 @@
 				const marker = L.marker([site.latitude, site.longitude])
 					.bindPopup(
 						`
-            <strong>${site.name}</strong><br>
-            ${site.description ? `<p>${site.description}</p>` : ''}
-            <small>Added: ${new Date(site.created_at).toLocaleString()}</small>
-            <br>
-            <button class="select-site-btn mt-2 px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700">
-              ${selectedSites.some((s) => s.id === site.id) ? 'Deselect' : 'Select for Route'}
-            </button>
+                        <strong>${site.name}</strong><br>
+                        ${site.description ? `<p>${site.description}</p>` : ''}
+                        <small>Added: ${new Date(site.created_at).toLocaleString()}</small>
+                        <br>
+                        <button class="select-site-btn mt-2 px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700">
+                          <span class="button-label start"></span>
+                        </button>
           `
 					)
 					.addTo(markersLayer);
 
 				// Add click handler for the select button
-				marker.on('popupopen', () => {
-					setTimeout(() => {
-						const btn = document.querySelector('.select-site-btn');
-						if (btn) {
-							btn.addEventListener('click', () => {
-								const isSelected = selectedSites.some((s) => s.id === site.id);
-								if (isSelected) {
-									selectedSites = selectedSites.filter((s) => s.id !== site.id);
-									marker.getElement().classList.remove('start', 'end');
-								} else {
-									// Clear existing route and markers if we already have a route
-									if (selectedSites.length === 2) {
-										// Clear the route
-										if (routeLayer) {
-											routeLayer.remove();
-										}
-										// Clear all start/end classes
-										document.querySelectorAll('.site-pip').forEach(pip => {
-											pip.classList.remove('start', 'end');
-										});
-										// Reset selected sites
-										selectedSites = [];
-									}
+        marker.on('popupopen', () => {
+    const btn = document.querySelector('.select-site-btn');
+    const buttonLabel = btn.querySelector('.button-label');
+    
+    // Update button label based on selected sites
+    if (selectedSites.length === 0) {
+        buttonLabel.classList.add('start');
+        buttonLabel.classList.remove('end');
+    } else if (selectedSites.length === 1) {
+        buttonLabel.classList.remove('start');
+        buttonLabel.classList.add('end');
+    } else if (selectedSites.length === 2) {
+        buttonLabel.classList.add('start');
+        buttonLabel.classList.remove('end');
+    }
 
-									if (selectedSites.length >= 2) {
-										selectedSites.shift(); // Remove the first site if we already have 2
-									}
-									selectedSites = [
-										...selectedSites,
-										{ id: site.id, lat: site.latitude, lng: site.longitude }
-									];
+    if (btn) {
+        btn.addEventListener('click', () => {
+            const isSelected = selectedSites.some((s) => s.id === site.id);
+            if (isSelected) {
+                selectedSites = selectedSites.filter((s) => s.id !== site.id);
+                marker.getElement().classList.remove('start', 'end');
+                buttonLabel.classList.add('start');
+                buttonLabel.classList.remove('end');
+            } else {
+                // Clear existing route and markers if we already have a route
+                if (selectedSites.length === 2) {
+                    // Clear the route
+                    if (routeLayer) {
+                        routeLayer.remove();
+                    }
+                    // Clear all start/end classes
+                    document.querySelectorAll('.site-pip').forEach(pip => {
+                        pip.classList.remove('start', 'end');
+                    });
+                    // Reset selected sites
+                    selectedSites = [];
+                }
 
-									// Add start or end class based on selection
-									if (selectedSites.length === 1) {
-										marker.getElement().classList.add('start'); // Changed layer to marker
-									} else if (selectedSites.length === 2) {
-										marker.getElement().classList.add('end'); // Changed layer to marker
-									}
-								}
+                if (selectedSites.length >= 2) {
+                    selectedSites.shift(); // Remove the first site if we already have 2
+                }
+                selectedSites = [
+                    ...selectedSites,
+                    { id: site.id, lat: site.latitude, lng: site.longitude }
+                ];
 
-								// If we have 2 sites selected, calculate the route
-								if (selectedSites.length === 2) {
-									calculateRoute(selectedSites[0], selectedSites[1]);
-								} else if (routeLayer) {
-									routeLayer.remove(); // Clear the route if we have fewer than 2 sites
-								}
+                // Add start or end class based on selection
+                if (selectedSites.length === 1) {
+                    marker.getElement().classList.add('start');
+                    buttonLabel.classList.remove('start');
+                    buttonLabel.classList.add('end');
+                } else if (selectedSites.length === 2) {
+                    marker.getElement().classList.add('end');
+                    buttonLabel.classList.add('start');
+                    buttonLabel.classList.remove('end');
+                }
+            }
 
-								marker.closePopup();
-							});
-						}
-					}, 0);
-				});
-			});
+            // If we have 2 sites selected, calculate the route
+            if (selectedSites.length === 2) {
+                calculateRoute(selectedSites[0], selectedSites[1]);
+            } else if (routeLayer) {
+                routeLayer.remove(); // Clear the route if we have fewer than 2 sites
+            }
+
+            marker.closePopup();
+        });
+    }
+});
+      });
 		}
 	});
 
