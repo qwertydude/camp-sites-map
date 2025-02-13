@@ -6,7 +6,7 @@
 	import { settings } from '$lib/stores/settings.js';
 
 	const dispatch = createEventDispatcher();
-  const mapboxToken= import.meta.env.PUBLIC_MAPBOX_ACCESS_TOKEN;
+	const mapboxToken = import.meta.env.PUBLIC_MAPBOX_ACCESS_TOKEN;
 
 	let L;
 	let map;
@@ -20,110 +20,6 @@
 	let endMarker;
 
 
-	async function calculateRoute(start, end) {
-		const mapboxProfile = {
-			'foot': 'walking',
-			'bike': 'cycling',
-			'car': 'driving'
-		}[travelMode];
-
-		const url = `https://api.mapbox.com/directions/v5/mapbox/${mapboxProfile}/${start.lng},${start.lat};${end.lng},${end.lat}?geometries=geojson&access_token=${mapboxToken}`;
-
-		try {
-			const response = await fetch(url);
-			const data = await response.json();
-
-			if (data.routes.length === 0) {
-				throw new Error('No routes found');
-			}
-
-			// Clear existing route
-			if (routeLayer) {
-				routeLayer.remove();
-			}
-
-			// Draw the new route
-			routeLayer = L.geoJSON(data.routes[0].geometry, {
-				style: {
-					color: '#4A90E2',
-					weight: 4,
-					opacity: 0.7
-				}
-			}).addTo(map);
-
-			// Zoom to the route when generated
-			map.fitBounds(routeLayer.getBounds());
-
-			// Calculate distance in kilometers
-			const distanceKm = (data.routes[0].distance / 1000).toFixed(2);
-			const duration = Math.round(data.routes[0].duration / 60); // Convert seconds to minutes
-
-			// Show the route information in a popup
-			const popupContent = document.createElement('div');
-			popupContent.innerHTML = `
-				<div class="route-info bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
-					<h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">Route Information</h3>
-					<p class="text-gray-700 dark:text-gray-300">Distance: ${distanceKm} km</p>
-					<p class="text-gray-700 dark:text-gray-300 mb-3">Duration: ~${duration} minutes</p>
-					<div class="travel-modes flex gap-2 mt-2">
-						<button class="travel-mode-btn p-1.5 rounded-md ${travelMode === 'foot' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors" data-mode="foot">
-							<img src="/icons/walk-icon.svg" alt="Walk" class="w-7 h-7 ${travelMode === 'foot' ? 'brightness-200' : ''}" />
-						</button>
-						<button class="travel-mode-btn p-1.5 rounded-md ${travelMode === 'bike' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors" data-mode="bike">
-							<img src="/icons/ride-icon.svg" alt="Bike" class="w-7 h-7 ${travelMode === 'bike' ? 'brightness-200' : ''}" />
-						</button>
-						<button class="travel-mode-btn p-1.5 rounded-md ${travelMode === 'car' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors" data-mode="car">
-							<img src="/icons/drive-icon.svg" alt="Drive" class="w-7 h-7 ${travelMode === 'car' ? 'brightness-200' : ''}" />
-						</button>
-					</div>
-				</div>
-			`;
-
-			// Add event listeners to the buttons
-			const buttons = popupContent.querySelectorAll('.travel-mode-btn');
-			buttons.forEach((button) => {
-				button.addEventListener('click', () => {
-					const mode = button.dataset.mode;
-					console.log('Setting travel mode to:', mode);
-					setTravelMode(mode);
-				});
-			});
-
-			// Create and open the popup
-			L.popup()
-				.setLatLng([(start.lat + end.lat) / 2, (start.lng + end.lng) / 2])
-				.setContent(popupContent)
-				.openOn(map);
-
-			// Change existing markers for start and end points with appropriate colors
-			if (startMarker) {
-				startMarker.setIcon(
-					L.divIcon({
-						html: '<div style="background-color: green; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>',
-						className: 'start-marker'
-					})
-				);
-			}
-			if (endMarker) {
-				endMarker.setIcon(
-					L.divIcon({
-						html: '<div style="background-color: red; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>',
-						className: 'end-marker'
-					})
-				);
-			}
-		} catch (error) {
-			console.error('Error calculating route:', error);
-			alert('Unable to calculate route. Please try again.');
-		}
-	}
-
-	function setTravelMode(mode) {
-		travelMode = mode;
-		if (selectedSites.length === 2) {
-			calculateRoute(selectedSites[0], selectedSites[1]);
-		}
-	}
 
 	async function loadLeaflet() {
 		if (browser) {
@@ -132,7 +28,7 @@
 		}
 	}
 
-	function initializeMap(position = null) {
+	async function initializeMap(position = null) {
 		if (!browser) return;
 
 		console.log('initializeMap called');
@@ -140,23 +36,23 @@
 		console.log('Map element dimensions:', mapElement?.getBoundingClientRect());
 
 		try {
-			// Use user location if available, otherwise default to SydneyWodonga
+			// Use user location if available, otherwise default to Wodonga
 			const startLat = position ? position.coords.latitude : -36.114858138524454;
 			const startLng = position ? position.coords.longitude : 146.8884086608887;
 
 			console.log('Creating map instance at:', { startLat, startLng });
 
 			// Fix for default marker icons
-			const defaultIcon = L.icon({
-				iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-				iconRetinaUrl:
-					'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-				shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-				iconSize: [25, 41],
-				iconAnchor: [12, 41],
+			const defaultIcon = new L.BeautifyIcon({
+				iconShape: 'circle',
+				iconSize: [20, 20],
+				iconColor: '#ff0000',
+				borderColor: '#ffffff',
+				borderWidth: 2,
 				popupAnchor: [1, -34],
 				shadowSize: [41, 41]
 			});
+
 			L.Marker.prototype.options.icon = defaultIcon;
 
 			if (!map) {
@@ -417,6 +313,111 @@
 			});
 		}
 	});
+
+	async function calculateRoute(start, end) {
+		const mapboxProfile = {
+			'foot': 'walking',
+			'bike': 'cycling',
+			'car': 'driving'
+		}[travelMode];
+
+		const url = `https://api.mapbox.com/directions/v5/mapbox/${mapboxProfile}/${start.lng},${start.lat};${end.lng},${end.lat}?geometries=geojson&access_token=${mapboxToken}`;
+
+		try {
+			const response = await fetch(url);
+			const data = await response.json();
+
+			if (data.routes.length === 0) {
+				throw new Error('No routes found');
+			}
+
+			// Clear existing route
+			if (routeLayer) {
+				routeLayer.remove();
+			}
+
+			// Draw the new route
+			routeLayer = L.geoJSON(data.routes[0].geometry, {
+				style: {
+					color: '#4A90E2',
+					weight: 4,
+					opacity: 0.7
+				}
+			}).addTo(map);
+
+			// Zoom to the route when generated
+			map.fitBounds(routeLayer.getBounds());
+
+			// Calculate distance in kilometers
+			const distanceKm = (data.routes[0].distance / 1000).toFixed(2);
+			const duration = Math.round(data.routes[0].duration / 60); // Convert seconds to minutes
+
+			// Show the route information in a popup
+			const popupContent = document.createElement('div');
+			popupContent.innerHTML = `
+				<div class="route-info bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+					<h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">Route Information</h3>
+					<p class="text-gray-700 dark:text-gray-300">Distance: ${distanceKm} km</p>
+					<p class="text-gray-700 dark:text-gray-300 mb-3">Duration: ~${duration} minutes</p>
+					<div class="travel-modes flex gap-2 mt-2">
+						<button class="travel-mode-btn p-1.5 rounded-md ${travelMode === 'foot' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors" data-mode="foot">
+							<img src="/icons/walk-icon.svg" alt="Walk" class="w-7 h-7 ${travelMode === 'foot' ? 'brightness-200' : ''}" />
+						</button>
+						<button class="travel-mode-btn p-1.5 rounded-md ${travelMode === 'bike' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors" data-mode="bike">
+							<img src="/icons/ride-icon.svg" alt="Bike" class="w-7 h-7 ${travelMode === 'bike' ? 'brightness-200' : ''}" />
+						</button>
+						<button class="travel-mode-btn p-1.5 rounded-md ${travelMode === 'car' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors" data-mode="car">
+							<img src="/icons/drive-icon.svg" alt="Drive" class="w-7 h-7 ${travelMode === 'car' ? 'brightness-200' : ''}" />
+						</button>
+					</div>
+				</div>
+			`;
+
+			// Add event listeners to the buttons
+			const buttons = popupContent.querySelectorAll('.travel-mode-btn');
+			buttons.forEach((button) => {
+				button.addEventListener('click', () => {
+					const mode = button.dataset.mode;
+					console.log('Setting travel mode to:', mode);
+					setTravelMode(mode);
+				});
+			});
+
+			// Create and open the popup
+			L.popup()
+				.setLatLng([(start.lat + end.lat) / 2, (start.lng + end.lng) / 2])
+				.setContent(popupContent)
+				.openOn(map);
+
+			// Change existing markers for start and end points with appropriate colors
+			if (startMarker) {
+				startMarker.setIcon(
+					L.divIcon({
+						html: '<div style="background-color: green; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>',
+						className: 'start-marker'
+					})
+				);
+			}
+			if (endMarker) {
+				endMarker.setIcon(
+					L.divIcon({
+						html: '<div style="background-color: red; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>',
+						className: 'end-marker'
+					})
+				);
+			}
+		} catch (error) {
+			console.error('Error calculating route:', error);
+			alert('Unable to calculate route. Please try again.');
+		}
+	}
+
+	function setTravelMode(mode) {
+		travelMode = mode;
+		if (selectedSites.length === 2) {
+			calculateRoute(selectedSites[0], selectedSites[1]);
+		}
+	}
 </script>
 
 <div id="map" class="map-container" class:add-site-mode={isAddSiteMode}></div>
