@@ -140,9 +140,9 @@
 		console.log('Map element dimensions:', mapElement?.getBoundingClientRect());
 
 		try {
-			// Use user location if available, otherwise default to Sydney
-			const startLat = position ? position.coords.latitude : -33.8688;
-			const startLng = position ? position.coords.longitude : 151.2093;
+			// Use user location if available, otherwise default to SydneyWodonga
+			const startLat = position ? position.coords.latitude : -36.114858138524454;
+			const startLng = position ? position.coords.longitude : 146.8884086608887;
 
 			console.log('Creating map instance at:', { startLat, startLng });
 
