@@ -406,23 +406,24 @@ if (hours > 0) {
     durationString = `${minutes} min${minutes !== 1 ? 's' : ''}`;
 }
 
+
 			// Show the route information in a popup
 			const popupContent = document.createElement('div');
 			popupContent.innerHTML = `
 				<div class="route-info bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
 					<h3 class="font-semibold text-gray-700 dark:text-gray-700 mb-2">Route Information</h3>
-					<p class="text-gray-700 dark:text-gray-700">${distanceKm} km - ${durationString}</p>
           <div class="travel-modes flex gap-2 mt-2">
-              <button class="travel-mode-btn p-1.5 rounded-md ${travelMode === 'foot' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="foot">
-                  <ion-icon name="walk"  class="w-7 h-7 ${travelMode === 'foot' ? 'brightness-200' : ''}"></ion-icon>
+              <button class="travel-mode-btn p-1 rounded-md ${travelMode === 'foot' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="foot">
+                  <ion-icon name="walk" size="small" class="${travelMode === 'foot' ? 'brightness-200' : ''}"></ion-icon>
               </button>
-              <button class="travel-mode-btn p-1.5 rounded-md ${travelMode === 'bike' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="bike">
-                  <ion-icon name="bicycle"  class="w-7 h-7 ${travelMode === 'bike' ? 'brightness-200' : ''}"></ion-icon>
+              <button class="travel-mode-btn p-1 rounded-md ${travelMode === 'bike' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="bike">
+                  <ion-icon name="bicycle" size="small" class="${travelMode === 'bike' ? 'brightness-200' : ''}"></ion-icon>
               </button>
-              <button class="travel-mode-btn p-1.5 rounded-md ${travelMode === 'car' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="car">
-                  <ion-icon name="car"  class="w-7 h-7 ${travelMode === 'car' ? 'brightness-200' : ''}"></ion-icon>
+              <button class="travel-mode-btn p-1 rounded-md ${travelMode === 'car' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="car">
+                  <ion-icon name="car" size="small" class="${travelMode === 'car' ? 'brightness-200' : ''}"></ion-icon>
               </button>
           </div>
+					<p class="text-gray-700 dark:text-gray-700">${distanceKm} km - ${durationString}</p>
 				</div>
 			`;
 

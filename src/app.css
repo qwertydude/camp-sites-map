@@ -46,8 +46,13 @@ body {
 
 /* Ionicons*/
 ion-icon {
-    color:white;
+    color:#333;
     font-size:32px;
+}
+
+/* Dark theme styles for Ionicons */
+.dark ion-icon {
+    color:white
 }
 
 .site-pip ion-icon {
@@ -56,6 +61,10 @@ ion-icon {
 
 .site-pip.start ion-icon{
     color:green;
+}
+
+.site-pip.end ion-icon{
+    color:red;
 }
 
 .button-label.start:after {
@@ -67,9 +76,7 @@ ion-icon {
 }
 
 
-.site-pip.end ion-icon{
-    color:red;
-}
+
 
 .travel-mode-btn ion-icon {
     color: gray;

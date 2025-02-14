@@ -16,7 +16,7 @@ export async function getCurrentLocation(map, settings) {
     // Add an overlay spinner
     let overlay = document.createElement('div');
     overlay.className = 'spinner-overlay';
-    overlay.innerHTML = '<div class="loading-spinner">Getting your location...</div>';
+    overlay.innerHTML = '<div class="loading-spinner"></div>';
     document.body.appendChild(overlay);
 
     // When location is found or error occurs, remove the overlay
