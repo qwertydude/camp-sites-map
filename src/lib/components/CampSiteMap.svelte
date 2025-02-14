@@ -14,7 +14,9 @@
 	let unsubscribe;
 	let isAddSiteMode = false;
 	let selectedSites = [];
-	let routeLayer;
+	let routeLayers = [];
+	let selectedRoute = 0;
+	let currentRouteIndex = 0;
 	let travelMode = 'foot';
 	let startMarker;
 	let endMarker;
@@ -362,8 +364,10 @@
 		try {
 			const response = await fetch(url);
 			const data = await response.json();
+			const routesCount = data.routes.length;
+			const routeDDList = data.routes.map((route, index) => `Route ${index + 1}: ${route.distance / 1000} km - ${Math.round(route.duration / 60)} min`);
 
-			if (data.routes.length === 0) {
+			if (routesCount === 0) {
 				throw new Error('No routes found');
 			}
 console.log("data:", data);
@@ -373,7 +377,7 @@ console.log("data:", data);
 			}
 
 			// Draw the new route
-			routeLayer = L.geoJSON(data.routes[0].geometry, {
+			routeLayer = L.geoJSON(data.routes[selectedRoute].geometry, {
 				style: {
 					color: '#4A90E2',
 					weight: 4,
@@ -399,7 +403,7 @@ console.log("data:", data);
 									<i class="${travelMode === 'car' ? 'brightness-200' : ''} fa-solid fa-car"></i>
 								</button>
 							</div>
-							<p class="text-gray-700 dark:text-gray-700">${data.routes[0].distance / 1000} km - ${Math.round(data.routes[0].duration / 60)} min</p>
+							<p class="text-gray-700 dark:text-gray-700">${routeDDList[selectedRoute]}</p>
 						</div>
 					`)
 					.openOn(map);
@@ -420,7 +424,7 @@ console.log("data:", data);
 			map.fitBounds(routeLayer.getBounds());
 
 			// Calculate distance in kilometers
-			const distanceKm = (data.routes[0].distance / 1000).toFixed(1);
+			const distanceKm = (data.routes[selectedRoute].distance / 1000).toFixed(1);
       const durationInMinutes = Math.round(data.routes[0].duration / 60); // Convert seconds to minutes
 const hours = Math.floor(durationInMinutes / 60);
 const minutes = durationInMinutes % 60;
