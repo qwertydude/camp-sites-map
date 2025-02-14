@@ -45,25 +45,25 @@ body {
 }
 
 /* Ionicons*/
-ion-icon {
+i {
     color:#333;
     font-size:32px;
 }
 
 /* Dark theme styles for Ionicons */
-.dark ion-icon {
+.dark i {
     color:white
 }
 
-.site-pip ion-icon {
+.site-pip i {
     color:#3498db;
 }
 
-.site-pip.start ion-icon{
+.site-pip.start i{
     color:green;
 }
 
-.site-pip.end ion-icon{
+.site-pip.end i{
     color:red;
 }
 
@@ -78,11 +78,11 @@ ion-icon {
 
 
 
-.travel-mode-btn ion-icon {
+.travel-mode-btn i {
     color: gray;
     font-size:16px;
 }
-.travel-mode-btn:hover ion-icon {
+.travel-mode-btn:hover i {
     color: white;
 }
 

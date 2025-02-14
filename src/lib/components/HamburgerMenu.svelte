@@ -28,30 +28,29 @@
 <div class="fixed top-0 left-2 z-30 h-full">
   <input id="menu-drawer" type="checkbox" class="hidden" bind:checked={isOpen} />
   
-  <div class="relative hs-dropdown">
+  <div class="relative">
     <label 
       for="menu-drawer" 
       class="hamburger-menu hs-dropdown-toggle
-             w-11 h-11 p-2 mt-2 ml-2rounded-sm 
-             bg-gray-200 
-             text-gray-700
-             dark:bg-gray-800 
+             w-11 h-11 p-2 mt-2 rounded-sm 
+             bg-gray-100 dark:bg-gray-700
+             text-gray-800 dark:text-gray-200
              transition-colors duration-200 
              flex items-center justify-center cursor-pointer"
     >
-      <ion-icon name="menu" size="small"></ion-icon>
+    <i class="fa-solid fa-bars"></i>
     </label>
 
-    <div class={`hs-dropdown-menu ${isOpen ? 'block' : 'hidden'} bg-white shadow-lg`}>  
+    <div class={`dropdown ${isOpen ? 'block' : 'hidden'} bg-white shadow-lg`}>  
       <ul class="menu space-y-2">
         <li>
-          <a on:click={gotoCurrentLocation} class="w-full flex items-center px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-150 menu-item" title="Go to current location"><ion-icon name="home" size="small"></ion-icon></a>
+          <a on:click={gotoCurrentLocation} class="w-full flex items-center px-3 py-2 menu-item" title="Go to current location"><i class="fa-solid fa-house-user text-gray-800 dark:text-gray-200"></i></a>
         </li>
         <li>
-          <a on:click={handleManageSites} class="w-full flex items-center px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-150 menu-item" title="Manage sites"><ion-icon name="map" size="small"></ion-icon></a>
+          <a on:click={handleManageSites} class="w-full flex items-center px-3 py-2 menu-item" title="Manage sites"><i class="fa-solid fa-map text-gray-800 dark:text-gray-200"></i></a>
         </li>
         <li>
-          <a on:click={handleSettings} class="w-full flex items-center px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-150 menu-item" title="Settings"><ion-icon name="settings" size="small"></ion-icon></a>
+          <a on:click={handleSettings} class="w-full flex items-center px-3 py-2 menu-item" title="Settings"><i class="fa-solid fa-gear text-gray-800 dark:text-gray-200"></i></a>
         </li>
       </ul>
     </div>

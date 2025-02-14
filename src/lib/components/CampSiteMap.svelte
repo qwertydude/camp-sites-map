@@ -40,21 +40,10 @@
 
 			console.log('Creating map instance at:', { startLat, startLng });
 
-			// Fix for default marker icons
-			const defaultIconOptions = {
-				icon: 'leaf',
-				iconShape: 'circle',
-				iconSize: [20, 20],
-				iconColor: '#ff0000',
-				borderColor: '#ffffff',
-				borderWidth: 2,
-				popupAnchor: [1, -34],
-				shadowSize: [41, 41]
-			};
 
 			const sitePip = L.divIcon({
 				className: 'site-pip',
-				html: '<ion-icon name="location" ></ion-icon>'
+				html: '<i class="fa-solid fa-location-dot"></i>'
 			});
 
 			L.Marker.prototype.options.icon = sitePip;
@@ -284,7 +273,7 @@
 					.addTo(markersLayer);
 
 					// Add a tooltip to show site tile when hovered
-        marker.bindTooltip(site.name,{offset:[24,8]});
+        marker.bindTooltip(site.name,{offset:[10,-2],direction:'top'});
 
 				// Add click handler for the select button
         marker.on('popupopen', () => {
@@ -368,7 +357,7 @@
 			car: 'driving'
 		}[travelMode];
 
-		const url = `https://api.mapbox.com/directions/v5/mapbox/${mapboxProfile}/${start.lng},${start.lat};${end.lng},${end.lat}?geometries=geojson&access_token=${mapboxToken}`;
+		const url = `https://api.mapbox.com/directions/v5/mapbox/${mapboxProfile}/${start.lng},${start.lat};${end.lng},${end.lat}?alternatives=true&geometries=geojson&access_token=${mapboxToken}`;
 
 		try {
 			const response = await fetch(url);
@@ -377,7 +366,7 @@
 			if (data.routes.length === 0) {
 				throw new Error('No routes found');
 			}
-
+console.log("data:", data);
 			// Clear existing route
 			if (routeLayer) {
 				routeLayer.remove();
@@ -417,13 +406,13 @@ if (hours > 0) {
 					<h3 class="font-semibold text-gray-700 dark:text-gray-700 mb-2">Route Information</h3>
           <div class="travel-modes flex gap-2 mt-2">
               <button class="travel-mode-btn p-1 rounded-md ${travelMode === 'foot' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="foot">
-                  <ion-icon name="walk" size="small" class="${travelMode === 'foot' ? 'brightness-200' : ''}"></ion-icon>
+                  <i class="${travelMode === 'foot' ? 'brightness-200' : ''} fa-solid fa-person-walking"></i>
               </button>
               <button class="travel-mode-btn p-1 rounded-md ${travelMode === 'bike' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="bike">
-                  <ion-icon name="bicycle" size="small" class="${travelMode === 'bike' ? 'brightness-200' : ''}"></ion-icon>
+                  <i class="${travelMode === 'bike' ? 'brightness-200' : ''} fa-solid fa-bicycle"></i>
               </button>
               <button class="travel-mode-btn p-1 rounded-md ${travelMode === 'car' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="car">
-                  <ion-icon name="car" size="small" class="${travelMode === 'car' ? 'brightness-200' : ''}"></ion-icon>
+                  <i class="${travelMode === 'car' ? 'brightness-200' : ''} fa-solid fa-car"></i>
               </button>
           </div>
 					<p class="text-gray-700 dark:text-gray-700">${distanceKm} km - ${durationString}</p>
