@@ -1,11 +1,14 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-	content: ['./src/**/*.{html,js,svelte,ts}'],
+	content: ['./src/**/*.{html,js,svelte,ts}',
+		'./node_modules/preline/preline.js',
+//		'./node_modules/preline-ui/**/*.{html,js}',
+	],
 	theme: {
 	  extend: {},
 	},
-	plugins: [require("daisyui")],
-	daisyui: {
-	  themes: ["light"], // start with just the light theme
-	},
-  }
+	plugins: [
+		require('preline/plugin'),
+//		require('preline-ui'),
+	],
+}
