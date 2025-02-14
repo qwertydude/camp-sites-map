@@ -381,6 +381,41 @@ console.log("data:", data);
 				}
 			}).addTo(map);
 
+			// Add click handler to the route
+			routeLayer.on('click', (e) => {
+				const popup = L.popup()
+					.setLatLng(e.latlng)
+					.setContent(`
+						<div class="route-info p-2">
+							<h3 class="font-semibold text-gray-700 dark:text-gray-700 mb-2">Route Information</h3>
+							<div class="travel-modes flex gap-2 mt-2">
+								<button class="travel-mode-btn p-1 rounded-md ${travelMode === 'foot' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="foot">
+									<i class="${travelMode === 'foot' ? 'brightness-200' : ''} fa-solid fa-person-walking"></i>
+								</button>
+								<button class="travel-mode-btn p-1 rounded-md ${travelMode === 'bike' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="bike">
+									<i class="${travelMode === 'bike' ? 'brightness-200' : ''} fa-solid fa-bicycle"></i>
+								</button>
+								<button class="travel-mode-btn p-1 rounded-md ${travelMode === 'car' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="car">
+									<i class="${travelMode === 'car' ? 'brightness-200' : ''} fa-solid fa-car"></i>
+								</button>
+							</div>
+							<p class="text-gray-700 dark:text-gray-700">${data.routes[0].distance / 1000} km - ${Math.round(data.routes[0].duration / 60)} min</p>
+						</div>
+					`)
+					.openOn(map);
+
+				// Add click handlers for the travel mode buttons after popup is added to DOM
+				setTimeout(() => {
+					document.querySelectorAll('.travel-mode-btn').forEach(btn => {
+						btn.addEventListener('click', (event) => {
+							const mode = event.currentTarget.dataset.mode;
+							travelMode = mode;
+							calculateRoute(start, end);
+						});
+					});
+				}, 0);
+			});
+
 			// Zoom to the route when generated
 			map.fitBounds(routeLayer.getBounds());
 
