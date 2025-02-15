@@ -194,11 +194,14 @@
 			});
 
 			// Initialize the store
+			let unsubscribe;
 			unsubscribe = campSitesStore.initialize();
 
 			// Wait for map to load before adding markers
 			map.on('load', () => {
-				updateMarkers(campSitesStore.get());
+				campSitesStore.subscribe((sites) => {
+					updateMarkers(sites);
+				});
 			});
 
 			console.log('Map initialization complete');
@@ -241,7 +244,6 @@
 		if (!browser) return;
 
 		console.log('CampSiteMap onMount called');
-		await loadLeaflet();
 
 		setTimeout(() => {
 			if ('geolocation' in navigator) {
@@ -304,8 +306,9 @@
 		if (unsubscribe) unsubscribe();
 	});
 
+	let unsubscribe;
 	// Subscribe to camp sites store
-	campSitesStore.subscribe((sites) => {
+	unsubscribe = campSitesStore.subscribe((sites) => {
 		if (browser && map) {
 			updateMarkers(sites);
 		}
