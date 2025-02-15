@@ -58,7 +58,7 @@
             <i class="fa-solid fa-gear text-md text-gray-800 dark:text-gray-200"></i></a>
         </li>
         <li>
-          <a on:click={() => campSiteMap.switchLayer()} class="w-full flex items-center p-3 menu-item" title="Switch Map Layer">
+          <a on:click={campSiteMap.switchLayer} class="w-full flex items-center p-3 menu-item" title="Switch Map Layer">
             <i class="fa-solid fa-layer-group text-md text-gray-800 dark:text-gray-200"></i>
           </a>
         </li>
