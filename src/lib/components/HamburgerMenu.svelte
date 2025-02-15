@@ -44,7 +44,7 @@
     </label>
 
     <div class={`dropdown ${isOpen ? 'block' : 'hidden'} bg-white dark:bg-gray-700 shadow-lg`}>  
-      <ul class="menu space-y-2">
+      <ul class="menu space-y-2 cursor-pointer">
         <li>
           <a on:click={gotoCurrentLocation} class="w-full flex items-center p-3 menu-item" title="Go to current location">
             <i class="fa-solid fa-house-user text-md text-gray-800 dark:text-gray-200"></i></a>

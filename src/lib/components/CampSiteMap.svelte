@@ -518,6 +518,7 @@
 	}
 
 	function switchLayer() {
+		console.log('switchLayer function called');
 		if (currentLayer === standardLayer) {
 			map.removeLayer(standardLayer);
 			map.addLayer(satelliteLayer);
