@@ -18,6 +18,25 @@
 	let selectedSites = [];
 	let currentRouteLayer;
 	let travelMode = 'foot';
+
+	function getRouteInfoTemplate(mode, content) {
+		return `
+			<div class="route-info p-2 bg-transparent">
+				<h3 class="font-semibold text-gray-700 dark:text-gray-700 mb-2">Route Information</h3>
+				<div class="travel-modes flex gap-2 mt-2">
+					<button class="travel-mode-btn p-1 rounded-md ${mode === 'foot' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="foot">
+						<i class="${mode === 'foot' ? 'brightness-200' : ''} fa-solid fa-person-walking"></i>
+					</button>
+					<button class="travel-mode-btn p-1 rounded-md ${mode === 'bike' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="bike">
+						<i class="${mode === 'bike' ? 'brightness-200' : ''} fa-solid fa-bicycle"></i>
+					</button>
+					<button class="travel-mode-btn p-1 rounded-md ${mode === 'car' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="car">
+						<i class="${mode === 'car' ? 'brightness-200' : ''} fa-solid fa-car"></i>
+					</button>
+				</div>
+				<p class="text-gray-700 dark:text-gray-700">${content}</p>
+			</div>
+		`;
 	let startMarker;
 	let endMarker;
 
@@ -389,25 +408,7 @@
 			currentRouteLayer.on('click', async (e) => {
 				const popup = L.popup()
 					.setLatLng(e.latlng)
-					.setContent(
-						`
-						<div class="route-info p-2">
-							<h3 class="font-semibold text-gray-700 dark:text-gray-700 mb-2">Route Information</h3>
-							<div class="travel-modes flex gap-2 mt-2">
-								<button class="travel-mode-btn p-1 rounded-md ${travelMode === 'foot' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="foot">
-									<i class="${travelMode === 'foot' ? 'brightness-200' : ''} fa-solid fa-person-walking"></i>
-								</button>
-								<button class="travel-mode-btn p-1 rounded-md ${travelMode === 'bike' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="bike">
-									<i class="${travelMode === 'bike' ? 'brightness-200' : ''} fa-solid fa-bicycle"></i>
-								</button>
-								<button class="travel-mode-btn p-1 rounded-md ${travelMode === 'car' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="car">
-									<i class="${travelMode === 'car' ? 'brightness-200' : ''} fa-solid fa-car"></i>
-								</button>
-							</div>
-							<p class="text-gray-700 dark:text-gray-700">${routes}</p>
-						</div>
-					`
-					)
+					.setContent(getRouteInfoTemplate(travelMode, routes))
 					.openOn(map);
 
 				// Add click handlers for the travel mode buttons after popup is added to DOM
@@ -443,23 +444,7 @@
 			//routes = routeDDList.join('<br>');
 			
 			const popupContent = document.createElement('div');
-			popupContent.innerHTML = `
-				<div class="route-info bg-white dark:bg-gray-800">
-					<h3 class="font-semibold text-gray-700 dark:text-gray-700 mb-2">Route Information</h3>
-					<div class="travel-modes flex gap-2 mt-2">
-						<button class="travel-mode-btn p-1 rounded-md ${travelMode === 'foot' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="foot">
-							<i class="${travelMode === 'foot' ? 'brightness-200' : ''} fa-solid fa-person-walking"></i>
-						</button>
-						<button class="travel-mode-btn p-1 rounded-md ${travelMode === 'bike' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="bike">
-							<i class="${travelMode === 'bike' ? 'brightness-200' : ''} fa-solid fa-bicycle"></i>
-						</button>
-						<button class="travel-mode-btn p-1 rounded-md ${travelMode === 'car' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="car">
-							<i class="${travelMode === 'car' ? 'brightness-200' : ''} fa-solid fa-car"></i>
-						</button>
-					</div>
-					<p class="text-gray-700 dark:text-gray-700">${routes}</p>
-				</div>
-			`;
+			popupContent.innerHTML = getRouteInfoTemplate(travelMode, routes);
 
 			// Add event listener to the popup content
 			popupContent.addEventListener('click', async (event) => {
