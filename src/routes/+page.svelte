@@ -12,6 +12,7 @@
   let isMenuOpen = false;
   let isSitesPanelOpen = false;
   let isSettingsPanelOpen = false;
+  let campSiteMap;
 
   onMount(() => {
     if (browser) {
@@ -50,10 +51,12 @@
     map={mapInstance}
     on:manageSites={handleManageSites}
     on:openSettings={handleOpenSettings}
+    campSiteMap={campSiteMap}
   />
   
   <CampSiteMap 
     on:mapInit={handleMapInit}
+    bind:this={campSiteMap}
   />
   
   <SitesPanel

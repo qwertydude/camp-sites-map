@@ -530,7 +530,6 @@
 	}
 </script>
 
-<HamburgerMenu isOpen={isOpen} map={map} switchLayer={switchLayer} />
 <div id="map" class="map-container" class:add-site-mode={isAddSiteMode}></div>
 
 <style>
