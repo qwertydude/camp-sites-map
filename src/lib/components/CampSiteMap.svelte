@@ -14,7 +14,7 @@
 	let unsubscribe;
 	let isAddSiteMode = false;
 	let selectedSites = [];
-	let routeLayers = [];
+	let routeLayer;
 	let selectedRoute = 0;
 	let currentRouteIndex = 0;
 	let travelMode = 'foot';
@@ -41,7 +41,6 @@
 			const startLng = position ? position.coords.longitude : 146.8884086608887;
 
 			console.log('Creating map instance at:', { startLat, startLng });
-
 
 			const sitePip = L.divIcon({
 				className: 'site-pip',
@@ -274,81 +273,81 @@
 					)
 					.addTo(markersLayer);
 
-					// Add a tooltip to show site tile when hovered
-        marker.bindTooltip(site.name,{offset:[10,-2],direction:'top'});
+				// Add a tooltip to show site tile when hovered
+				marker.bindTooltip(site.name, { offset: [10, -2], direction: 'top' });
 
 				// Add click handler for the select button
-        marker.on('popupopen', () => {
-    const btn = document.querySelector('.select-site-btn');
-    const buttonLabel = btn.querySelector('.button-label');
-    
-    // Update button label based on selected sites
-    if (selectedSites.length === 0) {
-        buttonLabel.classList.add('start');
-        buttonLabel.classList.remove('end');
-    } else if (selectedSites.length === 1) {
-        buttonLabel.classList.remove('start');
-        buttonLabel.classList.add('end');
-    } else if (selectedSites.length === 2) {
-        buttonLabel.classList.add('start');
-        buttonLabel.classList.remove('end');
-    }
+				marker.on('popupopen', () => {
+					const btn = document.querySelector('.select-site-btn');
+					const buttonLabel = btn.querySelector('.button-label');
 
-    if (btn) {
-        btn.addEventListener('click', () => {
-            const isSelected = selectedSites.some((s) => s.id === site.id);
-            if (isSelected) {
-                selectedSites = selectedSites.filter((s) => s.id !== site.id);
-                marker.getElement().classList.remove('start', 'end');
-                buttonLabel.classList.add('start');
-                buttonLabel.classList.remove('end');
-            } else {
-                // Clear existing route and markers if we already have a route
-                if (selectedSites.length === 2) {
-                    // Clear the route
-                    if (routeLayer) {
-                        routeLayer.remove();
-                    }
-                    // Clear all start/end classes
-                    document.querySelectorAll('.site-pip').forEach(pip => {
-                        pip.classList.remove('start', 'end');
-                    });
-                    // Reset selected sites
-                    selectedSites = [];
-                }
+					// Update button label based on selected sites
+					if (selectedSites.length === 0) {
+						buttonLabel.classList.add('start');
+						buttonLabel.classList.remove('end');
+					} else if (selectedSites.length === 1) {
+						buttonLabel.classList.remove('start');
+						buttonLabel.classList.add('end');
+					} else if (selectedSites.length === 2) {
+						buttonLabel.classList.add('start');
+						buttonLabel.classList.remove('end');
+					}
 
-                if (selectedSites.length >= 2) {
-                    selectedSites.shift(); // Remove the first site if we already have 2
-                }
-                selectedSites = [
-                    ...selectedSites,
-                    { id: site.id, lat: site.latitude, lng: site.longitude }
-                ];
+					if (btn) {
+						btn.addEventListener('click', () => {
+							const isSelected = selectedSites.some((s) => s.id === site.id);
+							if (isSelected) {
+								selectedSites = selectedSites.filter((s) => s.id !== site.id);
+								marker.getElement().classList.remove('start', 'end');
+								buttonLabel.classList.add('start');
+								buttonLabel.classList.remove('end');
+							} else {
+								// Clear existing route and markers if we already have a route
+								if (selectedSites.length === 2) {
+									// Clear the route
+									if (routeLayer) {
+										routeLayer.remove();
+									}
+									// Clear all start/end classes
+									document.querySelectorAll('.site-pip').forEach((pip) => {
+										pip.classList.remove('start', 'end');
+									});
+									// Reset selected sites
+									selectedSites = [];
+								}
 
-                // Add start or end class based on selection
-                if (selectedSites.length === 1) {
-                    marker.getElement().classList.add('start');
-                    buttonLabel.classList.remove('start');
-                    buttonLabel.classList.add('end');
-                } else if (selectedSites.length === 2) {
-                    marker.getElement().classList.add('end');
-                    buttonLabel.classList.add('start');
-                    buttonLabel.classList.remove('end');
-                }
-            }
+								if (selectedSites.length >= 2) {
+									selectedSites.shift(); // Remove the first site if we already have 2
+								}
+								selectedSites = [
+									...selectedSites,
+									{ id: site.id, lat: site.latitude, lng: site.longitude }
+								];
 
-            // If we have 2 sites selected, calculate the route
-            if (selectedSites.length === 2) {
-                calculateRoute(selectedSites[0], selectedSites[1]);
-            } else if (routeLayer) {
-                routeLayer.remove(); // Clear the route if we have fewer than 2 sites
-            }
+								// Add start or end class based on selection
+								if (selectedSites.length === 1) {
+									marker.getElement().classList.add('start');
+									buttonLabel.classList.remove('start');
+									buttonLabel.classList.add('end');
+								} else if (selectedSites.length === 2) {
+									marker.getElement().classList.add('end');
+									buttonLabel.classList.add('start');
+									buttonLabel.classList.remove('end');
+								}
+							}
 
-            marker.closePopup();
-        });
-    }
-});
-      });
+							// If we have 2 sites selected, calculate the route
+							if (selectedSites.length === 2) {
+								calculateRoute(selectedSites[0], selectedSites[1]);
+							// } else if (routeLayer) {
+							// 	routeLayer.remove(); // Clear the route if we have fewer than 2 sites
+							}
+
+							marker.closePopup();
+						});
+					}
+				});
+			});
 		}
 	});
 
@@ -365,12 +364,18 @@
 			const response = await fetch(url);
 			const data = await response.json();
 			const routesCount = data.routes.length;
-			const routeDDList = data.routes.map((route, index) => `Route ${index + 1}: ${route.distance / 1000} km - ${Math.round(route.duration / 60)} min`);
+			const routeDDList = data.routes.map(
+				(route, index) =>
+					`Route ${index + 1}: ${route.distance / 1000} km - ${Math.round(route.duration / 60)} min`
+			);
+
+			console.log('routeDDList:', routeDDList);
+			console.log('selectedRoute:', selectedRoute);
 
 			if (routesCount === 0) {
 				throw new Error('No routes found');
 			}
-console.log("data:", data);
+			console.log('data:', data);
 			// Clear existing route
 			if (routeLayer) {
 				routeLayer.remove();
@@ -389,7 +394,8 @@ console.log("data:", data);
 			routeLayer.on('click', (e) => {
 				const popup = L.popup()
 					.setLatLng(e.latlng)
-					.setContent(`
+					.setContent(
+						`
 						<div class="route-info p-2">
 							<h3 class="font-semibold text-gray-700 dark:text-gray-700 mb-2">Route Information</h3>
 							<div class="travel-modes flex gap-2 mt-2">
@@ -405,12 +411,13 @@ console.log("data:", data);
 							</div>
 							<p class="text-gray-700 dark:text-gray-700">${routeDDList[selectedRoute]}</p>
 						</div>
-					`)
+					`
+					)
 					.openOn(map);
 
 				// Add click handlers for the travel mode buttons after popup is added to DOM
 				setTimeout(() => {
-					document.querySelectorAll('.travel-mode-btn').forEach(btn => {
+					document.querySelectorAll('.travel-mode-btn').forEach((btn) => {
 						btn.addEventListener('click', (event) => {
 							const mode = event.currentTarget.dataset.mode;
 							travelMode = mode;
@@ -425,18 +432,17 @@ console.log("data:", data);
 
 			// Calculate distance in kilometers
 			const distanceKm = (data.routes[selectedRoute].distance / 1000).toFixed(1);
-      const durationInMinutes = Math.round(data.routes[0].duration / 60); // Convert seconds to minutes
-const hours = Math.floor(durationInMinutes / 60);
-const minutes = durationInMinutes % 60;
+			const durationInMinutes = Math.round(data.routes[0].duration / 60); // Convert seconds to minutes
+			const hours = Math.floor(durationInMinutes / 60);
+			const minutes = durationInMinutes % 60;
 
-// Format the duration string
-let durationString;
-if (hours > 0) {
-    durationString = `${hours} hr${hours > 1 ? 's' : ''} ${minutes} min${minutes !== 1 ? 's' : ''}`;
-} else {
-    durationString = `${minutes} min${minutes !== 1 ? 's' : ''}`;
-}
-
+			// Format the duration string
+			let durationString;
+			if (hours > 0) {
+				durationString = `${hours} hr${hours > 1 ? 's' : ''} ${minutes} min${minutes !== 1 ? 's' : ''}`;
+			} else {
+				durationString = `${minutes} min${minutes !== 1 ? 's' : ''}`;
+			}
 
 			// Show the route information in a popup
 			const popupContent = document.createElement('div');
@@ -454,7 +460,9 @@ if (hours > 0) {
                   <i class="${travelMode === 'car' ? 'brightness-200' : ''} fa-solid fa-car"></i>
               </button>
           </div>
-					<p class="text-gray-700 dark:text-gray-700">${distanceKm} km - ${durationString}</p>
+					{#each routeDDList as route, index}
+						<p class="text-gray-700 dark:text-gray-700">${route}</p>
+					{/each}
 				</div>
 			`;
 
