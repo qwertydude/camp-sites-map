@@ -220,7 +220,7 @@
 			const el = document.createElement('div');
 			el.className = 'site-pip-container';
 			el.innerHTML = '<i class="fa-solid fa-location-dot text-3xl drop-shadow-md site-pip"></i>';
-
+console.log('selectedSites', selectedSites)
 			const popup = new mapboxgl.Popup()
 				.setHTML(
 					`
@@ -228,14 +228,14 @@
 							${site.name ? `<h3>${site.name}</h3>` : ''}
 							${site.description ? `<p>${site.description}</p>` : ''}
 							<div class="popup-buttons">
-								${selectedSites.length === 0 || selectedSites[0].id !== site.id ? '<button class="route-btn start-route bg-blue-500 pt-1 pb-1 pl-2 pr-2 rounded-md text-white" >Start Route</button>' : ''}
-								${selectedSites.length === 1 && selectedSites[0].id !== site.id ? '<button class="route-btn end-route bg-blue-500 pt-1 pb-1 pl-2 pr-2 rounded-md text-white" >End Route</button>' : ''}
+								${selectedSites.length === 0 || selectedSites[0].id !== site.id ? '<button class="route-btn start-route bg-blue-500 pt-1 pb-1 pl-2 pr-2 rounded-md text-white">Start Route</button>' : ''}
+								${selectedSites.length === 1 && selectedSites[0].id === site.id ? '<button class="route-btn end-route bg-blue-500 pt-1 pb-1 pl-2 pr-2 rounded-md text-white">End Route</button>' : ''}
 							</div>
 						</div>
 					`
 				)
 
-			const marker = new mapboxgl.Marker({color:'blue'})
+			const marker = new mapboxgl.Marker({color:'blue',className:'site-pip'})
 				.setLngLat([site.longitude, site.latitude])
 				.setPopup(popup)
 				.addTo(map);
@@ -251,20 +251,19 @@
 					// Add click handlers
 					if (startRoute) {
 						startRoute.addEventListener('click', () => {
-							console.log('Details button clicked');
-							setRouteStart(site,marker)
+							console.log('Start route button clicked');
+							setRouteStart(site, popup);
 						});
 					}
 					if (endRoute) {
 						endRoute.addEventListener('click', () => {
-							console.log('Directions button clicked');
-							setRouteEnd(site,marker)});
+							console.log('End route button clicked');
+							setRouteEnd(site, popup);
+						});
 					}
-				})
-
+				});	
 		});
 	}
-
 	onMount(async () => {
 		if (!browser) return;
 
@@ -486,19 +485,53 @@
 		isSettingsPanelOpen = true;
 	}
 
-	function setRouteStart(site, marker) {
+	function setRouteStart(site, popup) {
 		selectedSites = [{ id: site.id, lat: site.latitude, lng: site.longitude }];
 		console.log('Route start set:', selectedSites);
-		console.log('Marker:', marker);
-		marker.options.color = 'green';
-		// Additional logic to visually indicate the start point can be added here
+
+		// Remove the old marker
+		const oldMarker = markers.get(site.id);
+		if (oldMarker) {
+			oldMarker.remove();
+		}
+
+		// Create a new marker with green color
+		const newMarker = new mapboxgl.Marker({ 
+			color: '#4CAF50',
+			className: 'site-pip start'
+		})
+			.setLngLat([site.longitude, site.latitude])
+			.setPopup(popup)
+			.addTo(map);
+		
+		// Update the markers Map with the new marker
+		markers.set(site.id, newMarker);
 	}
 
-	function setRouteEnd(site, marker) {
+	function setRouteEnd(site, popup) {
 		if (selectedSites.length === 1) {
 			selectedSites.push({ id: site.id, lat: site.latitude, lng: site.longitude });
 			console.log('Route end set:', selectedSites);
-			// Additional logic to calculate and display the route can be added here
+
+			// Remove the old marker
+			const oldMarker = markers.get(site.id);
+			if (oldMarker) {
+				oldMarker.remove();
+			}
+
+			// Create a new marker with orange color
+			const newMarker = new mapboxgl.Marker({ 
+				color: '#FF9800',
+				className: 'site-pip end'
+			})
+				.setLngLat([site.longitude, site.latitude])
+				.setPopup(popup)
+				.addTo(map);
+			
+			// Update the markers Map with the new marker
+			markers.set(site.id, newMarker);
+
+			// Calculate the route
 			calculateRoute(selectedSites[0], selectedSites[1]);
 		}
 	}
