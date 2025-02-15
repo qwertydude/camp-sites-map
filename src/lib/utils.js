@@ -70,3 +70,13 @@ export async function getCurrentLocation(map, settings) {
         }
     }
 }
+
+export async function drawRoute(map, routeGeometry) {
+  return L.geoJSON(routeGeometry, {
+    style: {
+      color: '#4A90E2',
+      weight: 5,
+      opacity: 0.7
+    }
+  }).addTo(map);
+}

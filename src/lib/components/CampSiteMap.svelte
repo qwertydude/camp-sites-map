@@ -3,6 +3,8 @@
 	import { browser } from '$app/environment';
 	import { campSitesStore } from '$lib/stores/campSites';
 	import { createEventDispatcher } from 'svelte';
+	import { getCurrentLocation } from '$lib/utils';
+	import { drawRoute } from '$lib/utils';
 	import { settings } from '$lib/stores/settings.js';
 
 	const dispatch = createEventDispatcher();
@@ -381,13 +383,7 @@
 			}
 
 			// Draw the new route
-			currentRouteLayer = L.geoJSON(data.routes[0].geometry, {
-				style: {
-					color: '#4A90E2',
-					weight: 4,
-					opacity: 0.7
-				}
-			}).addTo(map);
+			currentRouteLayer = drawRoute(map, data.routes[0].geometry);
 
 			// Add click handler to the route
 			currentRouteLayer.on('click', (e) => {
@@ -471,13 +467,7 @@
 					const index = event.target.dataset.index;
 					console.log('Clicked route index:', index);
 					currentRouteLayer.remove();
-					currentRouteLayer = L.geoJSON(data.routes[index].geometry, {
-						style: {
-							color: 'blue',
-							weight: 5,
-							opacity: 0.7
-						}
-					}).addTo(map);
+					currentRouteLayer = drawRoute(map, data.routes[index].geometry);
 					map.fitBounds(currentRouteLayer.getBounds());
 				}
 			});
