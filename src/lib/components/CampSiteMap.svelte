@@ -6,6 +6,7 @@
 	import { getCurrentLocation } from '$lib/utils';
 	import { drawRoute } from '$lib/utils';
 	import { settings } from '$lib/stores/settings.js';
+	import HamburgerMenu from '$lib/components/HamburgerMenu.svelte';
 
 	const dispatch = createEventDispatcher();
 	const mapboxToken = import.meta.env.PUBLIC_MAPBOX_ACCESS_TOKEN;
@@ -22,6 +23,8 @@
 	let satelliteLayer;
 	let standardLayer;
 	let currentLayer;
+
+	let isOpen = false;
 
 	function getRouteInfoTemplate(mode, content) {
 		return `
@@ -527,6 +530,7 @@
 	}
 </script>
 
+<HamburgerMenu isOpen={isOpen} map={map} switchLayer={switchLayer} />
 <div id="map" class="map-container" class:add-site-mode={isAddSiteMode}></div>
 
 <style>
