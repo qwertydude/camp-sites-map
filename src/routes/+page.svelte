@@ -46,13 +46,15 @@
 </svelte:head>
 
 <main class="relative h-screen w-screen overflow-hidden">
-  <HamburgerMenu 
-    bind:isOpen={isMenuOpen}
-    map={mapInstance}
-    on:manageSites={handleManageSites}
-    on:openSettings={handleOpenSettings}
-    campSiteMap={campSiteMap}
-  />
+  {campSiteMap && (
+    <HamburgerMenu 
+      bind:isOpen={isMenuOpen}
+      map={mapInstance}
+      on:manageSites={handleManageSites}
+      on:openSettings={handleOpenSettings}
+      campSiteMap={campSiteMap}
+    />
+  )}
   
   <CampSiteMap 
     on:mapInit={handleMapInit}
