@@ -9,24 +9,23 @@
 	import HamburgerMenu from '$lib/components/HamburgerMenu.svelte';
 	import SitesPanel from '$lib/components/SitesPanel.svelte';
 	import SettingsPanel from '$lib/components/SettingsPanel.svelte';
+	import mapboxgl from 'mapbox-gl';
+	import 'mapbox-gl/dist/mapbox-gl.css';
 
 	const dispatch = createEventDispatcher();
 	const mapboxToken = import.meta.env.PUBLIC_MAPBOX_ACCESS_TOKEN;
+	mapboxgl.accessToken = mapboxToken;
 
-	let L;
 	let map;
-	let markersLayer;
-	let unsubscribe;
+	let markers = new Map(); // Store markers with site IDs
 	let isAddSiteMode = false;
 	let selectedSites = [];
 	let currentRouteLayer;
 	let travelMode = 'foot';
 	let isMenuOpen = false;
-	let satelliteLayer;
-	let standardLayer;
-	let currentLayer;
 	let isSitesPanelOpen = false;
 	let isSettingsPanelOpen = false;
+	let currentStyle = 'mapbox://styles/mapbox/streets-v12'; // Default style
 
 
 	let isOpen = false;
@@ -523,21 +522,17 @@
 	}
 
 	function switchLayer() {
-		if (currentLayer === standardLayer) {
-			map.addLayer(satelliteLayer); // Add the new layer first
-			standardLayer.getContainer().classList.add('fade-out'); // Apply fade-out animation
-			setTimeout(() => {
-				map.removeLayer(standardLayer); // Remove the old layer after the animation completes
-			}, 300); // Match the duration of the CSS animation
-			currentLayer = satelliteLayer;
-		} else {
-			map.addLayer(standardLayer); // Add the new layer first
-			satelliteLayer.getContainer().classList.add('fade-out'); // Apply fade-out animation
-			setTimeout(() => {
-				map.removeLayer(satelliteLayer); // Remove the old layer after the animation completes
-			}, 300); // Match the duration of the CSS animation
-			currentLayer = standardLayer;
-		}
+		const newStyle = currentStyle === 'mapbox://styles/mapbox/streets-v12' 
+			? 'mapbox://styles/mapbox/satellite-streets-v12'
+			: 'mapbox://styles/mapbox/streets-v12';
+		
+		map.setStyle(newStyle);
+		currentStyle = newStyle;
+
+		// Re-add markers after style change
+		map.once('style.load', () => {
+			updateMarkers(campSitesStore.get());
+		});
 	}
 	function handleManageSites() {
 		isSitesPanelOpen = true;
