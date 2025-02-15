@@ -523,14 +523,13 @@
 	}
 
 	function switchLayer() {
-		console.log('switchLayer function called');
 		if (currentLayer === standardLayer) {
-			map.removeLayer(standardLayer);
-			map.addLayer(satelliteLayer);
+			map.addLayer(satelliteLayer); // Add the new layer first
+			map.removeLayer(standardLayer); // Then remove the old layer
 			currentLayer = satelliteLayer;
 		} else {
-			map.removeLayer(satelliteLayer);
-			map.addLayer(standardLayer);
+			map.addLayer(standardLayer); // Add the new layer first
+			map.removeLayer(satelliteLayer); // Then remove the old layer
 			currentLayer = standardLayer;
 		}
 	}
