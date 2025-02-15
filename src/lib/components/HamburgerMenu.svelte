@@ -7,6 +7,8 @@
   export let map;
   export let campSiteMap;
 
+  console.log('campSiteMap in HamburgerMenu:', campSiteMap);
+
   const dispatch = createEventDispatcher();
 
   function handleManageSites() {
@@ -26,7 +28,8 @@
   }
 
   function handleSwitchLayer() {
-    campSiteMap.switchLayer();
+    console.log('handleSwitchLayer called');
+    campSiteMap.switchLayer($settings); // Corrected function call
   }
 </script>
 

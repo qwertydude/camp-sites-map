@@ -48,11 +48,11 @@
 	{#if campSiteMap}
 		<HamburgerMenu
 			bind:isOpen={isMenuOpen}
-			map={mapInstance}
-			on:manageSites={handleManageSites}
-			on:openSettings={handleOpenSettings}
-			{campSiteMap}
-		/>
+      bind:map={mapInstance}
+      bind:campSiteMap={campSiteMap}
+      on:manageSites={handleManageSites}
+      on:openSettings={handleOpenSettings}
+  />
 	{/if}
 
 	<CampSiteMap on:mapInit={handleMapInit} bind:this={campSiteMap} />
