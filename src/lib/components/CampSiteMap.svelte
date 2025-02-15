@@ -364,13 +364,14 @@
 			const response = await fetch(url);
 			const data = await response.json();
 			const routesCount = data.routes.length;
-			const routeDDList = data.routes.map(
-				(route, index) =>
-					`Route ${index + 1}: ${route.distance / 1000} km - ${Math.round(route.duration / 60)} min`
+			const routeDDList = data.routes.map((route, index) =>
+				`Route ${index + 1}: ${Math.round(route.distance / 1000, 1)} km - ${Math.round(route.duration / 60, 1)} min`
 			);
 
+//			console.log('selectedRoute:', selectedRoute);
 			console.log('routeDDList:', routeDDList);
-			console.log('selectedRoute:', selectedRoute);
+			console.log('typeof routeDDList:', typeof routeDDList);
+			console.log('Is routeDDList an array?', Array.isArray(routeDDList));
 
 			if (routesCount === 0) {
 				throw new Error('No routes found');
@@ -445,9 +446,11 @@
 			}
 
 			// Show the route information in a popup
+			let routes = routeDDList.join('<br>');
+			
 			const popupContent = document.createElement('div');
 			popupContent.innerHTML = `
-				<div class="route-info bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+				<div class="route-info bg-white dark:bg-gray-800">
 					<h3 class="font-semibold text-gray-700 dark:text-gray-700 mb-2">Route Information</h3>
           <div class="travel-modes flex gap-2 mt-2">
               <button class="travel-mode-btn p-1 rounded-md ${travelMode === 'foot' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="foot">
@@ -460,9 +463,7 @@
                   <i class="${travelMode === 'car' ? 'brightness-200' : ''} fa-solid fa-car"></i>
               </button>
           </div>
-					{#each routeDDList as route, index}
-						<p class="text-gray-700 dark:text-gray-700">${route}</p>
-					{/each}
+					<p class="text-gray-700 dark:text-gray-700">${routes}</p>
 				</div>
 			`;
 
@@ -527,29 +528,6 @@
 		cursor: crosshair;
 	}
 
-	.add-site-popup {
-		@apply rounded-lg bg-white p-4 text-gray-900;
-	}
-
-	.add-site-popup h3 {
-		@apply mb-3 text-lg font-semibold text-gray-800;
-	}
-
-	.site-input {
-		@apply mb-3 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500;
-	}
-
-	.popup-buttons {
-		@apply mt-3 flex justify-between;
-	}
-
-	.confirm-btn {
-		@apply rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700;
-	}
-
-	.cancel-btn {
-		@apply rounded-md bg-gray-200 px-4 py-2 text-gray-800 hover:bg-gray-300;
-	}
 
 	/* Leaflet dark mode adjustments */
 	:global(.leaflet-popup.dark) {
@@ -561,7 +539,4 @@
 		color: rgb(229 231 235 / var(--tw-text-opacity));
 	}
 
-	.home-button {
-		@apply absolute left-4 top-4 rounded-md bg-gray-200 p-2 text-gray-800 hover:bg-gray-300;
-	}
 </style>
