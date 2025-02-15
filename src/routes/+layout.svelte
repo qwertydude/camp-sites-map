@@ -6,23 +6,10 @@
   let { children } = $props();
 
   onMount(() => {
-    // Subscribe to theme changes
-    settings.subscribe(($settings) => {
-      let theme = $settings.app.theme;
-      if (theme === 'system') {
-        theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      }
-      document.documentElement.classList.remove('light', 'dark');
-      document.documentElement.classList.add(theme);
-    });
-  });
-</script>
-{@render children()}
-.add(theme);
-    }
+    console.log('Layout mounted');
     
     // Subscribe to theme changes
-    settings.subscribe(($settings) => {
+    const unsubscribe = settings.subscribe(($settings) => {
       console.log('Settings changed:', $settings);
       let theme = $settings.app.theme;
       console.log('Current theme:', theme);
@@ -39,14 +26,22 @@
     });
     
     // Listen for system theme changes
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-      const currentTheme = settings.get().app.theme;
-      if (currentTheme === 'system') {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleThemeChange = (e) => {
+      const currentSettings = settings.get();
+      if (currentSettings.app.theme === 'system') {
         const newTheme = e.matches ? 'dark' : 'light';
         document.documentElement.classList.remove('light', 'dark');
         document.documentElement.classList.add(newTheme);
       }
-    });
+    };
+    
+    mediaQuery.addEventListener('change', handleThemeChange);
+    
+    return () => {
+      unsubscribe();
+      mediaQuery.removeEventListener('change', handleThemeChange);
+    };
   });
 </script>
 {@render children()}
