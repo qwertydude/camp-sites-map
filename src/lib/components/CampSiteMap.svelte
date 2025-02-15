@@ -37,6 +37,7 @@
 				<p class="text-gray-700 dark:text-gray-700">${content}</p>
 			</div>
 		`;
+	}
 	let startMarker;
 	let endMarker;
 
