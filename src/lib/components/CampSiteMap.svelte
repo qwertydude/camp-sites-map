@@ -529,10 +529,6 @@
 
 <div id="map" class="map-container" class:add-site-mode={isAddSiteMode}></div>
 
-<div class="layer-switcher">
-  <button on:click={switchLayer}>Switch Layer</button>
-</div>
-
 <style>
 	.map-container {
 		width: 100%;
@@ -542,16 +538,6 @@
 
 	.map-container.add-site-mode {
 		cursor: crosshair;
-	}
-
-	.layer-switcher {
-		position: absolute;
-		top: 10px;
-		right: 10px;
-		background: white;
-		padding: 5px;
-		border-radius: 5px;
-		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 	}
 
 	/* Leaflet dark mode adjustments */
