@@ -525,11 +525,15 @@
 	function switchLayer() {
 		if (currentLayer === standardLayer) {
 			map.addLayer(satelliteLayer); // Add the new layer first
-			map.removeLayer(standardLayer); // Then remove the old layer
+			setTimeout(() => {
+				map.removeLayer(standardLayer); // Remove the old layer after a short delay
+			}, 100);
 			currentLayer = satelliteLayer;
 		} else {
 			map.addLayer(standardLayer); // Add the new layer first
-			map.removeLayer(satelliteLayer); // Then remove the old layer
+			setTimeout(() => {
+				map.removeLayer(satelliteLayer); // Remove the old layer after a short delay
+			}, 100);
 			currentLayer = standardLayer;
 		}
 	}
