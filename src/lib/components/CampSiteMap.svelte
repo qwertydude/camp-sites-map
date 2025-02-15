@@ -525,15 +525,17 @@
 	function switchLayer() {
 		if (currentLayer === standardLayer) {
 			map.addLayer(satelliteLayer); // Add the new layer first
+			standardLayer.getContainer().classList.add('fade-out'); // Apply fade-out animation
 			setTimeout(() => {
-				map.removeLayer(standardLayer); // Remove the old layer after a short delay
-			}, 100);
+				map.removeLayer(standardLayer); // Remove the old layer after the animation completes
+			}, 300); // Match the duration of the CSS animation
 			currentLayer = satelliteLayer;
 		} else {
 			map.addLayer(standardLayer); // Add the new layer first
+			satelliteLayer.getContainer().classList.add('fade-out'); // Apply fade-out animation
 			setTimeout(() => {
-				map.removeLayer(satelliteLayer); // Remove the old layer after a short delay
-			}, 100);
+				map.removeLayer(satelliteLayer); // Remove the old layer after the animation completes
+			}, 300); // Match the duration of the CSS animation
 			currentLayer = standardLayer;
 		}
 	}
@@ -579,5 +581,19 @@
 
 	:global(.leaflet-popup.dark .leaflet-popup-content) {
 		color: rgb(229 231 235 / var(--tw-text-opacity));
+	}
+
+	/* Fade-out animation for layer switching */
+	.fade-out {
+		animation: fade-out 0.3s;
+	}
+
+	@keyframes fade-out {
+		0% {
+			opacity: 1;
+		}
+		100% {
+			opacity: 0;
+		}
 	}
 </style>
