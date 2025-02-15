@@ -23,6 +23,10 @@
   function closeMenu() {
     isOpen = false; // Set the menu state to closed
   }
+
+  function switchLayer() {
+    // Add the implementation for switching the map layer here
+  }
 </script>
 
 <div class="fixed top-0 left-2 z-30 h-full">
@@ -52,6 +56,18 @@
         </li>
         <li>
           <a on:click={handleSettings} class="w-full flex items-center p-3 menu-item" title="Settings"><i class="fa-solid fa-gear text-md text-gray-800 dark:text-gray-200"></i></a>
+        </li>
+        <li>
+          <a on:click={switchLayer} class="w-full flex items-center p-3 menu-item" title="Switch Map Layer">
+            <i class="fa-solid fa-layer-group text-md text-gray-800 dark:text-gray-200"></i>
+            <span>Switch Layer</span>
+          </a>
+        </li>
+        <li>
+          <a on:click={switchLayer} class="w-full flex items-center p-3 menu-item" title="Switch Map Layer">
+            <i class="fa-solid fa-layer-group text-md text-gray-800 dark:text-gray-200"></i>
+            <span>Switch Layer</span>
+          </a>
         </li>
       </ul>
     </div>
