@@ -386,7 +386,7 @@
 			currentRouteLayer = await drawRoute(map, data.routes[0].geometry);
 
 			// Add click handler to the route
-			currentRouteLayer.on('click', (e) => {
+			currentRouteLayer.on('click', async (e) => {
 				const popup = L.popup()
 					.setLatLng(e.latlng)
 					.setContent(
@@ -462,7 +462,7 @@
 			`;
 
 			// Add event listener to the popup content
-			popupContent.addEventListener('click', (event) => {
+			popupContent.addEventListener('click', async (event) => {
 				if (event.target.classList.contains('route-link')) {
 					const index = event.target.dataset.index;
 					console.log('Clicked route index:', index);
