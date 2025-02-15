@@ -274,7 +274,7 @@
 					.addTo(markersLayer);
 
 				// Add a tooltip to show site tile when hovered
-				marker.bindTooltip(site.name, { offset: [10, -2], direction: 'top' });
+				marker.bindTooltip(site.name, { offset: [10, -2], direction: 'top',className:'site-tooltip' });
 
 				// Add click handler for the select button
 				marker.on('popupopen', () => {

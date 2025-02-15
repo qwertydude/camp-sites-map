@@ -4,7 +4,7 @@ import { defineConfig } from 'vite';
 import path from 'path';
 
 export default defineConfig({
-	plugins: [sveltekit(), tailwindcss()],
+	plugins: [tailwindcss(), sveltekit()],
 	envPrefix: 'PUBLIC_',
 	server: {
     fs: {

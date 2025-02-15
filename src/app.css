@@ -55,6 +55,12 @@ body {
     color:red;
 }
 
+.dark .site-tooltip{
+    background-color: #333;
+    color: #eee;
+    border-color: white;
+}
+
 .button-label.start:after {
     content:"Start route here";
 }

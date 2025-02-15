@@ -34,7 +34,8 @@
       class="hamburger-menu
              p-3 mt-2
              text-md
-            @apply dark:bg-gray-700
+             dark:bg-gray-700
+             bg-gray-200
              dark:text-gray-200
              flex items-center justify-center cursor-pointer"
     >
