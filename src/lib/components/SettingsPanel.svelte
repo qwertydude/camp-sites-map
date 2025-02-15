@@ -40,23 +40,16 @@
       <div class="p-4 space-y-4">
         <div class="space-y-2">
           <h3 class="font-medium text-gray-700 dark:text-gray-300">Theme</h3>
-          <div>
-            <label class="block text-sm text-gray-600 dark:text-gray-400">Select Theme</label>
-            <select
-              value={$settings.app.theme}
-              on:change={updateTheme}
-              class="mt-1 w-full rounded 
-                border-gray-300 dark:border-gray-600 
-                bg-white dark:bg-gray-700 
-                text-gray-900 dark:text-gray-100
-                shadow-sm 
-                focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            >
-              <option value="system">System</option>
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-            </select>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Choose your preferred theme</p>
+          <div class="theme-button-bar">
+            <button class="theme-button" on:click={() => settings.changeTheme('light')}>
+              <i class="fa-solid fa-sun"></i>
+            </button>
+            <button class="theme-button" on:click={() => settings.changeTheme('dark')}>
+              <i class="fa-solid fa-moon"></i>
+            </button>
+            <button class="theme-button" on:click={() => settings.changeTheme('system')}>
+              <i class="fa-solid fa-desktop"></i>
+            </button>
           </div>
         </div>
 
