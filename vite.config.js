@@ -4,7 +4,12 @@ import { defineConfig } from 'vite';
 import path from 'path';
 
 export default defineConfig({
-	plugins: [sveltekit(),tailwindcss()],
+	plugins: [sveltekit(), tailwindcss()],
+	css: {
+		postcss: {
+			plugins: [require('autoprefixer')]
+		}
+	},
 	envPrefix: 'PUBLIC_',
 	server: {
     fs: {
