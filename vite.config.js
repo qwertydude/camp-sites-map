@@ -5,11 +5,6 @@ import path from 'path';
 
 export default defineConfig({
 	plugins: [sveltekit(), tailwindcss()],
-	css: {
-		postcss: {
-			plugins: [require('autoprefixer')]
-		}
-	},
 	envPrefix: 'PUBLIC_',
 	server: {
     fs: {
