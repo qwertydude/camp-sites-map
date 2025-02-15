@@ -31,26 +31,26 @@
   <div class="relative">
     <label 
       for="menu-drawer" 
-      class="hamburger-menu hs-dropdown-toggle
-             w-11 h-11 p-2 mt-2 rounded-sm 
-             bg-gray-100 dark:bg-gray-700
-             text-gray-800 dark:text-gray-200
-             text-sm
+      class="hamburger-menu
+             p-3 mt-2
+             text-md
+            @apply dark:bg-gray-700
+             dark:text-gray-200
              flex items-center justify-center cursor-pointer"
     >
-    <i class="fa-solid fa-bars text-sm"></i>
+    <i class="fa-solid fa-bars text-sm text-gray-800 dark:text-gray-200"></i>
     </label>
 
     <div class={`dropdown ${isOpen ? 'block' : 'hidden'} bg-white shadow-lg`}>  
       <ul class="menu space-y-2">
         <li>
-          <a on:click={gotoCurrentLocation} class="w-full flex items-center px-3 py-2 menu-item" title="Go to current location"><i class="fa-solid fa-house-user text-sm text-gray-800 dark:text-gray-200"></i></a>
+          <a on:click={gotoCurrentLocation} class="w-full flex items-center p-3 menu-item" title="Go to current location"><i class="fa-solid fa-house-user text-md text-gray-800 dark:text-gray-200"></i></a>
         </li>
         <li>
-          <a on:click={handleManageSites} class="w-full flex items-center px-3 py-2 menu-item" title="Manage sites"><i class="fa-solid fa-map text-sm text-gray-800 dark:text-gray-200"></i></a>
+          <a on:click={handleManageSites} class="w-full flex items-center p-3 menu-item" title="Manage sites"><i class="fa-solid fa-map text-md text-gray-800 dark:text-gray-200"></i></a>
         </li>
         <li>
-          <a on:click={handleSettings} class="w-full flex items-center px-3 py-2 menu-item" title="Settings"><i class="fa-solid fa-gear text-sm text-gray-800 dark:text-gray-200"></i></a>
+          <a on:click={handleSettings} class="w-full flex items-center p-3 menu-item" title="Settings"><i class="fa-solid fa-gear text-md text-gray-800 dark:text-gray-200"></i></a>
         </li>
       </ul>
     </div>

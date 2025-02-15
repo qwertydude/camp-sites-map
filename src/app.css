@@ -1,7 +1,7 @@
 @import "tailwindcss";
-/* @tailwind base;
+@tailwind base;
 @tailwind components;
-@tailwind utilities; */
+@tailwind utilities;
 
 /* Make sure the map container is full size */
 html, 
@@ -45,20 +45,8 @@ body {
     background-color: rgb(55 65 81); /* bg-gray-700 */
 }
 
-/* Ionicons*/
-i {
-    color:#333;
-    font-size:32px;
-}
-
-/* Dark theme styles for Ionicons */
-.dark i {
-    color:white
-}
-
 .site-pip i {
     color:#3498db;
-    text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
 }
 
 .site-pip.start i{
@@ -78,11 +66,13 @@ i {
 }
 
 
-
-
 .travel-mode-btn i {
     color: gray;
     font-size:16px;
+}
+
+.dark .travel-mode-btn i {
+    color: white;
 }
 .travel-mode-btn:hover i {
     color: white;

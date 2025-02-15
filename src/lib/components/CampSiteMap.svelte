@@ -44,7 +44,7 @@
 
 			const sitePip = L.divIcon({
 				className: 'site-pip',
-				html: '<i class="fa-solid fa-location-dot"></i>'
+				html: '<i class="fa-solid fa-location-dot text-3xl drop-shadow-md"></i>'
 			});
 
 			L.Marker.prototype.options.icon = sitePip;
