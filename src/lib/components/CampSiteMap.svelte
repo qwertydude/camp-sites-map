@@ -7,6 +7,8 @@
 	import { drawRoute } from '$lib/utils';
 	import { settings } from '$lib/stores/settings.js';
 	import HamburgerMenu from '$lib/components/HamburgerMenu.svelte';
+	import SitesPanel from '$lib/components/SitesPanel.svelte';
+	import SettingsPanel from '$lib/components/SettingsPanel.svelte';
 
 	const dispatch = createEventDispatcher();
 	const mapboxToken = import.meta.env.PUBLIC_MAPBOX_ACCESS_TOKEN;
@@ -19,10 +21,13 @@
 	let selectedSites = [];
 	let currentRouteLayer;
 	let travelMode = 'foot';
-
+	let isMenuOpen = false;
 	let satelliteLayer;
 	let standardLayer;
 	let currentLayer;
+	let isSitesPanelOpen = false;
+	let isSettingsPanelOpen = false;
+
 
 	let isOpen = false;
 
@@ -529,9 +534,28 @@
 			currentLayer = standardLayer;
 		}
 	}
+	function handleManageSites() {
+		isSitesPanelOpen = true;
+	}
+
+	function handleOpenSettings() {
+		isSettingsPanelOpen = true;
+  }
+
 </script>
 
 <div id="map" class="map-container" class:add-site-mode={isAddSiteMode}></div>
+<HamburgerMenu
+	bind:isOpen={isMenuOpen}
+	map={map}
+	on:manageSites={handleManageSites}
+	on:openSettings={handleOpenSettings}
+	on:switchLayer={switchLayer}
+/>
+<SitesPanel bind:isOpen={isSitesPanelOpen} map={map} />
+
+<SettingsPanel bind:isOpen={isSettingsPanelOpen} />
+
 
 <style>
 	.map-container {

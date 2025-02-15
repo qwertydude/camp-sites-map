@@ -2,16 +2,9 @@
 	import { browser } from '$app/environment';
 	import CampSiteMap from '$lib/components/CampSiteMap.svelte';
 	import { onMount } from 'svelte'; 
-	import HamburgerMenu from '$lib/components/HamburgerMenu.svelte';
-	import SitesPanel from '$lib/components/SitesPanel.svelte';
-	import SettingsPanel from '$lib/components/SettingsPanel.svelte';
 	import { settings } from '$lib/stores/settings.js';
 
 	let mapInstance;
-	let isMenuOpen = false;
-	let isSitesPanelOpen = false;
-	let isSettingsPanelOpen = false;
-	let campSiteMap;
 
 	onMount(() => {
 		if (browser) {
@@ -23,15 +16,7 @@
 		mapInstance = event.detail;
 	}
 
-	function handleManageSites() {
-		isSitesPanelOpen = true;
-		// isMenuOpen = false;  // Removed to keep menu open
-	}
 
-	function handleOpenSettings() {
-		isSettingsPanelOpen = true;
-		// isMenuOpen = false;  // Removed to keep menu open
-	}
 </script>
 
 <svelte:head>
@@ -45,17 +30,5 @@
 </svelte:head>
 
 <main class="relative h-screen w-screen overflow-hidden">
-	<CampSiteMap on:mapInit={handleMapInit} bind:this={campSiteMap} />
-
-	<HamburgerMenu
-		bind:isOpen={isMenuOpen}
-		map={mapInstance}
-		on:manageSites={handleManageSites}
-		on:openSettings={handleOpenSettings}
-		on:switchLayer={() => campSiteMap.switchLayer()}
-	/>
-
-	<SitesPanel bind:isOpen={isSitesPanelOpen} map={mapInstance} />
-
-	<SettingsPanel bind:isOpen={isSettingsPanelOpen} />
+	<CampSiteMap on:mapInit={handleMapInit} />
 </main>

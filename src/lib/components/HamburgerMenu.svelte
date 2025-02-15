@@ -5,9 +5,7 @@
 
   export let isOpen = false;
   export let map;
-  export let campSiteMap;
 
-  console.log('campSiteMap in HamburgerMenu:', campSiteMap);
 
   const dispatch = createEventDispatcher();
 
