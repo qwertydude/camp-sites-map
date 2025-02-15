@@ -29,7 +29,7 @@
 
   function handleSwitchLayer() {
     console.log('handleSwitchLayer called');
-    campSiteMap.switchLayer($settings); // Corrected function call
+    dispatch('switchLayer');
   }
 </script>
 

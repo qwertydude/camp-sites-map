@@ -1,7 +1,7 @@
 <script>
 	import { browser } from '$app/environment';
 	import CampSiteMap from '$lib/components/CampSiteMap.svelte';
-	import { onMount } from 'svelte'; // Add this line
+	import { onMount } from 'svelte'; 
 	import HamburgerMenu from '$lib/components/HamburgerMenu.svelte';
 	import SitesPanel from '$lib/components/SitesPanel.svelte';
 	import SettingsPanel from '$lib/components/SettingsPanel.svelte';
@@ -45,17 +45,15 @@
 </svelte:head>
 
 <main class="relative h-screen w-screen overflow-hidden">
-	{#if campSiteMap}
-		<HamburgerMenu
-			bind:isOpen={isMenuOpen}
-      bind:map={mapInstance}
-      bind:campSiteMap={campSiteMap}
-      on:manageSites={handleManageSites}
-      on:openSettings={handleOpenSettings}
-  />
-	{/if}
-
 	<CampSiteMap on:mapInit={handleMapInit} bind:this={campSiteMap} />
+
+	<HamburgerMenu
+		bind:isOpen={isMenuOpen}
+		map={mapInstance}
+		on:manageSites={handleManageSites}
+		on:openSettings={handleOpenSettings}
+		on:switchLayer={() => campSiteMap.switchLayer()}
+	/>
 
 	<SitesPanel bind:isOpen={isSitesPanelOpen} map={mapInstance} />
 
