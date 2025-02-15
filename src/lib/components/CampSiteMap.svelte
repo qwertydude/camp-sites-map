@@ -26,8 +26,6 @@
 	let isSitesPanelOpen = false;
 	let isSettingsPanelOpen = false;
 	let currentStyle = 'mapbox://styles/mapbox/streets-v12'; // Default style
-
-
 	let isOpen = false;
 
 	function getRouteInfoTemplate(mode, content) {
@@ -79,9 +77,11 @@
 				console.log('Map dispatched');
 
 				// Add navigation controls
-				map.addControl(new mapboxgl.NavigationControl({
-					position: 'top-right'
-				}));
+				map.addControl(
+					new mapboxgl.NavigationControl({
+						position: 'top-right'
+					})
+				);
 
 				// Add geolocate control
 				const geolocateControl = new mapboxgl.GeolocateControl({
@@ -103,9 +103,7 @@
 					el.style.borderRadius = '50%';
 					el.style.border = '2px solid white';
 
-					new mapboxgl.Marker(el)
-						.setLngLat([startLng, startLat])
-						.addTo(map);
+					new mapboxgl.Marker(el).setLngLat([startLng, startLat]).addTo(map);
 				}
 			}
 			// Add map click handler
@@ -121,7 +119,7 @@
 				const currentZoom = map.getZoom();
 				if (currentZoom < 14) {
 					new mapboxgl.Popup({
-						className: 'dark:bg-gray-800 dark:text-gray-100'
+						className: 'dark:bg-gray-800 dark:text-gray-100 p-5'
 					})
 						.setLngLat(point)
 						.setHTML(
@@ -220,23 +218,50 @@
 		// Add new markers
 		sites.forEach((site) => {
 			const el = document.createElement('div');
-			el.className = 'marker';
-			el.innerHTML = '<i class="fa-solid fa-location-dot text-3xl drop-shadow-md"></i>';
-			
-			const marker = new mapboxgl.Marker(el)
-				.setLngLat([site.longitude, site.latitude])
-				.setPopup(
-					new mapboxgl.Popup({ offset: 25 })
-						.setHTML(`
+			el.className = 'site-pip-container';
+			el.innerHTML = '<i class="fa-solid fa-location-dot text-3xl drop-shadow-md site-pip"></i>';
+
+			const popup = new mapboxgl.Popup()
+				.setHTML(
+					`
 							<div class="popup-content ${$settings.app.theme === 'dark' ? 'dark' : ''}">
-								<h3>${site.title}</h3>
-								<p>${site.description || 'No description available'}</p>
+							${site.name ? `<h3>${site.name}</h3>` : ''}
+							${site.description ? `<p>${site.description}</p>` : ''}
+							<div class="popup-buttons">
+								${selectedSites.length === 0 || selectedSites[0].id !== site.id ? '<button class="route-btn start-route bg-blue-500 pt-1 pb-1 pl-2 pr-2 rounded-md text-white" >Start Route</button>' : ''}
+								${selectedSites.length === 1 && selectedSites[0].id !== site.id ? '<button class="route-btn end-route bg-blue-500 pt-1 pb-1 pl-2 pr-2 rounded-md text-white" >End Route</button>' : ''}
 							</div>
-						`)
+						</div>
+					`
 				)
+
+			const marker = new mapboxgl.Marker({color:'blue'})
+				.setLngLat([site.longitude, site.latitude])
+				.setPopup(popup)
 				.addTo(map);
 
 			markers.set(site.id, marker);
+
+			popup.on('open', (marker) => {
+					console.log('Popup opened for site:', site.name);
+					const startRoute = document.querySelector('.start-route');
+					const endRoute = document.querySelector('.end-route');
+
+					console.log(startRoute, endRoute);
+					// Add click handlers
+					if (startRoute) {
+						startRoute.addEventListener('click', () => {
+							console.log('Details button clicked');
+							setRouteStart(site,marker)
+						});
+					}
+					if (endRoute) {
+						endRoute.addEventListener('click', () => {
+							console.log('Directions button clicked');
+							setRouteEnd(site,marker)});
+					}
+				})
+
 		});
 	}
 
@@ -350,10 +375,8 @@
 
 			// Add click handler to the route
 			currentRouteLayer.on('click', async (e) => {
-				const popup = L.popup()
-					.setLatLng(e.latlng)
-					.setContent(getRouteInfoTemplate(travelMode, routes))
-					.openOn(map);
+				const popupContent = document.createElement('div');
+				popupContent.innerHTML = getRouteInfoTemplate(travelMode, routes);
 
 				// Add click handlers for the travel mode buttons after popup is added to DOM
 				setTimeout(() => {
@@ -365,6 +388,9 @@
 						});
 					});
 				}, 0);
+
+				// Create and open the popup
+				new mapboxgl.Popup().setLngLat(e.lngLat).setDOMContent(popupContent).addTo(map);
 			});
 
 			// Zoom to the route when generated
@@ -386,7 +412,7 @@
 
 			// Show the route information in a popup
 			//routes = routeDDList.join('<br>');
-			
+
 			const popupContent = document.createElement('div');
 			popupContent.innerHTML = getRouteInfoTemplate(travelMode, routes);
 
@@ -412,27 +438,17 @@
 			});
 
 			// Create and open the popup
-			L.popup()
-				.setLatLng([(start.lat + end.lat) / 2, (start.lng + end.lng) / 2])
-				.setContent(popupContent)
-				.openOn(map);
+			new mapboxgl.Popup()
+				.setLngLat([(start.lat + end.lat) / 2, (start.lng + end.lng) / 2])
+				.setDOMContent(popupContent)
+				.addTo(map);
 
 			// Change existing markers for start and end points with appropriate colors
 			if (startMarker) {
-				startMarker.setIcon(
-					L.divIcon({
-						html: '<div style="background-color: green; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>',
-						className: 'start-marker'
-					})
-				);
+				startMarker.setIcon(document.createElement('div'));
 			}
 			if (endMarker) {
-				endMarker.setIcon(
-					L.divIcon({
-						html: '<div style="background-color: red; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>',
-						className: 'end-marker'
-					})
-				);
+				endMarker.setIcon(document.createElement('div'));
 			}
 		} catch (error) {
 			console.error('Error calculating route:', error);
@@ -449,10 +465,11 @@
 	}
 
 	function switchLayer() {
-		const newStyle = currentStyle === 'mapbox://styles/mapbox/streets-v12' 
-			? 'mapbox://styles/mapbox/satellite-streets-v12'
-			: 'mapbox://styles/mapbox/streets-v12';
-		
+		const newStyle =
+			currentStyle === 'mapbox://styles/mapbox/streets-v12'
+				? 'mapbox://styles/mapbox/satellite-streets-v12'
+				: 'mapbox://styles/mapbox/streets-v12';
+
 		map.setStyle(newStyle);
 		currentStyle = newStyle;
 
@@ -467,22 +484,37 @@
 
 	function handleOpenSettings() {
 		isSettingsPanelOpen = true;
-  }
+	}
 
+	function setRouteStart(site, marker) {
+		selectedSites = [{ id: site.id, lat: site.latitude, lng: site.longitude }];
+		console.log('Route start set:', selectedSites);
+		console.log('Marker:', marker);
+		marker.options.color = 'green';
+		// Additional logic to visually indicate the start point can be added here
+	}
+
+	function setRouteEnd(site, marker) {
+		if (selectedSites.length === 1) {
+			selectedSites.push({ id: site.id, lat: site.latitude, lng: site.longitude });
+			console.log('Route end set:', selectedSites);
+			// Additional logic to calculate and display the route can be added here
+			calculateRoute(selectedSites[0], selectedSites[1]);
+		}
+	}
 </script>
 
 <div id="map" class="map-container" class:add-site-mode={isAddSiteMode}></div>
 <HamburgerMenu
 	bind:isOpen={isMenuOpen}
-	map={map}
+	{map}
 	on:manageSites={handleManageSites}
 	on:openSettings={handleOpenSettings}
 	on:switchLayer={switchLayer}
 />
-<SitesPanel bind:isOpen={isSitesPanelOpen} map={map} />
+<SitesPanel bind:isOpen={isSitesPanelOpen} {map} />
 
 <SettingsPanel bind:isOpen={isSettingsPanelOpen} />
-
 
 <style>
 	.map-container {
@@ -517,5 +549,79 @@
 		100% {
 			opacity: 0;
 		}
+	}
+
+	/* .site-pip {
+		color: #1a73e8;
+		font-size: 2rem;
+		cursor: pointer;
+		background-color: white;
+		border-radius: 50%;
+		padding: 5px;
+		box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+	} */
+
+	.user-location {
+		cursor: pointer;
+	}
+
+	:global(.mapboxgl-popup-content) {
+		padding: 10px 15px;
+		border-radius: 8px;
+	}
+
+	:global(.popup-content) {
+		color: #1f2937;
+	}
+
+	:global(.popup-content.dark) {
+		color: #e5e7eb;
+	}
+
+	:global(.mapboxgl-popup-content h3) {
+		margin: 0 0 10px 0;
+		font-size: 1.1em;
+		font-weight: 600;
+	}
+
+	:global(.mapboxgl-popup-content p) {
+		margin: 0;
+		font-size: 0.9em;
+	}
+
+	:global(.add-site-popup) {
+		padding: 15px;
+	}
+
+	:global(.site-input) {
+		width: 100%;
+		margin: 8px 0;
+		padding: 8px;
+		border: 1px solid #e2e8f0;
+		border-radius: 4px;
+	}
+
+	:global(.popup-buttons) {
+		display: flex;
+		gap: 8px;
+		margin-top: 12px;
+	}
+
+	:global(.confirm-btn, .cancel-btn) {
+		padding: 6px 12px;
+		border-radius: 4px;
+		cursor: pointer;
+	}
+
+	:global(.mapboxgl-popup-close-button) {
+		padding: 0 4px;
+	}
+
+	.start {
+		background-color: #4caf50;
+	}
+
+	.end {
+		background-color: #ff9800;
 	}
 </style>
