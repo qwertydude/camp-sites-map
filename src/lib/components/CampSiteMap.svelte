@@ -52,13 +52,6 @@
 	let startMarker;
 	let endMarker;
 
-	async function loadLeaflet() {
-		if (browser) {
-			L = await import('leaflet');
-			return L;
-		}
-	}
-
 	async function initializeMap(position = null) {
 		if (!browser) return;
 
@@ -73,65 +66,52 @@
 
 			console.log('Creating map instance at:', { startLat, startLng });
 
-			const sitePip = L.divIcon({
-				className: 'site-pip',
-				html: '<i class="fa-solid fa-location-dot text-3xl drop-shadow-md"></i>'
-			});
-
-			L.Marker.prototype.options.icon = sitePip;
-
 			if (!map) {
-				map = L.map('map', {
-					zoomControl: false
-				}).setView([startLat, startLng], $settings.app.defaultZoomLevel);
+				map = new mapboxgl.Map({
+					container: 'map',
+					style: currentStyle,
+					center: [startLng, startLat],
+					zoom: $settings.app.defaultZoomLevel
+				});
 
 				console.log('Map created in CampSiteMap:', map);
 				dispatch('mapInit', map);
 				console.log('Map dispatched');
 
-				console.log('Adding zoom control');
-				L.control
-					.zoom({
-						position: 'topright'
-					})
-					.addTo(map);
+				// Add navigation controls
+				map.addControl(new mapboxgl.NavigationControl({
+					position: 'top-right'
+				}));
 
-				standardLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-					attribution: ' OpenStreetMap contributors'
-				}).addTo(map);
-
-				satelliteLayer = L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-					attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+				// Add geolocate control
+				const geolocateControl = new mapboxgl.GeolocateControl({
+					positionOptions: {
+						enableHighAccuracy: true
+					},
+					trackUserLocation: true
 				});
-
-				currentLayer = standardLayer;
+				map.addControl(geolocateControl);
 
 				// Add user location marker if we have it
 				if (position) {
 					console.log('Adding user location marker');
-					L.circle([startLat, startLng], {
-						color: '#4A90E2',
-						fillColor: '#4A90E2',
-						fillOpacity: 0.15,
-						radius: position.coords.accuracy
-					}).addTo(map);
+					const el = document.createElement('div');
+					el.className = 'user-location';
+					el.style.backgroundColor = '#4A90E2';
+					el.style.width = '12px';
+					el.style.height = '12px';
+					el.style.borderRadius = '50%';
+					el.style.border = '2px solid white';
 
-					L.marker([startLat, startLng], {
-						icon: L.divIcon({
-							html: '<div style="background-color: #4A90E2; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>',
-							className: 'user-location-marker'
-						})
-					}).addTo(map);
-					// .bindPopup('Your location')
-					// .openPopup();
+					new mapboxgl.Marker(el)
+						.setLngLat([startLng, startLat])
+						.addTo(map);
 				}
-
-				// Initialize markers layer
-				markersLayer = L.layerGroup().addTo(map);
 			}
 			// Add map click handler
 			map.on('click', async (e) => {
-				console.log('Map clicked at:', e.latlng);
+				const point = e.lngLat;
+				console.log('Map clicked at:', point);
 
 				// Check if command/ctrl key is pressed
 				if (!e.originalEvent.metaKey && !e.originalEvent.ctrlKey) {
@@ -140,11 +120,11 @@
 
 				const currentZoom = map.getZoom();
 				if (currentZoom < 14) {
-					L.popup({
+					new mapboxgl.Popup({
 						className: 'dark:bg-gray-800 dark:text-gray-100'
 					})
-						.setLatLng(e.latlng)
-						.setContent(
+						.setLngLat(point)
+						.setHTML(
 							'<div class="add-site-popup dark:bg-gray-800 dark:text-gray-100">' +
 								'<p>Please zoom in closer to add a camp site (zoom level must be 14 or greater)</p>' +
 								'<p>Current zoom level: ' +
@@ -153,7 +133,7 @@
 								'<p>Tip: Use Cmd/Ctrl + Click to add a site</p>' +
 								'</div>'
 						)
-						.openOn(map);
+						.addTo(map);
 					return;
 				}
 
@@ -175,15 +155,14 @@
 					</div>
 					`;
 
-				// Add event listeners to the buttons
-				const popup = L.popup({
+				// Create and show the popup
+				const popup = new mapboxgl.Popup({
 					className: 'dark:bg-gray-800 dark:text-gray-100',
-					minWidth: 250,
-					maxWidth: 300
+					maxWidth: '300px'
 				})
-					.setLatLng(e.latlng)
-					.setContent(popupContent)
-					.openOn(map);
+					.setLngLat(point)
+					.setDOMContent(popupContent)
+					.addTo(map);
 
 				// Handle form submission
 				popupContent.querySelector('#confirm-add').addEventListener('click', async () => {
@@ -194,12 +173,12 @@
 						const newSite = await campSitesStore.addSite({
 							name: title,
 							description: description || '',
-							latitude: e.latlng.lat,
-							longitude: e.latlng.lng
+							latitude: point.lat,
+							longitude: point.lng
 						});
 
 						if (newSite) {
-							map.closePopup();
+							popup.remove();
 						} else {
 							alert('Error adding camp site. Please try again.');
 						}
@@ -210,17 +189,52 @@
 
 				// Handle cancellation
 				popupContent.querySelector('#cancel-add').addEventListener('click', () => {
-					map.closePopup();
+					popup.remove();
 				});
 			});
 
 			// Initialize the store
 			unsubscribe = campSitesStore.initialize();
 
+			// Wait for map to load before adding markers
+			map.on('load', () => {
+				updateMarkers(campSitesStore.get());
+			});
+
 			console.log('Map initialization complete');
 		} catch (error) {
 			console.error('Error initializing map:', error);
 		}
+	}
+
+	function updateMarkers(sites) {
+		// Remove existing markers
+		for (let marker of markers.values()) {
+			marker.remove();
+		}
+		markers.clear();
+
+		// Add new markers
+		sites.forEach((site) => {
+			const el = document.createElement('div');
+			el.className = 'marker';
+			el.innerHTML = '<i class="fa-solid fa-location-dot text-3xl drop-shadow-md"></i>';
+			
+			const marker = new mapboxgl.Marker(el)
+				.setLngLat([site.longitude, site.latitude])
+				.setPopup(
+					new mapboxgl.Popup({ offset: 25 })
+						.setHTML(`
+							<div class="popup-content ${$settings.app.theme === 'dark' ? 'dark' : ''}">
+								<h3>${site.title}</h3>
+								<p>${site.description || 'No description available'}</p>
+							</div>
+						`)
+				)
+				.addTo(map);
+
+			markers.set(site.id, marker);
+		});
 	}
 
 	onMount(async () => {
