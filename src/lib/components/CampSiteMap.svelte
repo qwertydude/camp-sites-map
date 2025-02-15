@@ -14,9 +14,7 @@
 	let unsubscribe;
 	let isAddSiteMode = false;
 	let selectedSites = [];
-	let routeLayer;
-	let selectedRoute = 0;
-	let currentRouteIndex = 0;
+	let currentRouteLayer;
 	let travelMode = 'foot';
 	let startMarker;
 	let endMarker;
@@ -305,8 +303,8 @@
 								// Clear existing route and markers if we already have a route
 								if (selectedSites.length === 2) {
 									// Clear the route
-									if (routeLayer) {
-										routeLayer.remove();
+									if (currentRouteLayer) {
+										currentRouteLayer.remove();
 									}
 									// Clear all start/end classes
 									document.querySelectorAll('.site-pip').forEach((pip) => {
@@ -364,11 +362,11 @@
 			const response = await fetch(url);
 			const data = await response.json();
 			const routesCount = data.routes.length;
-			const routeDDList = data.routes.map((route, index) =>
-				`Route ${index + 1}: ${Math.round(route.distance / 1000, 1)} km - ${Math.round(route.duration / 60, 1)} min`
-			);
+			const routeDDList = data.routes.map((route, index) => {
+				return `<a href="#" class="route-link" data-index="${index}">Route ${index + 1}: ${Math.round(route.distance / 1000, 1)} km - ${Math.round(route.duration / 60, 1)} min</a>`;
+			});
 
-//			console.log('selectedRoute:', selectedRoute);
+			let routes = routeDDList.join('<br>');
 			console.log('routeDDList:', routeDDList);
 			console.log('typeof routeDDList:', typeof routeDDList);
 			console.log('Is routeDDList an array?', Array.isArray(routeDDList));
@@ -378,12 +376,12 @@
 			}
 			console.log('data:', data);
 			// Clear existing route
-			if (routeLayer) {
-				routeLayer.remove();
+			if (currentRouteLayer) {
+				currentRouteLayer.remove();
 			}
 
 			// Draw the new route
-			routeLayer = L.geoJSON(data.routes[selectedRoute].geometry, {
+			currentRouteLayer = L.geoJSON(data.routes[0].geometry, {
 				style: {
 					color: '#4A90E2',
 					weight: 4,
@@ -392,7 +390,7 @@
 			}).addTo(map);
 
 			// Add click handler to the route
-			routeLayer.on('click', (e) => {
+			currentRouteLayer.on('click', (e) => {
 				const popup = L.popup()
 					.setLatLng(e.latlng)
 					.setContent(
@@ -410,7 +408,7 @@
 									<i class="${travelMode === 'car' ? 'brightness-200' : ''} fa-solid fa-car"></i>
 								</button>
 							</div>
-							<p class="text-gray-700 dark:text-gray-700">${routeDDList[selectedRoute]}</p>
+							<p class="text-gray-700 dark:text-gray-700">${routes}</p>
 						</div>
 					`
 					)
@@ -429,10 +427,10 @@
 			});
 
 			// Zoom to the route when generated
-			map.fitBounds(routeLayer.getBounds());
+			map.fitBounds(currentRouteLayer.getBounds());
 
 			// Calculate distance in kilometers
-			const distanceKm = (data.routes[selectedRoute].distance / 1000).toFixed(1);
+			const distanceKm = (data.routes[0].distance / 1000).toFixed(1);
 			const durationInMinutes = Math.round(data.routes[0].duration / 60); // Convert seconds to minutes
 			const hours = Math.floor(durationInMinutes / 60);
 			const minutes = durationInMinutes % 60;
@@ -446,26 +444,43 @@
 			}
 
 			// Show the route information in a popup
-			let routes = routeDDList.join('<br>');
+			//routes = routeDDList.join('<br>');
 			
 			const popupContent = document.createElement('div');
 			popupContent.innerHTML = `
 				<div class="route-info bg-white dark:bg-gray-800">
 					<h3 class="font-semibold text-gray-700 dark:text-gray-700 mb-2">Route Information</h3>
-          <div class="travel-modes flex gap-2 mt-2">
-              <button class="travel-mode-btn p-1 rounded-md ${travelMode === 'foot' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="foot">
-                  <i class="${travelMode === 'foot' ? 'brightness-200' : ''} fa-solid fa-person-walking"></i>
-              </button>
-              <button class="travel-mode-btn p-1 rounded-md ${travelMode === 'bike' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="bike">
-                  <i class="${travelMode === 'bike' ? 'brightness-200' : ''} fa-solid fa-bicycle"></i>
-              </button>
-              <button class="travel-mode-btn p-1 rounded-md ${travelMode === 'car' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="car">
-                  <i class="${travelMode === 'car' ? 'brightness-200' : ''} fa-solid fa-car"></i>
-              </button>
-          </div>
+					<div class="travel-modes flex gap-2 mt-2">
+						<button class="travel-mode-btn p-1 rounded-md ${travelMode === 'foot' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="foot">
+							<i class="${travelMode === 'foot' ? 'brightness-200' : ''} fa-solid fa-person-walking"></i>
+						</button>
+						<button class="travel-mode-btn p-1 rounded-md ${travelMode === 'bike' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="bike">
+							<i class="${travelMode === 'bike' ? 'brightness-200' : ''} fa-solid fa-bicycle"></i>
+						</button>
+						<button class="travel-mode-btn p-1 rounded-md ${travelMode === 'car' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="car">
+							<i class="${travelMode === 'car' ? 'brightness-200' : ''} fa-solid fa-car"></i>
+						</button>
+					</div>
 					<p class="text-gray-700 dark:text-gray-700">${routes}</p>
 				</div>
 			`;
+
+			// Add event listener to the popup content
+			popupContent.addEventListener('click', (event) => {
+				if (event.target.classList.contains('route-link')) {
+					const index = event.target.dataset.index;
+					console.log('Clicked route index:', index);
+					currentRouteLayer.remove();
+					currentRouteLayer = L.geoJSON(data.routes[index].geometry, {
+						style: {
+							color: 'blue',
+							weight: 5,
+							opacity: 0.7
+						}
+					}).addTo(map);
+					map.fitBounds(currentRouteLayer.getBounds());
+				}
+			});
 
 			// Add event listeners to the buttons
 			const buttons = popupContent.querySelectorAll('.travel-mode-btn');
