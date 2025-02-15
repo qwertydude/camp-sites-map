@@ -70,7 +70,7 @@ body {
 }
 
 
-.travel-mode-btn i {
+/* .travel-mode-btn i {
     color: gray;
     font-size:16px;
 }
@@ -80,7 +80,7 @@ body {
 }
 .travel-mode-btn:hover i {
     color: white;
-}
+} */
 
 /* Popup styles */
 .add-site-popup {

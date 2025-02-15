@@ -19,18 +19,22 @@
 	let currentRouteLayer;
 	let travelMode = 'foot';
 
+	let satelliteLayer;
+	let standardLayer;
+	let currentLayer;
+
 	function getRouteInfoTemplate(mode, content) {
 		return `
 			<div class="route-info p-2 bg-transparent">
 				<h3 class="font-semibold text-gray-700 dark:text-gray-700 mb-2">Route Information</h3>
-				<div class="travel-modes flex gap-2 mt-2">
-					<button class="travel-mode-btn p-1 rounded-md ${mode === 'foot' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="foot">
+				<div class="travel-modes flex gap-2 mt-2 text-lg">
+					<button class="travel-mode-btn p-1 rounded-md ${mode === 'foot' ? 'text-blue-800 dark:text-blue-300' : 'bg-transparent text-white'} hover:text-blue-800 " data-mode="foot">
 						<i class="${mode === 'foot' ? 'brightness-200' : ''} fa-solid fa-person-walking"></i>
 					</button>
-					<button class="travel-mode-btn p-1 rounded-md ${mode === 'bike' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="bike">
+					<button class="travel-mode-btn p-1 rounded-md ${mode === 'bike' ? 'text-blue-800 dark:text-blue-300' : 'bg-transparent text-white'} hover:text-blue-800 " data-mode="bike">
 						<i class="${mode === 'bike' ? 'brightness-200' : ''} fa-solid fa-bicycle"></i>
 					</button>
-					<button class="travel-mode-btn p-1 rounded-md ${mode === 'car' ? 'bg-blue-500 dark:bg-blue-600 text-white' : 'bg-transparent text-gray-700 dark:text-gray-300'} hover:bg-blue-500 dark:hover:bg-blue-500 transition-colors" data-mode="car">
+					<button class="travel-mode-btn p-1 rounded-md ${mode === 'car' ? 'text-blue-800 dark:text-blue-300' : 'bg-transparent text-white'} hover:text-blue-800 " data-mode="car">
 						<i class="${mode === 'car' ? 'brightness-200' : ''} fa-solid fa-car"></i>
 					</button>
 				</div>
@@ -85,10 +89,15 @@
 					})
 					.addTo(map);
 
-				console.log('Adding tile layer');
-				L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+				standardLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 					attribution: ' OpenStreetMap contributors'
 				}).addTo(map);
+
+				satelliteLayer = L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+					attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+				});
+
+				currentLayer = standardLayer;
 
 				// Add user location marker if we have it
 				if (position) {
@@ -504,9 +513,25 @@
 			calculateRoute(selectedSites[0], selectedSites[1]);
 		}
 	}
+
+	function switchLayer() {
+		if (currentLayer === standardLayer) {
+			map.removeLayer(standardLayer);
+			map.addLayer(satelliteLayer);
+			currentLayer = satelliteLayer;
+		} else {
+			map.removeLayer(satelliteLayer);
+			map.addLayer(standardLayer);
+			currentLayer = standardLayer;
+		}
+	}
 </script>
 
 <div id="map" class="map-container" class:add-site-mode={isAddSiteMode}></div>
+
+<div class="layer-switcher">
+  <button on:click={switchLayer}>Switch Layer</button>
+</div>
 
 <style>
 	.map-container {
@@ -519,6 +544,15 @@
 		cursor: crosshair;
 	}
 
+	.layer-switcher {
+		position: absolute;
+		top: 10px;
+		right: 10px;
+		background: white;
+		padding: 5px;
+		border-radius: 5px;
+		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+	}
 
 	/* Leaflet dark mode adjustments */
 	:global(.leaflet-popup.dark) {
@@ -529,5 +563,4 @@
 	:global(.leaflet-popup.dark .leaflet-popup-content) {
 		color: rgb(229 231 235 / var(--tw-text-opacity));
 	}
-
 </style>
