@@ -51,21 +51,24 @@
     <div class={`dropdown ${isOpen ? 'block' : 'hidden'} bg-white dark:bg-gray-700 shadow-lg`}>  
       <ul class="menu space-y-2 cursor-pointer">
         <li>
-          <a on:click={gotoCurrentLocation} class="w-full flex items-center p-3 menu-item" title="Go to current location">
-            <i class="fa-solid fa-house-user text-md text-gray-800 dark:text-gray-200"></i></a>
+          <button on:click={gotoCurrentLocation} class="w-full flex items-center p-3 menu-item" title="Go to current location">
+            <i class="fa-solid fa-house-user text-md text-gray-800 dark:text-gray-200"></i>
+          </button>
         </li>
         <li>
-          <a on:click={handleManageSites} class="w-full flex items-center p-3 menu-item" title="Manage sites">
-            <i class="fa-solid fa-map text-md text-gray-800 dark:text-gray-200"></i></a>
+          <button on:click={handleManageSites} class="w-full flex items-center p-3 menu-item" title="Manage sites">
+            <i class="fa-solid fa-map text-md text-gray-800 dark:text-gray-200"></i>
+          </button>
         </li>
         <li>
-          <a on:click={handleSettings} class="w-full flex items-center p-3 menu-item" title="Settings">
-            <i class="fa-solid fa-gear text-md text-gray-800 dark:text-gray-200"></i></a>
+          <button on:click={handleSettings} class="w-full flex items-center p-3 menu-item" title="Settings">
+            <i class="fa-solid fa-gear text-md text-gray-800 dark:text-gray-200"></i>
+          </button>
         </li>
         <li>
-          <a on:click={handleSwitchLayer} class="w-full flex items-center p-3 menu-item" title="Switch Map Layer">
+          <button on:click={handleSwitchLayer} class="w-full flex items-center p-3 menu-item" title="Switch Map Layer">
             <i class="fa-solid fa-layer-group text-md text-gray-800 dark:text-gray-200"></i>
-          </a>
+          </button>
         </li>
       </ul>
     </div>

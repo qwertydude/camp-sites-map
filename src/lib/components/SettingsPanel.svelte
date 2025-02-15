@@ -41,13 +41,13 @@
         <div class="space-y-2">
           <h3 class="font-medium text-gray-700 dark:text-gray-300">Theme</h3>
           <div class="theme-button-bar">
-            <button class="theme-button" on:click={() => settings.changeTheme('light')}>
+            <button class="theme-button p-2" on:click={() => settings.changeTheme('light')}>
               <i class="fa-solid fa-sun"></i>
             </button>
-            <button class="theme-button" on:click={() => settings.changeTheme('dark')}>
+            <button class="theme-button p-2" on:click={() => settings.changeTheme('dark')}>
               <i class="fa-solid fa-moon"></i>
             </button>
-            <button class="theme-button" on:click={() => settings.changeTheme('system')}>
+            <button class="theme-button p-2" on:click={() => settings.changeTheme('system')}>
               <i class="fa-solid fa-desktop"></i>
             </button>
           </div>
@@ -56,8 +56,9 @@
         <div class="space-y-2">
           <h3 class="font-medium text-gray-700 dark:text-gray-300">Zoom Levels</h3>
           <div>
-            <label class="block text-sm text-gray-600 dark:text-gray-400">Default Zoom</label>
+            <label for="default-zoom" class="block text-sm text-gray-600 dark:text-gray-400">Default Zoom</label>
             <input 
+              id="default-zoom"
               type="range" 
               min="10" 
               max="20" 
@@ -75,8 +76,9 @@
           </div>
 
           <div>
-            <label class="block text-sm text-gray-600 dark:text-gray-400">Focus Zoom</label>
+            <label for="focus-zoom" class="block text-sm text-gray-600 dark:text-gray-400">Focus Zoom</label>
             <input 
+              id="focus-zoom"
               type="range" 
               min="10" 
               max="20" 
