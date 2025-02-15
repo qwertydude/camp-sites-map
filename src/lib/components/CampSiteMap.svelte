@@ -383,7 +383,7 @@
 			}
 
 			// Draw the new route
-			currentRouteLayer = drawRoute(map, data.routes[0].geometry);
+			currentRouteLayer = await drawRoute(map, data.routes[0].geometry);
 
 			// Add click handler to the route
 			currentRouteLayer.on('click', (e) => {
@@ -467,7 +467,7 @@
 					const index = event.target.dataset.index;
 					console.log('Clicked route index:', index);
 					currentRouteLayer.remove();
-					currentRouteLayer = drawRoute(map, data.routes[index].geometry);
+					currentRouteLayer = await drawRoute(map, data.routes[index].geometry);
 					map.fitBounds(currentRouteLayer.getBounds());
 				}
 			});
