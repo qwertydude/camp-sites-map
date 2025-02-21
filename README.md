@@ -1,38 +1,42 @@
-# sv
+# Camp Sites Map
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A modern web application for exploring and discovering camp sites, built with Svelte and Mapbox.
 
-## Creating a project
+This is a side project built for personal learning and use.
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Features
 
-```bash
-# create a new project in the current directory
-npx sv create
+- Interactive map with camp site locations
+- Detailed camp site information
+- Search and filtering capabilities
+- Responsive design
 
-# create a new project in my-app
-npx sv create my-app
-```
+## Installation
 
-## Developing
+1. Clone the repository
+2. Run `npm install`
+3. Create a `.env` file with your Mapbox access token
+4. Run `npm run dev`
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Configuration
 
-```bash
-npm run dev
+- Set up your Mapbox access token in `.env`
+- Customize Tailwind CSS in `tailwind.config.js`
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+## Usage
 
-## Building
+- Search for camp sites using the search bar
+- Click on map markers for more information
+- Use filters to narrow down results
 
-To create a production version of your app:
+## Technologies Used
 
-```bash
-npm run build
-```
+- Svelte 5
+- Tailwind CSS 4
+- Mapbox GL JS
+- Vite
 
-You can preview the production build with `npm run preview`.
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+## License
+
+MIT

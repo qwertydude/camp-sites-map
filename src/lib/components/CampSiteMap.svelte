@@ -27,7 +27,15 @@
 	let isSettingsPanelOpen = false;
 	let currentStyle = 'mapbox://styles/mapbox/streets-v12'; // Default style
 	let isOpen = false;
+	let popups = [];
+	
 
+	/**
+	 * Returns a template for the route information popup.
+	 * @param {string} mode - The travel mode (foot, bike, or car).
+	 * @param {string} content - The content to display in the popup.
+	 * @returns {string} The HTML template for the popup.
+	 */
 	function getRouteInfoTemplate(mode, content) {
 		return `
 			<div class="route-info p-2 bg-transparent">
@@ -50,6 +58,11 @@
 	let startMarker;
 	let endMarker;
 
+	/**
+	 * Initializes the map with the given position.
+	 * If no position is provided, it defaults to Wodonga.
+	 * @param {Object} position - The position object containing latitude and longitude.
+	 */
 	async function initializeMap(position = null) {
 		if (!browser) return;
 
@@ -208,6 +221,10 @@
 		}
 	}
 
+	/**
+	 * Updates the markers on the map based on the given sites.
+	 * @param {Array} sites - The array of site objects.
+	 */
 	function updateMarkers(sites) {
 		// Remove existing markers
 		for (let marker of markers.values()) {
@@ -338,6 +355,11 @@ console.log('selectedSites', selectedSites)
 		}
 	});
 
+	/**
+	 * Calculates the route between the given start and end points.
+	 * @param {Object} start - The start point object containing latitude and longitude.
+	 * @param {Object} end - The end point object containing latitude and longitude.
+	 */
 	async function calculateRoute(start, end) {
 		const mapboxProfile = {
 			foot: 'walking',
@@ -455,6 +477,10 @@ console.log('selectedSites', selectedSites)
 		}
 	}
 
+	/**
+	 * Sets the travel mode to the given mode.
+	 * @param {string} mode - The travel mode (foot, bike, or car).
+	 */
 	function setTravelMode(mode) {
 		travelMode = mode;
 
@@ -463,6 +489,9 @@ console.log('selectedSites', selectedSites)
 		}
 	}
 
+	/**
+	 * Switches the map layer to the satellite or street view.
+	 */
 	function switchLayer() {
 		const newStyle =
 			currentStyle === 'mapbox://styles/mapbox/streets-v12'
@@ -477,24 +506,37 @@ console.log('selectedSites', selectedSites)
 			updateMarkers(campSitesStore.get());
 		});
 	}
+	/**
+	 * Handles the manage sites button click.
+	 */
 	function handleManageSites() {
 		isSitesPanelOpen = true;
 	}
 
+	/**
+	 * Handles the open settings button click.
+	 */
 	function handleOpenSettings() {
 		isSettingsPanelOpen = true;
 	}
 
+	/**
+	 * Initializes the route start with the given site.
+	 * Updates the selected sites and changes the marker color to green.
+	 * Also updates the popup for the current marker.
+	 * @param {Object} site - The site object containing id, latitude, and longitude.
+	 * @param {Object} popup - The popup object associated with the marker.
+	 */
 	function setRouteStart(site, popup) {
 		selectedSites = [{ id: site.id, lat: site.latitude, lng: site.longitude }];
 		console.log('Route start set:', selectedSites);
-
+		
 		// Remove the old marker
 		const oldMarker = markers.get(site.id);
 		if (oldMarker) {
 			oldMarker.remove();
 		}
-
+		
 		// Create a new marker with green color
 		const newMarker = new mapboxgl.Marker({ 
 			color: '#4CAF50',
@@ -508,17 +550,24 @@ console.log('selectedSites', selectedSites)
 		markers.set(site.id, newMarker);
 	}
 
+	/**
+	 * Initializes the route end with the given site.
+	 * Updates the selected sites and changes the marker color to orange.
+	 * Also updates the popup for the current marker.
+	 * @param {Object} site - The site object containing id, latitude, and longitude.
+	 * @param {Object} popup - The popup object associated with the marker.
+	 */
 	function setRouteEnd(site, popup) {
 		if (selectedSites.length === 1) {
 			selectedSites.push({ id: site.id, lat: site.latitude, lng: site.longitude });
 			console.log('Route end set:', selectedSites);
-
+			
 			// Remove the old marker
 			const oldMarker = markers.get(site.id);
 			if (oldMarker) {
 				oldMarker.remove();
 			}
-
+			
 			// Create a new marker with orange color
 			const newMarker = new mapboxgl.Marker({ 
 				color: '#FF9800',
@@ -530,7 +579,7 @@ console.log('selectedSites', selectedSites)
 			
 			// Update the markers Map with the new marker
 			markers.set(site.id, newMarker);
-
+			
 			// Calculate the route
 			calculateRoute(selectedSites[0], selectedSites[1]);
 		}
