@@ -562,61 +562,18 @@ console.log('selectedSites', selectedSites)
 			console.log('Current cities layer state:', { citiesLayerVisible, citiesLayer });
 
 			if (citiesLayerVisible) {
-				console.log('Removing cities layer');
-				if (map.getLayer('cities')) {
-					map.removeLayer('cities');
-				}
-				if (map.getSource('cities')) {
-					map.removeSource('cities');
-				}
-				citiesLayer = null;
+				console.log('Hiding city labels');
+				// Hide all place labels
+				map.setLayoutProperty('settlement-major-label', 'visibility', 'none');
+				map.setLayoutProperty('settlement-minor-label', 'visibility', 'none');
+				map.setLayoutProperty('settlement-subdivision-label', 'visibility', 'none');
+				citiesLayer = false;
 			} else {
-				console.log('Adding cities layer');
-				// Get all layers and find the topmost symbol layer
-				const layers = map.getStyle().layers;
-				let topSymbolLayerId;
-				for (let i = layers.length - 1; i >= 0; i--) {
-					if (layers[i].type === 'symbol') {
-						topSymbolLayerId = layers[i].id;
-						break;
-					}
-				}
-
-				// Add the cities layer directly from the map style's layers
-				map.addLayer({
-					id: 'cities',
-					type: 'symbol',
-					source: 'composite',
-					'source-layer': 'place_label',
-					layout: {
-						'text-field': ['get', 'name_en'],
-						'text-size': [
-							'interpolate',
-							['linear'],
-							['zoom'],
-							3, 12,
-							8, 16
-						],
-						'text-anchor': 'center',
-						'text-transform': 'uppercase',
-						'visibility': 'visible',
-						'text-allow-overlap': true,
-						'text-ignore-placement': true
-					},
-					paint: {
-						'text-color': '#333',
-						'text-halo-color': '#fff',
-						'text-halo-width': 2
-					},
-					filter: [
-						'match',
-						['get', 'class'],
-						['city', 'town', 'village'],
-						true,
-						false
-					],
-					minzoom: 4
-				}, topSymbolLayerId); // Add the layer above the topmost symbol layer
+				console.log('Showing city labels');
+				// Show all place labels
+				map.setLayoutProperty('settlement-major-label', 'visibility', 'visible');
+				map.setLayoutProperty('settlement-minor-label', 'visibility', 'visible');
+				map.setLayoutProperty('settlement-subdivision-label', 'visibility', 'visible');
 				citiesLayer = true;
 			}
 			citiesLayerVisible = !citiesLayerVisible;
