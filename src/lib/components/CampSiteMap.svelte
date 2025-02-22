@@ -572,6 +572,16 @@ console.log('selectedSites', selectedSites)
 				citiesLayer = null;
 			} else {
 				console.log('Adding cities layer');
+				// Get all layers and find the topmost symbol layer
+				const layers = map.getStyle().layers;
+				let topSymbolLayerId;
+				for (let i = layers.length - 1; i >= 0; i--) {
+					if (layers[i].type === 'symbol') {
+						topSymbolLayerId = layers[i].id;
+						break;
+					}
+				}
+
 				// Add the cities layer directly from the map style's layers
 				map.addLayer({
 					id: 'cities',
@@ -589,7 +599,9 @@ console.log('selectedSites', selectedSites)
 						],
 						'text-anchor': 'center',
 						'text-transform': 'uppercase',
-						'visibility': 'visible'
+						'visibility': 'visible',
+						'text-allow-overlap': true,
+						'text-ignore-placement': true
 					},
 					paint: {
 						'text-color': '#333',
@@ -604,7 +616,7 @@ console.log('selectedSites', selectedSites)
 						false
 					],
 					minzoom: 4
-				});
+				}, topSymbolLayerId); // Add the layer above the topmost symbol layer
 				citiesLayer = true;
 			}
 			citiesLayerVisible = !citiesLayerVisible;
