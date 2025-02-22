@@ -600,7 +600,9 @@ console.log('selectedSites', selectedSites)
 				map.addSource('weather', {
 					type: 'raster',
 					tiles: [weatherTileUrl],
-					tileSize: 256
+					tileSize: 256,
+					minzoom: 0,
+					maxzoom: 22
 				});
 				console.log('Added weather source');
 
@@ -615,8 +617,7 @@ console.log('selectedSites', selectedSites)
 					source: 'weather',
 					paint: {
 						'raster-opacity': 0.7
-					},
-					maxzoom: 12 // Limit zoom level for better visibility
+					}
 				}, firstSymbolId); // Insert before first symbol layer to keep text readable
 				console.log('Added weather layer');
 				weatherLayer = true;
