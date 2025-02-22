@@ -505,12 +505,26 @@ console.log('selectedSites', selectedSites)
 				? 'mapbox://styles/mapbox/satellite-streets-v12'
 				: 'mapbox://styles/mapbox/streets-v12';
 
+		// Save the current weather layer state
+		const wasWeatherLayerVisible = weatherLayerVisible;
+
+		// Remove weather layer if it exists before style change
+		if (weatherLayerVisible) {
+			toggleWeatherLayer();
+		}
+
 		map.setStyle(newStyle);
 		currentStyle = newStyle;
 
-		// Re-add markers after style change
+		// Re-add markers and weather layer after style change
 		map.once('style.load', () => {
-			updateMarkers(campSitesStore.get());
+			// Re-add markers
+			updateMarkers($campSitesStore);
+
+			// Re-add weather layer if it was visible before
+			if (wasWeatherLayerVisible) {
+				toggleWeatherLayer();
+			}
 		});
 	}
 	/**
