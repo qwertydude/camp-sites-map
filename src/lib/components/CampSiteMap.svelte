@@ -619,33 +619,7 @@ console.log('selectedSites', selectedSites)
 		color: rgb(229 231 235 / var(--tw-text-opacity));
 	}
 
-	/* Fade-out animation for layer switching */
-	.fade-out {
-		animation: fade-out 0.3s;
-	}
 
-	@keyframes fade-out {
-		0% {
-			opacity: 1;
-		}
-		100% {
-			opacity: 0;
-		}
-	}
-
-	/* .site-pip {
-		color: #1a73e8;
-		font-size: 2rem;
-		cursor: pointer;
-		background-color: white;
-		border-radius: 50%;
-		padding: 5px;
-		box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-	} */
-
-	.user-location {
-		cursor: pointer;
-	}
 
 	:global(.mapboxgl-popup-content) {
 		padding: 10px 15px;
@@ -699,11 +673,4 @@ console.log('selectedSites', selectedSites)
 		padding: 0 4px;
 	}
 
-	.start {
-		background-color: #4caf50;
-	}
-
-	.end {
-		background-color: #ff9800;
-	}
 </style>
