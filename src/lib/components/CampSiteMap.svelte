@@ -27,7 +27,7 @@
 	let citiesLayer = null;
 	let currentRouteLayer;
 	let travelMode = 'foot';
-	let isMenuOpen = false;
+	let isMenuOpen = true;
 	let isSitesPanelOpen = false;
 	let isSettingsPanelOpen = false;
 	let currentStyle = 'mapbox://styles/mapbox/streets-v12'; // Default style
