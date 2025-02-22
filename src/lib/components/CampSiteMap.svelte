@@ -597,24 +597,30 @@ console.log('selectedSites', selectedSites)
 					data: cityPoints
 				});
 
+				// Get all layers and make sure we add our layer at the very top
+				const layers = map.getStyle().layers;
+
 				map.addLayer({
 					id: 'city-temperatures',
 					type: 'symbol',
 					source: 'city-temperatures',
 					layout: {
 						'text-field': ['concat', ['get', 'temperature'], '°C'],
-						'text-size': 12,
-						'text-offset': [1, 0],
+						'text-size': 14,
+						'text-offset': [2, 0],
 						'text-anchor': 'left',
 						'text-allow-overlap': true,
-						'text-ignore-placement': true
+						'text-ignore-placement': true,
+						'symbol-placement': 'point',
+						'symbol-z-order': 'viewport',
+						'visibility': 'visible'
 					},
 					paint: {
 						'text-color': '#E67E22',
 						'text-halo-color': '#fff',
 						'text-halo-width': 2
 					}
-				});
+				}, 'settlement-major-label'); // Add above the city labels
 
 				// Fetch temperatures for each city
 				features.forEach(async (feature) => {
