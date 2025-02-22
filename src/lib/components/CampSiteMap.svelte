@@ -14,6 +14,7 @@
 
 	const dispatch = createEventDispatcher();
 	const mapboxToken = import.meta.env.PUBLIC_MAPBOX_ACCESS_TOKEN;
+const weatherApiKey = import.meta.env.PUBLIC_OPENWEATHER_API_KEY;
 	mapboxgl.accessToken = mapboxToken;
 
 	let map;
@@ -517,6 +518,37 @@ console.log('selectedSites', selectedSites)
 		isSitesPanelOpen = true;
 	}
 
+	export function toggleWeatherLayer() {
+		if (!map) return;
+
+		if (weatherLayerVisible) {
+			if (weatherLayer) {
+				map.removeLayer('weather');
+				map.removeSource('weather');
+				weatherLayer = null;
+			}
+		} else {
+			map.addSource('weather', {
+				type: 'raster',
+				tiles: [
+					`https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${weatherApiKey}`
+				],
+				tileSize: 256
+			});
+
+			map.addLayer({
+				id: 'weather',
+				type: 'raster',
+				source: 'weather',
+				paint: {
+					'raster-opacity': 0.6
+				}
+			});
+			weatherLayer = true;
+		}
+		weatherLayerVisible = !weatherLayerVisible;
+	}
+
 	/**
 	 * Handles the open settings button click.
 	 */
@@ -597,6 +629,7 @@ console.log('selectedSites', selectedSites)
 	on:manageSites={handleManageSites}
 	on:openSettings={handleOpenSettings}
 	on:switchLayer={switchLayer}
+	on:toggleWeather={toggleWeatherLayer}
 />
 <SitesPanel bind:isOpen={isSitesPanelOpen} {map} />
 

@@ -29,6 +29,10 @@
     console.log('handleSwitchLayer called');
     dispatch('switchLayer');
   }
+
+  function handleWeatherLayer() {
+    dispatch('toggleWeather');
+  }
 </script>
 
 <div class="fixed top-0 left-2 z-30 h-full">
@@ -78,6 +82,15 @@
             on:click={handleSwitchLayer}
             title="Switch Map Layer"
             icon="fa-solid fa-layer-group"
+          />
+        </li>
+        <li>
+          <Button
+            variant="menu"
+            fullWidth
+            on:click={handleWeatherLayer}
+            title="Toggle Weather Layer"
+            icon="fa-solid fa-cloud"
           />
         </li>
       </ul>
