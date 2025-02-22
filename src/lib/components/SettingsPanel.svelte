@@ -1,5 +1,6 @@
 <script>
   import { settings } from '$lib/stores/settings.js';
+  import Button from './Button.svelte';
     
   export let isOpen = false;
 
@@ -29,10 +30,12 @@
       bg-gray-50 dark:bg-gray-700 
       border-gray-200 dark:border-gray-600">
       <h2 class="text-lg font-semibold">Settings</h2>
-      <button class="p-1 
-        text-gray-600 dark:text-gray-300 
-        hover:bg-gray-100 dark:hover:bg-gray-600 
-        rounded" on:click={handleClose}>×</button>
+      <Button
+        variant="icon"
+        size="sm"
+        icon="fa-solid fa-times"
+        on:click={handleClose}
+      />
     </div>
 
     <!-- Content -->
@@ -41,14 +44,24 @@
         <div class="space-y-2">
           <h3 class="font-medium text-gray-700 dark:text-gray-300">Theme</h3>
           <div class="theme-button-bar">
-            <button class="theme-button p-2" on:click={() => settings.changeTheme('light')}>
-              <i class="fa-solid fa-sun"></i>
-            </button>
-            <button class="theme-button p-2" on:click={() => settings.changeTheme('dark')}>
-              <i class="fa-solid fa-moon"></i>
-            </button>
-            <button class="theme-button p-2" on:click={() => settings.changeTheme('system')}>
-              <i class="fa-solid fa-desktop"></i>
+            <Button
+              variant="icon"
+              size="md"
+              icon="fa-solid fa-sun"
+              on:click={() => settings.changeTheme('light')}
+            />
+            <Button
+              variant="icon"
+              size="md"
+              icon="fa-solid fa-moon"
+              on:click={() => settings.changeTheme('dark')}
+            />
+            <Button
+              variant="icon"
+              size="md"
+              icon="fa-solid fa-desktop"
+              on:click={() => settings.changeTheme('system')}
+            />
             </button>
           </div>
         </div>
