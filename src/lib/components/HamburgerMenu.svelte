@@ -8,6 +8,7 @@
   export let map;
 
   const dispatch = createEventDispatcher();
+  let showCities = false;
 
   function handleManageSites() {
     dispatch('manageSites');
@@ -33,11 +34,16 @@
   function handleWeatherLayer() {
     dispatch('toggleWeather');
   }
+
+  function handleCitiesLayer() {
+    showCities = !showCities;
+    dispatch('toggleCities');
+  }
 </script>
 
 <div class="fixed top-0 left-2 z-30 h-full">
   <input id="menu-drawer" type="checkbox" class="hidden" bind:checked={isOpen} />
-  
+
   <div class="relative">
     <label 
       for="menu-drawer" 
@@ -91,6 +97,15 @@
             on:click={handleWeatherLayer}
             title="Toggle Weather Layer"
             icon="fa-solid fa-cloud"
+          />
+        </li>
+        <li>
+          <Button
+            variant="menu"
+            fullWidth
+            on:click={handleCitiesLayer}
+            title={`${showCities ? 'Hide' : 'Show'} Cities`}
+            icon="fa-solid fa-city"
           />
         </li>
       </ul>

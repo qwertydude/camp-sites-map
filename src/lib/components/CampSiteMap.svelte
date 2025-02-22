@@ -23,6 +23,8 @@
 	let selectedSites = [];
 	let weatherLayerVisible = false;
 	let weatherLayer = null;
+	let citiesLayerVisible = false;
+	let citiesLayer = null;
 	let currentRouteLayer;
 	let travelMode = 'foot';
 	let isMenuOpen = false;
@@ -549,6 +551,65 @@ console.log('selectedSites', selectedSites)
 		isSitesPanelOpen = true;
 	}
 
+	export async function toggleCitiesLayer() {
+		console.log('toggleCitiesLayer called');
+		if (!map) {
+			console.log('Map not initialized');
+			return;
+		}
+
+		try {
+			console.log('Current cities layer state:', { citiesLayerVisible, citiesLayer });
+
+			if (citiesLayerVisible) {
+				console.log('Removing cities layer');
+				if (map.getLayer('cities')) {
+					map.removeLayer('cities');
+				}
+				if (map.getSource('cities')) {
+					map.removeSource('cities');
+				}
+				citiesLayer = null;
+			} else {
+				console.log('Adding cities layer');
+				// Add a new source for city labels
+				map.addSource('cities', {
+					type: 'vector',
+					url: 'mapbox://mapbox.mapbox-streets-v8'
+				});
+
+				// Add the cities layer using the place_label layer from Mapbox Streets
+				map.addLayer({
+					id: 'cities',
+					type: 'symbol',
+					source: 'cities',
+					'source-layer': 'place_label',
+					layout: {
+						'text-field': ['get', 'name'],
+						'text-size': 14,
+						'text-anchor': 'top',
+						'text-offset': [0, 1]
+					},
+					paint: {
+						'text-color': '#666',
+						'text-halo-color': '#fff',
+						'text-halo-width': 2
+					},
+					filter: ['any', 
+						['==', ['get', 'class'], 'city'],
+						['==', ['get', 'class'], 'state_capital'],
+						['==', ['get', 'class'], 'capital']
+					]
+				});
+				citiesLayer = true;
+			}
+			citiesLayerVisible = !citiesLayerVisible;
+			console.log('Cities layer toggled:', { citiesLayerVisible, citiesLayer });
+		} catch (error) {
+			console.error('Error toggling cities layer:', error);
+		}
+	}
+
 	export async function toggleWeatherLayer() {
 		console.log('toggleWeatherLayer called');
 		if (!map) {
@@ -710,6 +771,7 @@ console.log('selectedSites', selectedSites)
 	on:openSettings={handleOpenSettings}
 	on:switchLayer={switchLayer}
 	on:toggleWeather={toggleWeatherLayer}
+	on:toggleCities={toggleCitiesLayer}
 />
 <SitesPanel bind:isOpen={isSitesPanelOpen} {map} />
 
