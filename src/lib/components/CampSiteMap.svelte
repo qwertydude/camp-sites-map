@@ -549,7 +549,7 @@ console.log('selectedSites', selectedSites)
 		isSitesPanelOpen = true;
 	}
 
-	export function toggleWeatherLayer() {
+	export async function toggleWeatherLayer() {
 		console.log('toggleWeatherLayer called');
 		if (!map) {
 			console.log('Map not initialized');
