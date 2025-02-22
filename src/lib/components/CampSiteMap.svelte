@@ -605,9 +605,18 @@ console.log('selectedSites', selectedSites)
 					type: 'symbol',
 					source: 'city-temperatures',
 					layout: {
-						'text-field': ['concat', ['get', 'temperature'], '°C'],
-						'text-size': 14,
-						'text-offset': [2, 0],
+						'text-field': ['format',
+							' ', {},
+							['concat', ['get', 'temperature'], '°C'], {
+								'font-scale': 0.9,
+								'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
+								'background-color': '#2C3E50',
+								'text-color': '#ECF0F1',
+								'padding': [4, 6]
+							}
+						],
+						'text-size': 11,
+						'text-offset': [1.5, 0],
 						'text-anchor': 'left',
 						'text-allow-overlap': true,
 						'text-ignore-placement': true,
@@ -616,9 +625,9 @@ console.log('selectedSites', selectedSites)
 						'visibility': 'visible'
 					},
 					paint: {
-						'text-color': '#E67E22',
-						'text-halo-color': '#fff',
-						'text-halo-width': 2
+						'text-opacity': 0.9,
+						'text-halo-color': '#2C3E50',
+						'text-halo-width': 0
 					}
 				}, 'settlement-major-label'); // Add above the city labels
 
