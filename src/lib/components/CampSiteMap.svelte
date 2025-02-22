@@ -581,30 +581,14 @@ console.log('selectedSites', selectedSites)
 					return;
 				}
 
-				// Get the map center coordinates
-				const center = map.getCenter();
-				const lat = center.lat;
-				const lon = center.lng;
-
-				// Fetch current weather data for the center of the map
-				try {
-					const response = await fetch(
-						`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${openWeatherMapApiKey}&units=metric`
-					);
-					const weatherData = await response.json();
-					console.log('Weather data for map center:', weatherData);
-
-					// Add the weather tile layer source
-					map.addSource('weather', {
-						type: 'raster',
-						tiles: [
-							`https://maps.openweathermap.org/maps/2.0/weather/PA0/{z}/{x}/{y}?appid=${openWeatherMapApiKey}&opacity=0.6`
-						],
-						tileSize: 256
-					});
-				} catch (error) {
-					console.error('Error fetching weather data:', error);
-				}
+				// Add the weather tile layer source using Weather Maps 1.0
+				map.addSource('weather', {
+					type: 'raster',
+					tiles: [
+						`https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${openWeatherMapApiKey}`
+					],
+					tileSize: 256
+				});
 				console.log('Added weather source');
 
 				// Get the first symbol layer ID
