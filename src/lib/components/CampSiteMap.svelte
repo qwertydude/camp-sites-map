@@ -21,6 +21,8 @@ const weatherApiKey = import.meta.env.PUBLIC_OPENWEATHER_API_KEY;
 	let markers = new Map(); // Store markers with site IDs
 	let isAddSiteMode = false;
 	let selectedSites = [];
+	let weatherLayerVisible = false;
+	let weatherLayer = null;
 	let currentRouteLayer;
 	let travelMode = 'foot';
 	let isMenuOpen = false;
