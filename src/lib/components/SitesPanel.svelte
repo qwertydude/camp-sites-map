@@ -1,7 +1,8 @@
 <script>
 	import { campSitesStore } from '$lib/stores/campSites';
 	import { settings } from '$lib/stores/settings.js';
-  import { getCurrentLocation } from '$lib/utils.js'; // Import the utility function
+	import { getCurrentLocation } from '$lib/utils.js';
+	import Button from './Button.svelte';
 
 	export let isOpen = false;
 	export let map;
@@ -9,7 +10,6 @@
 	function handleClose() {
 		isOpen = false;
 	}
-
 
 	function focusOnSite(site) {
 		if (!map) return;
@@ -35,8 +35,6 @@
 					targetMarker.openPopup();
 				}, 1000);
 			}
-
-			// handleClose();
 		} catch (error) {
 			console.error('Error focusing on site:', error);
 		}
@@ -57,7 +55,7 @@
 	}
 
 	async function handleCurrentLocation() {
-		await getCurrentLocation(map, $settings); // Call the utility function with map and settings
+		await getCurrentLocation(map, $settings);
 	}
 </script>
 
@@ -72,15 +70,20 @@
 			<div class="flex items-center justify-between border-b bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 px-4 py-3">
 				<h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Camp Sites</h2>
 				<div class="flex items-center space-x-2">
-					<button
-            class="p-1 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-300"
-            on:click={handleCurrentLocation}
-            aria-label="Get current location">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 01-1 1H9a1 1 0 000-2h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 001 1v2a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 01-1 1H11a1 1 0 000-2h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-2" />
-            </svg>
-					</button>
-					<button class="p-1 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 rounded" on:click={handleClose}>×</button>
+					<Button
+						variant="icon"
+						size="sm"
+						on:click={handleCurrentLocation}
+						title="Get current location"
+						icon="fa-solid fa-location-crosshairs"
+					/>
+					<Button
+						variant="icon"
+						size="sm"
+						on:click={handleClose}
+						title="Close panel"
+						icon="fa-solid fa-times"
+					/>
 				</div>
 			</div>
 
@@ -107,40 +110,20 @@
 										{/if}
 									</div>
 									<div class="flex items-center space-x-2">
-										<button
-											class="p-1 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-500"
+										<Button
+											variant="icon-blue"
+											size="sm"
 											on:click={() => focusOnSite(site)}
-										>
-											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												class="h-5 w-5"
-												viewBox="0 0 20 20"
-												fill="currentColor"
-											>
-												<path
-													fill-rule="evenodd"
-													d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-													clip-rule="evenodd"
-												/>
-											</svg>
-										</button>
-										<button
-											class="p-1 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-500"
+											title="Focus on site"
+											icon="fa-solid fa-location-dot"
+										/>
+										<Button
+											variant="icon-red"
+											size="sm"
 											on:click={() => deleteSite(site)}
-										>
-											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												class="h-5 w-5"
-												viewBox="0 0 20 20"
-												fill="currentColor"
-											>
-												<path
-													fill-rule="evenodd"
-													d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-													clip-rule="evenodd"
-												/>
-											</svg>
-										</button>
+											title="Delete site"
+											icon="fa-solid fa-trash"
+										/>
 									</div>
 								</div>
 							</div>

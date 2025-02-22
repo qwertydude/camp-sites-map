@@ -1,5 +1,5 @@
 <script>
-  export let variant = 'default'; // default, primary, secondary, icon, menu, route-start, route-end
+  export let variant = 'default'; // default, primary, secondary, icon, menu, route-start, route-end, icon-blue, icon-red
   export let size = 'md'; // sm, md, lg
   export let disabled = false;
   export let type = 'button';
@@ -17,7 +17,9 @@
     icon: 'rounded-md bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200',
     menu: 'w-full p-3 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200',
     'route-start': 'rounded-md bg-blue-500 hover:bg-blue-600 text-white px-2 py-1',
-    'route-end': 'rounded-md bg-blue-500 hover:bg-blue-600 text-white px-2 py-1'
+    'route-end': 'rounded-md bg-blue-500 hover:bg-blue-600 text-white px-2 py-1',
+    'icon-blue': 'p-1 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-500 bg-transparent',
+    'icon-red': 'p-1 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-500 bg-transparent'
   };
   
   const sizeClasses = {
