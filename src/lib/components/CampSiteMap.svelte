@@ -523,32 +523,42 @@ console.log('selectedSites', selectedSites)
 	export function toggleWeatherLayer() {
 		if (!map) return;
 
-		if (weatherLayerVisible) {
-			if (weatherLayer) {
-				map.removeLayer('weather');
-				map.removeSource('weather');
-				weatherLayer = null;
-			}
-		} else {
-			map.addSource('weather', {
-				type: 'raster',
-				tiles: [
-					`https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${weatherApiKey}`
-				],
-				tileSize: 256
-			});
-
-			map.addLayer({
-				id: 'weather',
-				type: 'raster',
-				source: 'weather',
-				paint: {
-					'raster-opacity': 0.6
+		try {
+			if (weatherLayerVisible) {
+				// Check if the layer exists before trying to remove it
+				if (map.getLayer('weather')) {
+					map.removeLayer('weather');
 				}
-			});
-			weatherLayer = true;
+				// Check if the source exists before trying to remove it
+				if (map.getSource('weather')) {
+					map.removeSource('weather');
+				}
+				weatherLayer = null;
+			} else {
+				// Add the source first
+				map.addSource('weather', {
+					type: 'raster',
+					tiles: [
+						`https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${weatherApiKey}`
+					],
+					tileSize: 256
+				});
+
+				// Then add the layer
+				map.addLayer({
+					id: 'weather',
+					type: 'raster',
+					source: 'weather',
+					paint: {
+						'raster-opacity': 0.6
+					}
+				});
+				weatherLayer = true;
+			}
+			weatherLayerVisible = !weatherLayerVisible;
+		} catch (error) {
+			console.error('Error toggling weather layer:', error);
 		}
-		weatherLayerVisible = !weatherLayerVisible;
 	}
 
 	/**
