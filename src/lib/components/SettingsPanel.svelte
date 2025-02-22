@@ -62,7 +62,6 @@
               icon="fa-solid fa-desktop"
               on:click={() => settings.changeTheme('system')}
             />
-            </button>
           </div>
         </div>
 

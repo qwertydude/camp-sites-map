@@ -1,11 +1,11 @@
 <script>
   import { createEventDispatcher } from 'svelte';
   import { settings } from '$lib/stores/settings.js';
-  import { getCurrentLocation } from '$lib/utils.js'; // Import the utility function
+  import { getCurrentLocation } from '$lib/utils.js';
+  import Button from './Button.svelte';
 
   export let isOpen = false;
   export let map;
-
 
   const dispatch = createEventDispatcher();
 
@@ -18,11 +18,11 @@
   }
 
   function gotoCurrentLocation() {
-    getCurrentLocation(map, $settings); // Call the utility function with map and settings
+    getCurrentLocation(map, $settings);
   }
 
   function closeMenu() {
-    isOpen = false; // Set the menu state to closed
+    isOpen = false;
   }
 
   function handleSwitchLayer() {
@@ -37,38 +37,48 @@
   <div class="relative">
     <label 
       for="menu-drawer" 
-      class="hamburger-menu
-             p-3 mt-2
-             text-md
-             dark:bg-gray-700
-             bg-gray-200
-             dark:text-gray-200
-             flex items-center justify-center cursor-pointer"
+      class="hamburger-menu p-3 mt-2 text-md dark:bg-gray-700 bg-gray-200 dark:text-gray-200 flex items-center justify-center cursor-pointer"
     >
-    <i class="fa-solid fa-bars text-sm text-gray-800 dark:text-gray-200"></i>
+      <i class="fa-solid fa-bars text-sm text-gray-800 dark:text-gray-200"></i>
     </label>
 
     <div class={`dropdown ${isOpen ? 'block' : 'hidden'} bg-white dark:bg-gray-700 shadow-lg`}>  
       <ul class="menu space-y-2 cursor-pointer">
         <li>
-          <button on:click={gotoCurrentLocation} class="w-full flex items-center p-3 menu-item" title="Go to current location">
-            <i class="fa-solid fa-house-user text-md text-gray-800 dark:text-gray-200"></i>
-          </button>
+          <Button
+            variant="menu"
+            fullWidth
+            on:click={gotoCurrentLocation}
+            title="Go to current location"
+            icon="fa-solid fa-house-user"
+          />
         </li>
         <li>
-          <button on:click={handleManageSites} class="w-full flex items-center p-3 menu-item" title="Manage sites">
-            <i class="fa-solid fa-map text-md text-gray-800 dark:text-gray-200"></i>
-          </button>
+          <Button
+            variant="menu"
+            fullWidth
+            on:click={handleManageSites}
+            title="Manage sites"
+            icon="fa-solid fa-map"
+          />
         </li>
         <li>
-          <button on:click={handleSettings} class="w-full flex items-center p-3 menu-item" title="Settings">
-            <i class="fa-solid fa-gear text-md text-gray-800 dark:text-gray-200"></i>
-          </button>
+          <Button
+            variant="menu"
+            fullWidth
+            on:click={handleSettings}
+            title="Settings"
+            icon="fa-solid fa-gear"
+          />
         </li>
         <li>
-          <button on:click={handleSwitchLayer} class="w-full flex items-center p-3 menu-item" title="Switch Map Layer">
-            <i class="fa-solid fa-layer-group text-md text-gray-800 dark:text-gray-200"></i>
-          </button>
+          <Button
+            variant="menu"
+            fullWidth
+            on:click={handleSwitchLayer}
+            title="Switch Map Layer"
+            icon="fa-solid fa-layer-group"
+          />
         </li>
       </ul>
     </div>

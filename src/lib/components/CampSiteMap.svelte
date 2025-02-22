@@ -245,8 +245,12 @@ console.log('selectedSites', selectedSites)
 							${site.name ? `<h3>${site.name}</h3>` : ''}
 							${site.description ? `<p>${site.description}</p>` : ''}
 							<div class="popup-buttons">
-								${selectedSites.length === 0 || selectedSites[0].id !== site.id ? '<button class="route-btn start-route bg-blue-500 pt-1 pb-1 pl-2 pr-2 rounded-md text-white">Start Route</button>' : ''}
-								${selectedSites.length === 1 && selectedSites[0].id === site.id ? '<button class="route-btn end-route bg-blue-500 pt-1 pb-1 pl-2 pr-2 rounded-md text-white">End Route</button>' : ''}
+								${selectedSites.length === 0 || selectedSites[0].id !== site.id ? 
+									`<button class="route-btn start-route" data-variant="route-start">Start Route</button>` : 
+									''}
+								${selectedSites.length === 1 && selectedSites[0].id === site.id ? 
+									`<button class="route-btn end-route" data-variant="route-end">End Route</button>` : 
+									''}
 							</div>
 						</div>
 					`

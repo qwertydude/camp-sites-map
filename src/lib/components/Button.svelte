@@ -1,18 +1,23 @@
 <script>
-  export let variant = 'default'; // default, primary, secondary, icon
+  export let variant = 'default'; // default, primary, secondary, icon, menu, route-start, route-end
   export let size = 'md'; // sm, md, lg
   export let disabled = false;
   export let type = 'button';
   export let icon = '';
   export let iconPosition = 'left'; // left, right
+  export let fullWidth = false;
+  export let title = '';
   
-  const baseClasses = 'inline-flex items-center justify-center rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2';
+  const baseClasses = 'inline-flex items-center justify-center transition-colors duration-200 focus:outline-none';
   
   const variantClasses = {
-    default: 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200',
-    primary: 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white',
-    secondary: 'bg-gray-600 hover:bg-gray-700 dark:bg-gray-500 dark:hover:bg-gray-600 text-white',
-    icon: 'bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200'
+    default: 'rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-offset-2',
+    primary: 'rounded-md bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white focus:ring-2 focus:ring-offset-2',
+    secondary: 'rounded-md bg-gray-600 hover:bg-gray-700 dark:bg-gray-500 dark:hover:bg-gray-600 text-white focus:ring-2 focus:ring-offset-2',
+    icon: 'rounded-md bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200',
+    menu: 'w-full p-3 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200',
+    'route-start': 'rounded-md bg-blue-500 hover:bg-blue-600 text-white px-2 py-1',
+    'route-end': 'rounded-md bg-blue-500 hover:bg-blue-600 text-white px-2 py-1'
   };
   
   const sizeClasses = {
@@ -30,7 +35,8 @@
   $: classes = `
     ${baseClasses}
     ${variantClasses[variant]}
-    ${variant === 'icon' ? iconSizeClasses[size] : sizeClasses[size]}
+    ${!['menu', 'route-start', 'route-end'].includes(variant) ? (variant === 'icon' ? iconSizeClasses[size] : sizeClasses[size]) : ''}
+    ${fullWidth ? 'w-full' : ''}
     ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
   `;
 </script>

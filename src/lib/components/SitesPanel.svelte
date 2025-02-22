@@ -72,7 +72,10 @@
 			<div class="flex items-center justify-between border-b bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 px-4 py-3">
 				<h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Camp Sites</h2>
 				<div class="flex items-center space-x-2">
-					<button class="p-1 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-300" on:click={handleCurrentLocation}>
+					<button
+            class="p-1 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-300"
+            on:click={handleCurrentLocation}
+            aria-label="Get current location">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-400" viewBox="0 0 20 20" fill="currentColor">
               <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 01-1 1H9a1 1 0 000-2h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 001 1v2a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 01-1 1H11a1 1 0 000-2h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-2" />
             </svg>
