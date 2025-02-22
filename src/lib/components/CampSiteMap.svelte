@@ -573,15 +573,21 @@ console.log('selectedSites', selectedSites)
 				citiesLayer = false;
 			} else {
 				console.log('Adding temperature markers');
-				// Get major cities from the map
+				// Get cities and towns from the map
 				const features = map.queryRenderedFeatures(undefined, {
-					layers: ['settlement-major-label']
+					layers: ['settlement-major-label', 'settlement-minor-label']
 				});
+
+				// Filter out very small settlements to avoid clutter
+				const filteredFeatures = features.filter(feature => 
+					['city', 'town'].includes(feature.properties.class) ||
+					feature.properties.symbolrank <= 12
+				);
 
 				// Create a GeoJSON source with city points
 				const cityPoints = {
 					type: 'FeatureCollection',
-					features: features.map(feature => ({
+					features: filteredFeatures.map(feature => ({
 						type: 'Feature',
 						geometry: feature.geometry,
 						properties: {
@@ -623,7 +629,7 @@ console.log('selectedSites', selectedSites)
 				}, 'settlement-major-label'); // Add above the city labels
 
 				// Fetch temperatures for each city
-				features.forEach(async (feature) => {
+				filteredFeatures.forEach(async (feature) => {
 					const [lng, lat] = feature.geometry.coordinates;
 					try {
 						const response = await fetch(
