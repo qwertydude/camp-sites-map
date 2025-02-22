@@ -582,11 +582,12 @@ console.log('selectedSites', selectedSites)
 				}
 
 				// Add the weather tile layer source using Weather Maps 1.0
+				const weatherTileUrl = `https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${openWeatherMapApiKey}`;
+				console.log('Weather tile URL template:', weatherTileUrl);
+
 				map.addSource('weather', {
 					type: 'raster',
-					tiles: [
-						`https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${openWeatherMapApiKey}`
-					],
+					tiles: [weatherTileUrl],
 					tileSize: 256
 				});
 				console.log('Added weather source');
