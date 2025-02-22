@@ -581,27 +581,11 @@ console.log('selectedSites', selectedSites)
 					return;
 				}
 
-				// Test the API key first
-				const testUrl = `https://api.openweathermap.org/data/2.5/weather?lat=0&lon=0&appid=${openWeatherMapApiKey}`;
-				console.log('Testing OpenWeatherMap API connection...');
-				try {
-					const response = await fetch(testUrl);
-					const data = await response.json();
-					if (response.ok) {
-						console.log('OpenWeatherMap API test successful');
-					} else {
-						throw new Error(`API Error: ${data.message}`);
-					}
-				} catch (error) {
-					console.error('OpenWeatherMap API test failed:', error);
-					throw error;
-				}
-
-				// Add the source first
+				// Add the source first using Weather Maps 2.0 API
 				map.addSource('weather', {
 					type: 'raster',
 					tiles: [
-						`https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${openWeatherMapApiKey}`
+						`https://maps.openweathermap.org/maps/2.0/weather/PA0/{z}/{x}/{y}?appid=${openWeatherMapApiKey}&opacity=0.6`
 					],
 					tileSize: 256
 				});
