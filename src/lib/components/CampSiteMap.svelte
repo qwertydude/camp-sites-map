@@ -572,34 +572,38 @@ console.log('selectedSites', selectedSites)
 				citiesLayer = null;
 			} else {
 				console.log('Adding cities layer');
-				// Add a new source for city labels
-				map.addSource('cities', {
-					type: 'vector',
-					url: 'mapbox://mapbox.mapbox-streets-v8'
-				});
-
-				// Add the cities layer using the place_label layer from Mapbox Streets
+				// Add the cities layer directly from the map style's layers
 				map.addLayer({
 					id: 'cities',
 					type: 'symbol',
-					source: 'cities',
+					source: 'composite',
 					'source-layer': 'place_label',
 					layout: {
-						'text-field': ['get', 'name'],
-						'text-size': 14,
-						'text-anchor': 'top',
-						'text-offset': [0, 1]
+						'text-field': ['get', 'name_en'],
+						'text-size': [
+							'interpolate',
+							['linear'],
+							['zoom'],
+							3, 12,
+							8, 16
+						],
+						'text-anchor': 'center',
+						'text-transform': 'uppercase',
+						'visibility': 'visible'
 					},
 					paint: {
-						'text-color': '#666',
+						'text-color': '#333',
 						'text-halo-color': '#fff',
 						'text-halo-width': 2
 					},
-					filter: ['any', 
-						['==', ['get', 'class'], 'city'],
-						['==', ['get', 'class'], 'state_capital'],
-						['==', ['get', 'class'], 'capital']
-					]
+					filter: [
+						'match',
+						['get', 'class'],
+						['city', 'town', 'village'],
+						true,
+						false
+					],
+					minzoom: 4
 				});
 				citiesLayer = true;
 			}
