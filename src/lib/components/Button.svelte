@@ -46,6 +46,7 @@
 <button
   {type}
   {disabled}
+  {title}
   class={classes}
   on:click
   {...$$restProps}
