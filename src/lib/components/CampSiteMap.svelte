@@ -590,8 +590,8 @@ console.log('selectedSites', selectedSites)
 				const y = Math.floor((1 - Math.log(Math.tan(center.lat * Math.PI / 180) + 1 / Math.cos(center.lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, zoom));
 
 				// Create both template and sample URLs
-				const weatherTileUrl = `https://maps.openweathermap.org/maps/2.0/weather/TA2/{z}/{x}/{y}?appid=${openWeatherMapApiKey}&opacity=0.6`;
-				const sampleUrl = `https://maps.openweathermap.org/maps/2.0/weather/TA2/${zoom}/${x}/${y}?appid=${openWeatherMapApiKey}&opacity=0.6`;
+				const weatherTileUrl = `https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=${openWeatherMapApiKey}`;
+				const sampleUrl = `https://tile.openweathermap.org/map/temp_new/${zoom}/${x}/${y}.png?appid=${openWeatherMapApiKey}`;
 				
 				console.log('Weather tile URL template:', weatherTileUrl);
 				console.log('Sample weather tile URL (current view):', sampleUrl);
