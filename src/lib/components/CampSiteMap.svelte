@@ -581,9 +581,21 @@ console.log('selectedSites', selectedSites)
 					return;
 				}
 
-				// Add the weather tile layer source using Weather Maps 1.0
+				// Get current map state
+				const zoom = Math.floor(map.getZoom());
+				const center = map.getCenter();
+				
+				// Convert lat/lng to tile coordinates
+				const x = Math.floor((center.lng + 180) / 360 * Math.pow(2, zoom));
+				const y = Math.floor((1 - Math.log(Math.tan(center.lat * Math.PI / 180) + 1 / Math.cos(center.lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, zoom));
+
+				// Create both template and sample URLs
 				const weatherTileUrl = `https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${openWeatherMapApiKey}`;
+				const sampleUrl = `https://tile.openweathermap.org/map/precipitation_new/${zoom}/${x}/${y}.png?appid=${openWeatherMapApiKey}`;
+				
 				console.log('Weather tile URL template:', weatherTileUrl);
+				console.log('Sample weather tile URL (current view):', sampleUrl);
+				console.log('Current map state:', { zoom, center: { lat: center.lat, lng: center.lng }, tileCoords: { x, y } });
 
 				map.addSource('weather', {
 					type: 'raster',
