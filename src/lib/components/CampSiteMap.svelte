@@ -612,7 +612,7 @@ console.log('selectedSites', selectedSites)
 						'text-allow-overlap': true,
 						'text-ignore-placement': true,
 						'symbol-placement': 'point',
-						'symbol-z-order': 'viewport',
+						'symbol-z-order': 'viewport-y',
 						'visibility': 'visible'
 					},
 					paint: {
