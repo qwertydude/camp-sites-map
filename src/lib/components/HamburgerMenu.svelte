@@ -104,7 +104,7 @@
             variant="menu"
             fullWidth
             on:click={handleCitiesLayer}
-            title={`${showCities ? 'Hide' : 'Show'} Cities`}
+            title={`${showCities ? 'Hide' : 'Show'} City Temperatures`}
             icon="fa-solid fa-city"
           />
         </li>

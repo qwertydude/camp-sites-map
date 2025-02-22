@@ -562,18 +562,85 @@ console.log('selectedSites', selectedSites)
 			console.log('Current cities layer state:', { citiesLayerVisible, citiesLayer });
 
 			if (citiesLayerVisible) {
-				console.log('Hiding city labels');
-				// Hide all place labels
-				map.setLayoutProperty('settlement-major-label', 'visibility', 'none');
-				map.setLayoutProperty('settlement-minor-label', 'visibility', 'none');
-				map.setLayoutProperty('settlement-subdivision-label', 'visibility', 'none');
+				console.log('Removing temperature markers');
+				// Remove temperature markers if they exist
+				if (map.getLayer('city-temperatures')) {
+					map.removeLayer('city-temperatures');
+				}
+				if (map.getSource('city-temperatures')) {
+					map.removeSource('city-temperatures');
+				}
 				citiesLayer = false;
 			} else {
-				console.log('Showing city labels');
-				// Show all place labels
-				map.setLayoutProperty('settlement-major-label', 'visibility', 'visible');
-				map.setLayoutProperty('settlement-minor-label', 'visibility', 'visible');
-				map.setLayoutProperty('settlement-subdivision-label', 'visibility', 'visible');
+				console.log('Adding temperature markers');
+				// Get major cities from the map
+				const features = map.queryRenderedFeatures(undefined, {
+					layers: ['settlement-major-label']
+				});
+
+				// Create a GeoJSON source with city points
+				const cityPoints = {
+					type: 'FeatureCollection',
+					features: features.map(feature => ({
+						type: 'Feature',
+						geometry: feature.geometry,
+						properties: {
+							name: feature.properties.name_en,
+							temperature: '...' // Placeholder for temperature
+						}
+					}))
+				};
+
+				// Add the source and layer for temperatures
+				map.addSource('city-temperatures', {
+					type: 'geojson',
+					data: cityPoints
+				});
+
+				map.addLayer({
+					id: 'city-temperatures',
+					type: 'symbol',
+					source: 'city-temperatures',
+					layout: {
+						'text-field': ['concat', ['get', 'temperature'], '°C'],
+						'text-size': 12,
+						'text-offset': [1, 0],
+						'text-anchor': 'left',
+						'text-allow-overlap': true,
+						'text-ignore-placement': true
+					},
+					paint: {
+						'text-color': '#E67E22',
+						'text-halo-color': '#fff',
+						'text-halo-width': 2
+					}
+				});
+
+				// Fetch temperatures for each city
+				features.forEach(async (feature) => {
+					const [lng, lat] = feature.geometry.coordinates;
+					try {
+						const response = await fetch(
+							`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${openWeatherMapApiKey}&units=metric`
+						);
+						const data = await response.json();
+						const temp = Math.round(data.main.temp);
+
+						// Update the temperature in the GeoJSON source
+						const source = map.getSource('city-temperatures');
+						const sourceData = source._data;
+						const cityFeature = sourceData.features.find(
+							f => f.geometry.coordinates[0] === lng && f.geometry.coordinates[1] === lat
+						);
+						if (cityFeature) {
+							cityFeature.properties.temperature = temp.toString();
+							source.setData(sourceData);
+						}
+					} catch (error) {
+						console.error('Error fetching temperature for city:', error);
+					}
+				});
+
 				citiesLayer = true;
 			}
 			citiesLayerVisible = !citiesLayerVisible;
