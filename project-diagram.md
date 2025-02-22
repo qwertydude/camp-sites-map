@@ -1,3 +1,7 @@
+# Project Architecture
+
+## Component Diagram
+
 ```mermaid
 classDiagram
     class CampSiteMap {
@@ -10,6 +14,7 @@ classDiagram
         +calculateRoute(start, end)
         +handleStyleChange(style)
         +handleTravelModeChange(mode)
+        +toggleCitiesLayer()
     }
 
     class MapboxGL {
@@ -38,11 +43,30 @@ classDiagram
         +applyTheme(theme)
     }
 
+    class SettingsPanel {
+        -settings: Settings
+        -visible: boolean
+        +togglePanel()
+        +updateSettings()
+        +saveSettings()
+    }
+
+    class SitesPanel {
+        -sites: Site[]
+        -visible: boolean
+        +togglePanel()
+        +loadSites()
+        +filterSites()
+    }
+
     CampSiteMap --> MapboxGL : uses
     CampSiteMap --> CampSitesStore : subscribes
     CampSiteMap --> SettingsStore : subscribes
-
+    CampSiteMap --> SettingsPanel : contains
+    CampSiteMap --> SitesPanel : contains
 ```
+
+## Sequence Diagram
 
 ```mermaid
 sequenceDiagram
@@ -51,12 +75,14 @@ sequenceDiagram
     participant MB as Mapbox
     participant DB as Supabase
     participant S as Stores
+    participant P as Panels
 
     U->>CM: Open Application
     CM->>S: Initialize Stores
     S->>DB: Load Settings & Sites
     CM->>MB: Initialize Map
     MB-->>CM: Map Instance
+    CM->>P: Update Panels
     
     U->>CM: Select Location
     CM->>MB: Get Coordinates
@@ -68,7 +94,17 @@ sequenceDiagram
     MB-->>CM: Route Data
     CM->>CM: Display Route
 
+    U->>P: Toggle Settings
+    P->>CM: Update Map Settings
+    CM->>MB: Apply Settings
+
+    U->>CM: Toggle Cities
+    CM->>MB: Query City Data
+    MB-->>CM: City Features
+    CM->>CM: Display Temperatures
 ```
+
+## State Diagram
 
 ```mermaid
 stateDiagram-v2
@@ -85,4 +121,8 @@ stateDiagram-v2
     
     MapReady --> ChangingStyle: Style Change
     ChangingStyle --> MapReady: Style Applied
+
+    MapReady --> LoadingCities: Cities Toggled
+    LoadingCities --> FetchingTemperatures: Cities Loaded
+    FetchingTemperatures --> MapReady: Temperatures Displayed
 ```
