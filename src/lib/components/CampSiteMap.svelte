@@ -576,15 +576,20 @@ console.log('selectedSites', selectedSites)
 				});
 				console.log('Added weather source');
 
-				// Then add the layer
+				// Get the first symbol layer ID
+				const layers = map.getStyle().layers;
+				const firstSymbolId = layers.find(layer => layer.type === 'symbol')?.id;
+
+				// Then add the layer before any symbols (so it appears below text but above other layers)
 				map.addLayer({
 					id: 'weather',
 					type: 'raster',
 					source: 'weather',
 					paint: {
-						'raster-opacity': 0.6
-					}
-				});
+						'raster-opacity': 0.7
+					},
+					maxzoom: 12 // Limit zoom level for better visibility
+				}, firstSymbolId); // Insert before first symbol layer to keep text readable
 				console.log('Added weather layer');
 				weatherLayer = true;
 			}
