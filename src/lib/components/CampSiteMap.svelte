@@ -535,20 +535,37 @@ console.log('selectedSites', selectedSites)
 	}
 
 	export function toggleWeatherLayer() {
-		if (!map) return;
+		console.log('toggleWeatherLayer called');
+		if (!map) {
+			console.log('Map not initialized');
+			return;
+		}
 
 		try {
+			console.log('Current weather layer state:', { weatherLayerVisible, weatherLayer });
+
 			if (weatherLayerVisible) {
+				console.log('Attempting to remove weather layer');
 				// Check if the layer exists before trying to remove it
 				if (map.getLayer('weather')) {
+					console.log('Removing weather layer');
 					map.removeLayer('weather');
 				}
 				// Check if the source exists before trying to remove it
 				if (map.getSource('weather')) {
+					console.log('Removing weather source');
 					map.removeSource('weather');
 				}
 				weatherLayer = null;
 			} else {
+				console.log('Attempting to add weather layer');
+				// Wait for the map style to be loaded
+				if (!map.isStyleLoaded()) {
+					console.log('Waiting for style to load');
+					map.once('style.load', () => toggleWeatherLayer());
+					return;
+				}
+
 				// Add the source first
 				map.addSource('weather', {
 					type: 'raster',
@@ -557,6 +574,7 @@ console.log('selectedSites', selectedSites)
 					],
 					tileSize: 256
 				});
+				console.log('Added weather source');
 
 				// Then add the layer
 				map.addLayer({
@@ -567,9 +585,11 @@ console.log('selectedSites', selectedSites)
 						'raster-opacity': 0.6
 					}
 				});
+				console.log('Added weather layer');
 				weatherLayer = true;
 			}
 			weatherLayerVisible = !weatherLayerVisible;
+			console.log('Weather layer toggled:', { weatherLayerVisible, weatherLayer });
 		} catch (error) {
 			console.error('Error toggling weather layer:', error);
 		}
