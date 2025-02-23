@@ -12,6 +12,6 @@ command = "npm run build"
 name = "camp-sites-map-new-prod"
 
 # Enable static asset handling
-[rules]
-[rules.static_assets]
-globs = ["**/*.{js,css,png,jpg,svg,ico}"]
+rules = [
+  { type = "Data", globs = ["**/*.{js,css,png,jpg,svg,ico}"], fallthrough = true }
+]
