@@ -7,3 +7,6 @@ workers_dev = true
 
 [build]
 command = "npm run build"
+
+[site]
+entry-point = "./.svelte-kit/cloudflare/_worker.js"
