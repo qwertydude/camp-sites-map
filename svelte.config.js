@@ -7,12 +7,10 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 export default {
 	kit: {
 		adapter: adapter({
-			// Enable static asset handling
-			assets: true,
-			nodeModules: 'copy',
-			// Handle client-side routing
-			fallback: 'index.html',
-			precompress: false,
+			routes: {
+				include: ['/*'],
+				exclude: ['/api/*']
+			},
 			strict: true
 		})
 	},
