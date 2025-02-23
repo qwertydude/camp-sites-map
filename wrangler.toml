@@ -1,6 +1,7 @@
 compatibility_date = "2024-02-23"
 name = "camp-sites-map-new"
 workers_dev = true
+main = "./.svelte-kit/cloudflare/_worker.js"
 
 [vars]
 # Add your environment variables here if needed
@@ -9,4 +10,4 @@ workers_dev = true
 command = "npm run build"
 
 [site]
-entry-point = "./.svelte-kit/cloudflare/_worker.js"
+bucket = ".svelte-kit/cloudflare"
