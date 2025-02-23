@@ -6,15 +6,20 @@ import path from 'path';
 export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
 	envPrefix: 'PUBLIC_',
-  build: {
-    outDir: 'dist'
-  },
+	build: {
+		outDir: '.svelte-kit/cloudflare',
+		assetsDir: 'assets',
+		manifest: true,
+		ssrManifest: true,
+		eminify: true,
+		ssrEmitAssets: true
+	},
 	server: {
-    fs: {
-      allow: [
-        path.resolve(__dirname, 'static'),
-      ],
-    }
+		fs: {
+			allow: [
+				path.resolve(__dirname, 'static'),
+			],
+		}
 	}
 });
 
