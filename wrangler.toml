@@ -8,14 +8,5 @@ bucket = ".svelte-kit/cloudflare"
 [build]
 command = "npm run build"
 
-[site.static]
-include = [
-  "**/*.html",
-  "**/*.css",
-  "**/*.js",
-  "**/*.json",
-  "**/*.ico",
-  "**/*.png",
-  "**/*.jpg",
-  "**/*.svg"
-]
+[build.upload]
+format = "service-worker"
