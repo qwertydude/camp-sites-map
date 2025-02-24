@@ -17,6 +17,9 @@ export default {
 			precompress: false,
 			strict: true,
 		}),
+		paths: {
+      base: '/camp-sites-map'
+    }
 	},
 	preprocess: vitePreprocess()
 };

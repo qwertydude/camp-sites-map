@@ -13,6 +13,9 @@ export default defineConfig({
 			],
 		}
 	},
+	build: {
+		outDir: 'build',
+	},
 	base: '/camp-sites-map/'
 });
 
