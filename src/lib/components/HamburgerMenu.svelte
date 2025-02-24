@@ -94,18 +94,9 @@
           <Button
             variant="menu"
             fullWidth
-            on:click={handleWeatherLayer}
-            title="Toggle Weather Layer"
-            icon="fa-solid fa-cloud"
-          />
-        </li>
-        <li>
-          <Button
-            variant="menu"
-            fullWidth
             on:click={handleCitiesLayer}
             title={`${showCities ? 'Hide' : 'Show'} City Temperatures`}
-            icon="fa-solid fa-city"
+            icon="fa-solid fa-cloud"
           />
         </li>
       </ul>

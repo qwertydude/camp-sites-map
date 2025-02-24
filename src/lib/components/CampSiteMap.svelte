@@ -24,7 +24,7 @@
 	let weatherLayerVisible = false;
 	let weatherLayer = null;
 	let citiesLayerVisible = false;
-	let citiesLayer = null;
+	let citiesLayer = [];
 	let currentRouteLayer;
 	let travelMode = 'foot';
 	let isMenuOpen = true;
@@ -100,6 +100,7 @@
 				map = new mapboxgl.Map({
 					container: 'map',
 					style: currentStyle,
+					projection:'naturalEarth',
 					center: [startLng, startLat],
 					zoom: $settings.app.defaultZoomLevel
 				});
@@ -566,13 +567,10 @@
 			if (citiesLayerVisible) {
 				console.log('Removing temperature markers');
 				// Remove temperature markers if they exist
-				if (map.getLayer('city-temperatures')) {
-					map.removeLayer('city-temperatures');
-				}
-				if (map.getSource('city-temperatures')) {
-					map.removeSource('city-temperatures');
-				}
-				citiesLayer = false;
+				citiesLayer.forEach((layer) => {
+					layer.remove();
+				});
+				citiesLayer = [];
 			} else {
 				console.log('Adding temperature markers');
 				// Get cities and towns from the map
@@ -589,6 +587,8 @@
 
 				// Remove existing symbol layer for city temperatures
 				// Add markers for each city
+
+				var i = 0;
 				filteredFeatures.forEach(async (feature) => {
 					const [lng, lat] = feature.geometry.coordinates;
 
@@ -608,13 +608,14 @@
 						markerElement.innerHTML = `<div class='temperature-badge'><span class="location" style='background-color: ${getColorForTemperature(temp)};'>${feature.properties.name}</span><span class="temperature">${temp}°C</span></div>`;
 						//							markerElement.innerHTML = `<div class='temperature-badge' style='background-color: ${getColorForTemperature(temp)};'>${feature.properties.name}</div>`;
 						// Create a marker and add it to the map
-						new mapboxgl.Marker(markerElement).setLngLat([lng, lat]).addTo(map);
+						citiesLayer[i] = new mapboxgl.Marker(markerElement).setLngLat([lng, lat]);
+						citiesLayer[i].addTo(map);
+						i++;
 					} catch (error) {
 						console.error('Error fetching temperature for city:', error);
 					}
 				});
 
-				citiesLayer = true;
 			}
 			citiesLayerVisible = !citiesLayerVisible;
 			console.log('Cities layer toggled:', { citiesLayerVisible, citiesLayer });
@@ -808,24 +809,25 @@
 	}
 	function getColorForTemperature(temp) {
 		const colorMap = [
-			{ maxTemp: -40, color: 'rgba(130, 22, 146, 1)' },
-			{ maxTemp: -30, color: 'rgba(130, 87, 219, 1)' },
-			{ maxTemp: -20, color: 'rgba(32, 140, 236, 1)' },
-			{ maxTemp: -10, color: 'rgba(32, 196, 232, 1)' },
-			{ maxTemp: 0, color: 'rgba(35, 221, 221, 1)' },
-			{ maxTemp: 10, color: 'rgba(194, 255, 40, 1)' },
-			{ maxTemp: 20, color: 'rgba(255, 240, 40, 1)' },
-			{ maxTemp: 25, color: 'rgba(255, 194, 40, 1)' },
-			{ maxTemp: 30, color: 'rgba(252, 128, 20, 1)' },
-			{ maxTemp: 35, color: 'rgba(252, 64, 20, 1)' },
-			{ maxTemp: 40, color: 'rgba(252, 0, 20, 1)' }
+			{ maxTemp: -40, bgColor: '#03055B' },
+			{ maxTemp: -30, bgColor: '#1A1D23' },
+			{ maxTemp: -20, bgColor: '#2F4F7F' },
+			{ maxTemp: -10, bgColor: '#4682B4' },
+			{ maxTemp: 0, bgColor: '#6495ED' },
+			{ maxTemp: 10, bgColor: '#77bbef' },
+			{ maxTemp: 20, bgColor: '#FFA07A' },
+			{ maxTemp: 30, bgColor: '#FF8C69' },
+			{ maxTemp: 40, bgColor: '#FF3737' }
 		];
 		console.log('Temp:', temp);
 		console.log('Color map:', colorMap);
 		const match = colorMap.find((entry) => temp <= entry.maxTemp);
 		console.log('Color match:', match);
 
-		return match ? match.color : '#aaaaaa'; // Default color
+		if (match) {
+			
+		}
+		return match ? match.bgColor : '#aaaaaa'; // Default color
 	}
 </script>
 
@@ -917,12 +919,13 @@
 	}
 
 	:global(.temperature-badge) {
+		font-size:11px;
 		display: inline-block;
 		text-align: center;
 	}
 	:global(.location) {
-		color: black;
-		background-color: #e74c3c;
+		color: white;
+		background-color: #aaaaaa;
 		padding: 5px 8px;
 	}
 	:global(.temperature) {
