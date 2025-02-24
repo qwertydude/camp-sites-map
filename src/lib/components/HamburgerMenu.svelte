@@ -8,7 +8,7 @@
   export let map;
 
   const dispatch = createEventDispatcher();
-  let showCities = false;
+  let showTemperatures = false;
 
   function handleManageSites() {
     dispatch('manageSites');
@@ -31,17 +31,17 @@
     dispatch('switchLayer');
   }
 
-  function handleWeatherLayer() {
-    dispatch('toggleWeather');
+  function handleHeatGradientLayer() {
+    dispatch('toggleHeatGradient');
   }
 
-  function handleCitiesLayer() {
-    showCities = !showCities;
-    dispatch('toggleCities');
+  function handleTemperaturesLayer() {
+    showTemperatures = !showTemperatures;
+    dispatch('toggleTemperatures');
   }
 </script>
 
-<div class="fixed top-0 left-2 z-30 h-full">
+<div class="fixed top-10 left-5 z-30 h-full">
   <input id="menu-drawer" type="checkbox" class="hidden" bind:checked={isOpen} />
 
   <div class="relative">
@@ -94,8 +94,8 @@
           <Button
             variant="menu"
             fullWidth
-            on:click={handleCitiesLayer}
-            title={`${showCities ? 'Hide' : 'Show'} City Temperatures`}
+            on:click={handleTemperaturesLayer}
+            title={`${showTemperatures ? 'Hide' : 'Show'} Location Temperatures`}
             icon="fa-solid fa-cloud"
           />
         </li>
