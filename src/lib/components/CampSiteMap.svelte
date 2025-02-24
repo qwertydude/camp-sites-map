@@ -581,7 +581,7 @@ console.log('selectedSites', selectedSites)
 				// Filter out very small settlements to avoid clutter
 				const filteredFeatures = features.filter(feature => 
 					['city', 'town'].includes(feature.properties.class) ||
-					feature.properties.symbolrank <= 12
+					feature.properties.symbolrank <= 24
 				);
 
 				// Create a GeoJSON source with city points
@@ -612,21 +612,23 @@ console.log('selectedSites', selectedSites)
 					source: 'city-temperatures',
 					layout: {
 						'text-field': ['concat', ' ', ['get', 'temperature'], '°C'],
-						'text-size': 11,
-						'text-offset': [1.5, 0],
+						'text-size': 14,
 						'text-anchor': 'left',
 						'text-allow-overlap': true,
 						'text-ignore-placement': true,
 						'symbol-placement': 'point',
-						'symbol-z-order': 'viewport-y',
+						'symbol-z-order': 'source',
+						'text-offset': [0.4, -1.75],
 						'visibility': 'visible'
 					},
 					paint: {
-						'text-color': '#ECF0F1',
-						'text-halo-color': '#2C3E50',
-						'text-halo-width': 2
+						'text-color': '#FFffff'
 					}
 				}, 'settlement-major-label'); // Add above the city labels
+
+
+
+
 
 				// Fetch temperatures for each city
 				filteredFeatures.forEach(async (feature) => {
@@ -902,6 +904,16 @@ console.log('selectedSites', selectedSites)
 
 	:global(.mapboxgl-popup-close-button) {
 		padding: 0 4px;
+	}
+
+	.temperature-badge {
+		background-color: #e74c3c;
+		color: white;
+		padding: 5px 10px;
+		border-radius: 5px;
+		font-weight: bold;
+		display: inline-block;
+		text-align: center;
 	}
 
 </style>
