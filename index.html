@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en" class="light">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="/favicon.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script src="https://kit.fontawesome.com/64b6a32c1b.js" crossorigin="anonymous"></script>
+	
+		<script>
+			// Theme initialization script
+			const getOSTheme = () => 
+				window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+			
+			const savedTheme = localStorage.getItem('app-theme');
+			const initialTheme = savedTheme === 'system' ? getOSTheme() : 
+								 (savedTheme === 'dark' ? 'dark' : 'light');
+			
+			document.documentElement.classList.remove('light', 'dark');
+			document.documentElement.classList.add(initialTheme);
+		</script>
+		
+		<link rel="modulepreload" href="/_app/immutable/entry/start.ZFTvWltZ.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/CP2t2kvN.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/DNYHnErA.js">
+		<link rel="modulepreload" href="/_app/immutable/entry/app.B0-55azf.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/C1FmrZbK.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/DiQ17Gsq.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/DKZZsbTD.js">
+		<link rel="modulepreload" href="/_app/immutable/chunks/CNPciPJZ.js">
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">
+			<script>
+				{
+					__sveltekit_1398wgq = {
+						base: ""
+					};
+
+					const element = document.currentScript.parentElement;
+
+					Promise.all([
+						import("/_app/immutable/entry/start.ZFTvWltZ.js"),
+						import("/_app/immutable/entry/app.B0-55azf.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element);
+					});
+				}
+			</script>
+		</div>
+	</body>
+</html>
