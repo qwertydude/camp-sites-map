@@ -1,7 +1,7 @@
 {
 	"name": "camp-sites-map-new",
 	"private": true,
-	"version": "0.1.26",
+	"version": "0.1.27",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
