@@ -33,7 +33,6 @@
 	let currentStyle = 'mapbox://styles/mapbox/streets-v12'; // Default style
 	let isOpen = false;
 	let popups = [];
-	
 
 	/**
 	 * Returns a template for the route information popup.
@@ -257,26 +256,29 @@
 			const el = document.createElement('div');
 			el.className = 'site-pip-container';
 			el.innerHTML = '<i class="fa-solid fa-location-dot text-3xl drop-shadow-md site-pip"></i>';
-console.log('selectedSites', selectedSites)
-			const popup = new mapboxgl.Popup()
-				.setHTML(
-					`
+			console.log('selectedSites', selectedSites);
+			const popup = new mapboxgl.Popup().setHTML(
+				`
 							<div class="popup-content ${$settings.app.theme === 'dark' ? 'dark' : ''}">
 							${site.name ? `<h3>${site.name}</h3>` : ''}
 							${site.description ? `<p>${site.description}</p>` : ''}
 							<div class="popup-buttons">
-								${selectedSites.length === 0 || selectedSites[0].id !== site.id ? 
-									`<button class="route-btn start-route" data-variant="route-start">Start Route</button>` : 
-									''}
-								${selectedSites.length === 1 && selectedSites[0].id === site.id ? 
-									`<button class="route-btn end-route" data-variant="route-end">End Route</button>` : 
-									''}
+								${
+									selectedSites.length === 0 || selectedSites[0].id !== site.id
+										? `<button class="route-btn start-route" data-variant="route-start">Start Route</button>`
+										: ''
+								}
+								${
+									selectedSites.length === 1 && selectedSites[0].id === site.id
+										? `<button class="route-btn end-route" data-variant="route-end">End Route</button>`
+										: ''
+								}
 							</div>
 						</div>
 					`
-				)
+			);
 
-			const marker = new mapboxgl.Marker({color:'blue',className:'site-pip'})
+			const marker = new mapboxgl.Marker({ color: 'blue', className: 'site-pip' })
 				.setLngLat([site.longitude, site.latitude])
 				.setPopup(popup)
 				.addTo(map);
@@ -284,25 +286,25 @@ console.log('selectedSites', selectedSites)
 			markers.set(site.id, marker);
 
 			popup.on('open', (marker) => {
-					console.log('Popup opened for site:', site.name);
-					const startRoute = document.querySelector('.start-route');
-					const endRoute = document.querySelector('.end-route');
+				console.log('Popup opened for site:', site.name);
+				const startRoute = document.querySelector('.start-route');
+				const endRoute = document.querySelector('.end-route');
 
-					console.log(startRoute, endRoute);
-					// Add click handlers
-					if (startRoute) {
-						startRoute.addEventListener('click', () => {
-							console.log('Start route button clicked');
-							setRouteStart(site, popup);
-						});
-					}
-					if (endRoute) {
-						endRoute.addEventListener('click', () => {
-							console.log('End route button clicked');
-							setRouteEnd(site, popup);
-						});
-					}
-				});	
+				console.log(startRoute, endRoute);
+				// Add click handlers
+				if (startRoute) {
+					startRoute.addEventListener('click', () => {
+						console.log('Start route button clicked');
+						setRouteStart(site, popup);
+					});
+				}
+				if (endRoute) {
+					endRoute.addEventListener('click', () => {
+						console.log('End route button clicked');
+						setRouteEnd(site, popup);
+					});
+				}
+			});
 		});
 	}
 	onMount(async () => {
@@ -579,60 +581,17 @@ console.log('selectedSites', selectedSites)
 				});
 
 				// Filter out very small settlements to avoid clutter
-				const filteredFeatures = features.filter(feature => 
-					['city', 'town'].includes(feature.properties.class) ||
-					feature.properties.symbolrank <= 24
+				const filteredFeatures = features.filter(
+					(feature) =>
+						['city', 'town'].includes(feature.properties.class) ||
+						feature.properties.symbolrank <= 24
 				);
 
-				// Create a GeoJSON source with city points
-				const cityPoints = {
-					type: 'FeatureCollection',
-					features: filteredFeatures.map(feature => ({
-						type: 'Feature',
-						geometry: feature.geometry,
-						properties: {
-							name: feature.properties.name_en,
-							temperature: '...' // Placeholder for temperature
-						}
-					}))
-				};
-
-				// Add the source and layer for temperatures
-				map.addSource('city-temperatures', {
-					type: 'geojson',
-					data: cityPoints
-				});
-
-				// Get all layers and make sure we add our layer at the very top
-				const layers = map.getStyle().layers;
-
-				map.addLayer({
-					id: 'city-temperatures',
-					type: 'symbol',
-					source: 'city-temperatures',
-					layout: {
-						'text-field': ['concat', ' ', ['get', 'temperature'], '°C'],
-						'text-size': 14,
-						'text-anchor': 'left',
-						'text-allow-overlap': true,
-						'text-ignore-placement': true,
-						'symbol-placement': 'point',
-						'symbol-z-order': 'source',
-						'text-offset': [0.4, -1.75],
-						'visibility': 'visible'
-					},
-					paint: {
-						'text-color': '#FFffff'
-					}
-				}, 'settlement-major-label'); // Add above the city labels
-
-
-
-
-
-				// Fetch temperatures for each city
+				// Remove existing symbol layer for city temperatures
+				// Add markers for each city
 				filteredFeatures.forEach(async (feature) => {
 					const [lng, lat] = feature.geometry.coordinates;
+
 					try {
 						const response = await fetch(
 							`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${openWeatherMapApiKey}&units=metric`
@@ -640,16 +599,16 @@ console.log('selectedSites', selectedSites)
 						const data = await response.json();
 						const temp = Math.round(data.main.temp);
 
-						// Update the temperature in the GeoJSON source
-						const source = map.getSource('city-temperatures');
-						const sourceData = source._data;
-						const cityFeature = sourceData.features.find(
-							f => f.geometry.coordinates[0] === lng && f.geometry.coordinates[1] === lat
-						);
-						if (cityFeature) {
-							cityFeature.properties.temperature = temp.toString();
-							source.setData(sourceData);
-						}
+						// Assign the temperature to the feature properties
+						feature.properties.temperature = temp;
+
+						// Create a custom HTML element for the marker
+						const markerElement = document.createElement('div');
+						markerElement.className = 'marker';
+						markerElement.innerHTML = `<div class='temperature-badge'><span class="location" style='background-color: ${getColorForTemperature(temp)};'>${feature.properties.name}</span><span class="temperature">${temp}°C</span></div>`;
+						//							markerElement.innerHTML = `<div class='temperature-badge' style='background-color: ${getColorForTemperature(temp)};'>${feature.properties.name}</div>`;
+						// Create a marker and add it to the map
+						new mapboxgl.Marker(markerElement).setLngLat([lng, lat]).addTo(map);
 					} catch (error) {
 						console.error('Error fetching temperature for city:', error);
 					}
@@ -699,18 +658,30 @@ console.log('selectedSites', selectedSites)
 				// Get current map state
 				const zoom = Math.floor(map.getZoom());
 				const center = map.getCenter();
-				
+
 				// Convert lat/lng to tile coordinates
-				const x = Math.floor((center.lng + 180) / 360 * Math.pow(2, zoom));
-				const y = Math.floor((1 - Math.log(Math.tan(center.lat * Math.PI / 180) + 1 / Math.cos(center.lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, zoom));
+				const x = Math.floor(((center.lng + 180) / 360) * Math.pow(2, zoom));
+				const y = Math.floor(
+					((1 -
+						Math.log(
+							Math.tan((center.lat * Math.PI) / 180) + 1 / Math.cos((center.lat * Math.PI) / 180)
+						) /
+							Math.PI) /
+						2) *
+						Math.pow(2, zoom)
+				);
 
 				// Create both template and sample URLs
 				const weatherTileUrl = `https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=${openWeatherMapApiKey}`;
 				const sampleUrl = `https://tile.openweathermap.org/map/temp_new/${zoom}/${x}/${y}.png?appid=${openWeatherMapApiKey}`;
-				
+
 				console.log('Weather tile URL template:', weatherTileUrl);
 				console.log('Sample weather tile URL (current view):', sampleUrl);
-				console.log('Current map state:', { zoom, center: { lat: center.lat, lng: center.lng }, tileCoords: { x, y } });
+				console.log('Current map state:', {
+					zoom,
+					center: { lat: center.lat, lng: center.lng },
+					tileCoords: { x, y }
+				});
 
 				map.addSource('weather', {
 					type: 'raster',
@@ -723,17 +694,20 @@ console.log('selectedSites', selectedSites)
 
 				// Get the first symbol layer ID
 				const layers = map.getStyle().layers;
-				const firstSymbolId = layers.find(layer => layer.type === 'symbol')?.id;
+				const firstSymbolId = layers.find((layer) => layer.type === 'symbol')?.id;
 
 				// Then add the layer before any symbols (so it appears below text but above other layers)
-				map.addLayer({
-					id: 'weather',
-					type: 'raster',
-					source: 'weather',
-					paint: {
-						'raster-opacity': 0.7
-					}
-				}, firstSymbolId); // Insert before first symbol layer to keep text readable
+				map.addLayer(
+					{
+						id: 'weather',
+						type: 'raster',
+						source: 'weather',
+						paint: {
+							'raster-opacity': 0.7
+						}
+					},
+					firstSymbolId
+				); // Insert before first symbol layer to keep text readable
 				console.log('Added weather layer');
 				weatherLayer = true;
 			}
@@ -761,22 +735,22 @@ console.log('selectedSites', selectedSites)
 	function setRouteStart(site, popup) {
 		selectedSites = [{ id: site.id, lat: site.latitude, lng: site.longitude }];
 		console.log('Route start set:', selectedSites);
-		
+
 		// Remove the old marker
 		const oldMarker = markers.get(site.id);
 		if (oldMarker) {
 			oldMarker.remove();
 		}
-		
+
 		// Create a new marker with green color
-		const newMarker = new mapboxgl.Marker({ 
+		const newMarker = new mapboxgl.Marker({
 			color: '#4CAF50',
 			className: 'site-pip start'
 		})
 			.setLngLat([site.longitude, site.latitude])
 			.setPopup(popup)
 			.addTo(map);
-		
+
 		// Update the markers Map with the new marker
 		markers.set(site.id, newMarker);
 	}
@@ -792,28 +766,66 @@ console.log('selectedSites', selectedSites)
 		if (selectedSites.length === 1) {
 			selectedSites.push({ id: site.id, lat: site.latitude, lng: site.longitude });
 			console.log('Route end set:', selectedSites);
-			
+
 			// Remove the old marker
 			const oldMarker = markers.get(site.id);
 			if (oldMarker) {
 				oldMarker.remove();
 			}
-			
+
 			// Create a new marker with orange color
-			const newMarker = new mapboxgl.Marker({ 
+			const newMarker = new mapboxgl.Marker({
 				color: '#FF9800',
 				className: 'site-pip end'
 			})
 				.setLngLat([site.longitude, site.latitude])
 				.setPopup(popup)
 				.addTo(map);
-			
+
 			// Update the markers Map with the new marker
 			markers.set(site.id, newMarker);
-			
+
 			// Calculate the route
 			calculateRoute(selectedSites[0], selectedSites[1]);
 		}
+	}
+
+	function oldgetColorForTemperature(temp) {
+		console.log('Getting color for temp:', temp);
+		if (temp <= -65) return 'rgba(130, 22, 146, 1)';
+		if (temp <= -55) return 'rgba(130, 22, 146, 1)';
+		if (temp <= -45) return 'rgba(130, 22, 146, 1)';
+		if (temp <= -40) return 'rgba(130, 22, 146, 1)';
+		if (temp <= -30) return 'rgba(130, 87, 219, 1)';
+		if (temp <= -20) return 'rgba(32, 140, 236, 1)';
+		if (temp <= -10) return 'rgba(32, 196, 232, 1)';
+		if (temp <= 0) return 'rgba(35, 221, 221, 1)';
+		if (temp <= 10) return 'rgba(194, 255, 40, 1)';
+		if (temp <= 20) return 'rgba(255, 240, 40, 1)';
+		if (temp <= 25) return 'rgba(255, 194, 40, 1)';
+		if (temp <= 30) return 'rgba(252, 128, 20, 1)';
+		return '#aaaaaa'; // Default color
+	}
+	function getColorForTemperature(temp) {
+		const colorMap = [
+			{ maxTemp: -40, color: 'rgba(130, 22, 146, 1)' },
+			{ maxTemp: -30, color: 'rgba(130, 87, 219, 1)' },
+			{ maxTemp: -20, color: 'rgba(32, 140, 236, 1)' },
+			{ maxTemp: -10, color: 'rgba(32, 196, 232, 1)' },
+			{ maxTemp: 0, color: 'rgba(35, 221, 221, 1)' },
+			{ maxTemp: 10, color: 'rgba(194, 255, 40, 1)' },
+			{ maxTemp: 20, color: 'rgba(255, 240, 40, 1)' },
+			{ maxTemp: 25, color: 'rgba(255, 194, 40, 1)' },
+			{ maxTemp: 30, color: 'rgba(252, 128, 20, 1)' },
+			{ maxTemp: 35, color: 'rgba(252, 64, 20, 1)' },
+			{ maxTemp: 40, color: 'rgba(252, 0, 20, 1)' }
+		];
+		console.log('Temp:', temp);
+		console.log('Color map:', colorMap);
+		const match = colorMap.find((entry) => temp <= entry.maxTemp);
+		console.log('Color match:', match);
+
+		return match ? match.color : '#aaaaaa'; // Default color
 	}
 </script>
 
@@ -851,8 +863,6 @@ console.log('selectedSites', selectedSites)
 	:global(.leaflet-popup.dark .leaflet-popup-content) {
 		color: rgb(229 231 235 / var(--tw-text-opacity));
 	}
-
-
 
 	:global(.mapboxgl-popup-content) {
 		padding: 10px 15px;
@@ -906,14 +916,18 @@ console.log('selectedSites', selectedSites)
 		padding: 0 4px;
 	}
 
-	.temperature-badge {
-		background-color: #e74c3c;
-		color: white;
-		padding: 5px 10px;
-		border-radius: 5px;
-		font-weight: bold;
+	:global(.temperature-badge) {
 		display: inline-block;
 		text-align: center;
 	}
-
+	:global(.location) {
+		color: black;
+		background-color: #e74c3c;
+		padding: 5px 8px;
+	}
+	:global(.temperature) {
+		color: white;
+		background-color: #777777;
+		padding: 5px 8px;
+	}
 </style>
