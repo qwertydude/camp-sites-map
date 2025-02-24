@@ -12,6 +12,7 @@ export default defineConfig({
 				path.resolve(__dirname, 'static'),
 			],
 		}
-	}
+	},
+	base: '/camp-sites-map/'
 });
 
