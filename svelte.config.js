@@ -1,4 +1,4 @@
-import adapter from '@sveltejs/adapter-static';
+import adapter from '@sveltejs/adapter-cloudflare';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -17,9 +17,6 @@ export default {
 			precompress: false,
 			strict: true,
 		}),
-		paths: {
-      base: '/camp-sites-map'
-    }
 	},
 	preprocess: vitePreprocess()
 };
