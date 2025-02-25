@@ -14,18 +14,12 @@ export default defineConfig({
 		}
 	},
 	build: {
-		outDir: 'build',
-		chunkSizeWarningLimit: 1000, // Increase limit
     rollupOptions: {
       output: {
-				manualChunks(id) {
-          if (id.includes('node_modules')) {
-            return 'vendor';
-          }
-				}
+				manualChunks: undefined,
+				inlineDynamicImports: true
       }
     }
 	},
-	base: '/camp-sites-map/'
 });
 
