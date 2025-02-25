@@ -266,12 +266,12 @@
 							<div class="popup-buttons">
 								${
 									selectedSites.length === 0 || selectedSites[0].id !== site.id
-										? `<button class="route-btn start-route" data-variant="route-start">Start Route</button>`
+										? `<button class="route-btn start-route" data-variant="route-start" data-site-id="${site.id}">Start: ${site.name}</button>`
 										: ''
 								}
 								${
 									selectedSites.length === 1 && selectedSites[0].id === site.id
-										? `<button class="route-btn end-route" data-variant="route-end">End Route</button>`
+										? `<button class="route-btn end-route" data-variant="route-end" data-site-id="${site.id}">End: ${site.name}</button>`
 										: ''
 								}
 							</div>
