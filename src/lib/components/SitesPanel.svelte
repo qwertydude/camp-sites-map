@@ -60,7 +60,7 @@
 </script>
 
 <div
-	class="fixed inset-y-0 left-0 z-50 w-80 transform transition-transform duration-300 ease-in-out {isOpen
+	class="fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out {isOpen
 		? 'translate-x-0'
 		: '-translate-x-full'}"
 >
@@ -68,7 +68,7 @@
 		<div class="flex h-full flex-col">
 			<!-- Header -->
 			<div class="flex items-center justify-between border-b bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 px-4 py-3">
-				<h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Camp Sites</h2>
+				<h2 class="text-md font-semibold text-gray-800 dark:text-gray-200">Camp Sites</h2>
 				<div class="flex items-center space-x-2">
 					<Button
 						variant="icon"
@@ -90,7 +90,7 @@
 			<!-- Content -->
 			<div class="flex-1 overflow-y-auto">
 				{#if $campSitesStore.length === 0}
-					<div class="p-4 text-center text-gray-500 dark:text-gray-400">
+					<div class="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
 						<p>No locations saved yet</p>
 					</div>
 				{:else}
@@ -103,7 +103,7 @@
 											type="text"
 											value={site.name}
 											on:blur={(e) => updateSiteName(site, e)}
-											class="w-full border-none bg-transparent p-0 font-medium focus:ring-0 text-gray-900 dark:text-gray-100"
+											class="w-full border-none bg-transparent p-0 font-medium focus:ring-0 text-gray-900 dark:text-gray-100 text-sm"
 										/>
 										{#if site.description}
 											<p class="truncate text-xs text-gray-500 dark:text-gray-400">{site.description}</p>

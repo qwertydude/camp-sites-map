@@ -23,12 +23,18 @@
     'icon-red': 'p-1 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-500 bg-transparent'
   };
   
-  const sizeClasses = {
+  const OLDsizeClasses = {
     sm: 'px-2 py-1 text-sm',
     md: 'px-4 py-2',
     lg: 'px-6 py-3 text-lg'
   };
-  
+
+  const sizeClasses = {
+    sm: 'text-sm',
+    md: '',
+    lg: 'text-lg'
+  };
+
   const iconSizeClasses = {
     sm: 'w-6 h-6',
     md: 'w-8 h-8',
