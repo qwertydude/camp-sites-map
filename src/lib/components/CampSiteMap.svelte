@@ -279,7 +279,7 @@
 					`
 			);
 
-			const marker = new mapboxgl.Marker({ color: 'blue', className: 'site-pip', scale: 0.75 })
+			const marker = new mapboxgl.Marker({ color: 'blue', className: 'site-pip', scale: 0.65 })
 				.setLngLat([site.longitude, site.latitude])
 				.setPopup(popup)
 				.addTo(map);
@@ -746,7 +746,7 @@
 		const newMarker = new mapboxgl.Marker({
 			color: '#4CAF50',
 			className: 'site-pip start',
-			scale: 0.75
+			scale: 0.65
 		})
 			.setLngLat([site.longitude, site.latitude])
 			.setPopup(popup)
