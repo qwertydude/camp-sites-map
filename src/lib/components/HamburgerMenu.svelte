@@ -8,6 +8,7 @@
 
   const dispatch = createEventDispatcher();
   let showTemperatures = false;
+  let mapType ='map';
 
   function handleManageSites() {
     dispatch('manageSites');
@@ -22,7 +23,8 @@
   }
 
   function handleSwitchLayer() {
-    console.log('handleSwitchLayer called');
+    mapType = mapType === 'map' ? 'globe' : 'map';
+    console.log('Map type:', mapType);
     dispatch('switchLayer');
   }
 
@@ -55,7 +57,7 @@
       variant="menu"
       on:click={handleSwitchLayer}
       title="Switch Map Layer"
-      icon="fa-solid fa-layer-group"
+      icon="fa-solid fa-{mapType}"
       selected={false}
     />
     <Button
