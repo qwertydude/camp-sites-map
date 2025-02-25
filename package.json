@@ -12,7 +12,8 @@
 		"lint": "prettier --check . && eslint .",
 		"test": "vitest",
 		"test:coverage": "vitest run --coverage",
-		"deploy": "wrangler pages deploy ./build"
+		"predeploy": "npm run build",
+		"deploy": "wrangler pages deploy .svelte-kit/cloudflare"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.5",
