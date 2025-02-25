@@ -48,26 +48,29 @@
       variant="menu"
       on:click={handleManageSites}
       title="Manage sites"
-      icon="fa-solid fa-map"
-    />
-    <Button
-      variant="menu"
-      on:click={handleSettings}
-      title="Settings"
-      icon="fa-solid fa-gear"
+      icon="fa-solid fa-list"
+      selected={false}
     />
     <Button
       variant="menu"
       on:click={handleSwitchLayer}
       title="Switch Map Layer"
       icon="fa-solid fa-layer-group"
+      selected={false}
     />
     <Button
       variant="menu"
       on:click={handleTemperaturesLayer}
       title={`${showTemperatures ? 'Hide' : 'Show'} Location Temperatures`}
       icon="fa-solid fa-cloud"
+      selected={showTemperatures}
+    />
+    <Button
+      variant="menu"
+      on:click={handleSettings}
+      title="Settings"
+      icon="fa-solid fa-gear"
+      selected={false}
     />
   </div>
 </div>
-
