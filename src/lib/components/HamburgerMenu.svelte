@@ -71,12 +71,3 @@
   </div>
 </div>
 
-<style>
-.close-button {
-    background: none;
-    color:#888;
-    border: none;
-    font-size: 1.5em;
-    cursor: pointer;
-}
-</style>
