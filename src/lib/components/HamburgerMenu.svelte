@@ -4,7 +4,6 @@
   import { getCurrentLocation } from '$lib/utils.js';
   import Button from './Button.svelte';
 
-  export let isOpen = false;
   export let map;
 
   const dispatch = createEventDispatcher();
@@ -22,10 +21,6 @@
     getCurrentLocation(map, $settings);
   }
 
-  function closeMenu() {
-    isOpen = false;
-  }
-
   function handleSwitchLayer() {
     console.log('handleSwitchLayer called');
     dispatch('switchLayer');
@@ -41,69 +36,40 @@
   }
 </script>
 
-<div class="fixed top-10 left-5 z-30 h-full">
-  <input id="menu-drawer" type="checkbox" class="hidden" bind:checked={isOpen} />
-
-  <div class="relative">
-    <label 
-      for="menu-drawer" 
-      class="hamburger-menu p-3 mt-2 text-md dark:bg-gray-700 bg-gray-200 dark:text-gray-200 flex items-center justify-center cursor-pointer"
-    >
-      <i class="fa-solid fa-bars text-sm text-gray-800 dark:text-gray-200"></i>
-    </label>
-
-    <div class={`dropdown ${isOpen ? 'block' : 'hidden'} bg-white dark:bg-gray-700 shadow-lg`}>  
-      <ul class="menu space-y-2 cursor-pointer">
-        <li>
-          <Button
-            variant="menu"
-            fullWidth
-            on:click={gotoCurrentLocation}
-            title="Go to current location"
-            icon="fa-solid fa-house-user"
-          />
-        </li>
-        <li>
-          <Button
-            variant="menu"
-            fullWidth
-            on:click={handleManageSites}
-            title="Manage sites"
-            icon="fa-solid fa-map"
-          />
-        </li>
-        <li>
-          <Button
-            variant="menu"
-            fullWidth
-            on:click={handleSettings}
-            title="Settings"
-            icon="fa-solid fa-gear"
-          />
-        </li>
-        <li>
-          <Button
-            variant="menu"
-            fullWidth
-            on:click={handleSwitchLayer}
-            title="Switch Map Layer"
-            icon="fa-solid fa-layer-group"
-          />
-        </li>
-        <li>
-          <Button
-            variant="menu"
-            fullWidth
-            on:click={handleTemperaturesLayer}
-            title={`${showTemperatures ? 'Hide' : 'Show'} Location Temperatures`}
-            icon="fa-solid fa-cloud"
-          />
-        </li>
-      </ul>
-    </div>
+<div class="fixed bottom-0 left-1/2 transform -translate-x-1/2 z-30 w-full bg-white dark:bg-gray-700 shadow-lg">
+  <div class="flex justify-center gap-2 py-0">
+    <Button
+      variant="menu"
+      on:click={gotoCurrentLocation}
+      title="Go to current location"
+      icon="fa-solid fa-house-user"
+    />
+    <Button
+      variant="menu"
+      on:click={handleManageSites}
+      title="Manage sites"
+      icon="fa-solid fa-map"
+    />
+    <Button
+      variant="menu"
+      on:click={handleSettings}
+      title="Settings"
+      icon="fa-solid fa-gear"
+    />
+    <Button
+      variant="menu"
+      on:click={handleSwitchLayer}
+      title="Switch Map Layer"
+      icon="fa-solid fa-layer-group"
+    />
+    <Button
+      variant="menu"
+      on:click={handleTemperaturesLayer}
+      title={`${showTemperatures ? 'Hide' : 'Show'} Location Temperatures`}
+      icon="fa-solid fa-cloud"
+    />
   </div>
 </div>
-
 
 <style>
 .close-button {
