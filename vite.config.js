@@ -7,11 +7,19 @@ export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
 	envPrefix: 'PUBLIC_',
 	server: {
-    fs: {
-      allow: [
-        path.resolve(__dirname, 'static'),
-      ],
+		fs: {
+			allow: [
+				path.resolve(__dirname, 'static'),
+			],
+		}
+	},
+	build: {
+    rollupOptions: {
+      output: {
+				manualChunks: undefined,
+				inlineDynamicImports: true
+      }
     }
-	}
+	},
 });
 

@@ -7,6 +7,7 @@
   export let iconPosition = 'left'; // left, right
   export let fullWidth = false;
   export let title = '';
+  export let className = '';
   
   const baseClasses = 'inline-flex items-center justify-center transition-colors duration-200 focus:outline-none';
   
@@ -40,6 +41,7 @@
     ${!['menu', 'route-start', 'route-end'].includes(variant) ? (variant === 'icon' ? iconSizeClasses[size] : sizeClasses[size]) : ''}
     ${fullWidth ? 'w-full' : ''}
     ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+    ${className}
   `;
 </script>
 

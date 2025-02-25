@@ -21,10 +21,10 @@
 	let markers = new Map(); // Store markers with site IDs
 	let isAddSiteMode = false;
 	let selectedSites = [];
-	let weatherLayerVisible = false;
-	let weatherLayer = null;
-	let citiesLayerVisible = false;
-	let citiesLayer = null;
+	let heatGradientLayerVisible = false;
+	let heatGradientLayer = null;
+	let temperaturesLayerVisible = false;
+	let temperaturesLayer = [];
 	let currentRouteLayer;
 	let travelMode = 'foot';
 	let isMenuOpen = true;
@@ -33,7 +33,6 @@
 	let currentStyle = 'mapbox://styles/mapbox/streets-v12'; // Default style
 	let isOpen = false;
 	let popups = [];
-	
 
 	/**
 	 * Returns a template for the route information popup.
@@ -101,6 +100,7 @@
 				map = new mapboxgl.Map({
 					container: 'map',
 					style: currentStyle,
+					projection: 'equirectangular',
 					center: [startLng, startLat],
 					zoom: $settings.app.defaultZoomLevel
 				});
@@ -257,26 +257,29 @@
 			const el = document.createElement('div');
 			el.className = 'site-pip-container';
 			el.innerHTML = '<i class="fa-solid fa-location-dot text-3xl drop-shadow-md site-pip"></i>';
-console.log('selectedSites', selectedSites)
-			const popup = new mapboxgl.Popup()
-				.setHTML(
-					`
+			console.log('selectedSites', selectedSites);
+			const popup = new mapboxgl.Popup().setHTML(
+				`
 							<div class="popup-content ${$settings.app.theme === 'dark' ? 'dark' : ''}">
 							${site.name ? `<h3>${site.name}</h3>` : ''}
 							${site.description ? `<p>${site.description}</p>` : ''}
 							<div class="popup-buttons">
-								${selectedSites.length === 0 || selectedSites[0].id !== site.id ? 
-									`<button class="route-btn start-route" data-variant="route-start">Start Route</button>` : 
-									''}
-								${selectedSites.length === 1 && selectedSites[0].id === site.id ? 
-									`<button class="route-btn end-route" data-variant="route-end">End Route</button>` : 
-									''}
+								${
+									selectedSites.length === 0 || selectedSites[0].id !== site.id
+										? `<button class="route-btn start-route" data-variant="route-start">Start Route</button>`
+										: ''
+								}
+								${
+									selectedSites.length === 1 && selectedSites[0].id === site.id
+										? `<button class="route-btn end-route" data-variant="route-end">End Route</button>`
+										: ''
+								}
 							</div>
 						</div>
 					`
-				)
+			);
 
-			const marker = new mapboxgl.Marker({color:'blue',className:'site-pip'})
+			const marker = new mapboxgl.Marker({ color: 'blue', className: 'site-pip', scale: 0.75 })
 				.setLngLat([site.longitude, site.latitude])
 				.setPopup(popup)
 				.addTo(map);
@@ -284,25 +287,25 @@ console.log('selectedSites', selectedSites)
 			markers.set(site.id, marker);
 
 			popup.on('open', (marker) => {
-					console.log('Popup opened for site:', site.name);
-					const startRoute = document.querySelector('.start-route');
-					const endRoute = document.querySelector('.end-route');
+				console.log('Popup opened for site:', site.name);
+				const startRoute = document.querySelector('.start-route');
+				const endRoute = document.querySelector('.end-route');
 
-					console.log(startRoute, endRoute);
-					// Add click handlers
-					if (startRoute) {
-						startRoute.addEventListener('click', () => {
-							console.log('Start route button clicked');
-							setRouteStart(site, popup);
-						});
-					}
-					if (endRoute) {
-						endRoute.addEventListener('click', () => {
-							console.log('End route button clicked');
-							setRouteEnd(site, popup);
-						});
-					}
-				});	
+				console.log(startRoute, endRoute);
+				// Add click handlers
+				if (startRoute) {
+					startRoute.addEventListener('click', () => {
+						console.log('Start route button clicked');
+						setRouteStart(site, popup);
+					});
+				}
+				if (endRoute) {
+					endRoute.addEventListener('click', () => {
+						console.log('End route button clicked');
+						setRouteEnd(site, popup);
+					});
+				}
+			});
 		});
 	}
 	onMount(async () => {
@@ -523,11 +526,11 @@ console.log('selectedSites', selectedSites)
 				: 'mapbox://styles/mapbox/streets-v12';
 
 		// Save the current weather layer state
-		const wasWeatherLayerVisible = weatherLayerVisible;
+		const wasWeatherLayerVisible = heatGradientLayerVisible;
 
 		// Remove weather layer if it exists before style change
-		if (weatherLayerVisible) {
-			toggleWeatherLayer();
+		if (heatGradientLayerVisible) {
+			toggleHeatGradientLayer();
 		}
 
 		map.setStyle(newStyle);
@@ -540,7 +543,7 @@ console.log('selectedSites', selectedSites)
 
 			// Re-add weather layer if it was visible before
 			if (wasWeatherLayerVisible) {
-				toggleWeatherLayer();
+				toggleHeatGradientLayer();
 			}
 		});
 	}
@@ -551,26 +554,23 @@ console.log('selectedSites', selectedSites)
 		isSitesPanelOpen = true;
 	}
 
-	export async function toggleCitiesLayer() {
-		console.log('toggleCitiesLayer called');
+	export async function toggleTemperaturesLayer() {
+		console.log('toggleTemperaturesLayer called');
 		if (!map) {
 			console.log('Map not initialized');
 			return;
 		}
 
 		try {
-			console.log('Current cities layer state:', { citiesLayerVisible, citiesLayer });
+			console.log('Current cities layer state:', { citiesLayerVisible: temperaturesLayerVisible, citiesLayer: temperaturesLayer });
 
-			if (citiesLayerVisible) {
+			if (temperaturesLayerVisible) {
 				console.log('Removing temperature markers');
 				// Remove temperature markers if they exist
-				if (map.getLayer('city-temperatures')) {
-					map.removeLayer('city-temperatures');
-				}
-				if (map.getSource('city-temperatures')) {
-					map.removeSource('city-temperatures');
-				}
-				citiesLayer = false;
+				temperaturesLayer.forEach((layer) => {
+					layer.remove();
+				});
+				temperaturesLayer = [];
 			} else {
 				console.log('Adding temperature markers');
 				// Get cities and towns from the map
@@ -579,58 +579,19 @@ console.log('selectedSites', selectedSites)
 				});
 
 				// Filter out very small settlements to avoid clutter
-				const filteredFeatures = features.filter(feature => 
-					['city', 'town'].includes(feature.properties.class) ||
-					feature.properties.symbolrank <= 12
+				const filteredFeatures = features.filter(
+					(feature) =>
+						['city', 'town'].includes(feature.properties.class) ||
+						feature.properties.symbolrank <= 24
 				);
 
-				// Create a GeoJSON source with city points
-				const cityPoints = {
-					type: 'FeatureCollection',
-					features: filteredFeatures.map(feature => ({
-						type: 'Feature',
-						geometry: feature.geometry,
-						properties: {
-							name: feature.properties.name_en,
-							temperature: '...' // Placeholder for temperature
-						}
-					}))
-				};
+				// Remove existing symbol layer for city temperatures
+				// Add markers for each city
 
-				// Add the source and layer for temperatures
-				map.addSource('city-temperatures', {
-					type: 'geojson',
-					data: cityPoints
-				});
-
-				// Get all layers and make sure we add our layer at the very top
-				const layers = map.getStyle().layers;
-
-				map.addLayer({
-					id: 'city-temperatures',
-					type: 'symbol',
-					source: 'city-temperatures',
-					layout: {
-						'text-field': ['concat', ' ', ['get', 'temperature'], '°C'],
-						'text-size': 11,
-						'text-offset': [1.5, 0],
-						'text-anchor': 'left',
-						'text-allow-overlap': true,
-						'text-ignore-placement': true,
-						'symbol-placement': 'point',
-						'symbol-z-order': 'viewport-y',
-						'visibility': 'visible'
-					},
-					paint: {
-						'text-color': '#ECF0F1',
-						'text-halo-color': '#2C3E50',
-						'text-halo-width': 2
-					}
-				}, 'settlement-major-label'); // Add above the city labels
-
-				// Fetch temperatures for each city
+				var i = 0;
 				filteredFeatures.forEach(async (feature) => {
 					const [lng, lat] = feature.geometry.coordinates;
+
 					try {
 						const response = await fetch(
 							`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${openWeatherMapApiKey}&units=metric`
@@ -638,31 +599,31 @@ console.log('selectedSites', selectedSites)
 						const data = await response.json();
 						const temp = Math.round(data.main.temp);
 
-						// Update the temperature in the GeoJSON source
-						const source = map.getSource('city-temperatures');
-						const sourceData = source._data;
-						const cityFeature = sourceData.features.find(
-							f => f.geometry.coordinates[0] === lng && f.geometry.coordinates[1] === lat
-						);
-						if (cityFeature) {
-							cityFeature.properties.temperature = temp.toString();
-							source.setData(sourceData);
-						}
+						// Assign the temperature to the feature properties
+						feature.properties.temperature = temp;
+
+						// Create a custom HTML element for the marker
+						const markerElement = document.createElement('div');
+						markerElement.className = 'marker';
+						markerElement.innerHTML = `<div class='temperature-badge'><span class="location temp-below-${getColorForTemperature(temp)}" >${feature.properties.name}</span><span class="temperature">${temp}°C</span></div>`;
+
+						// Create a marker and add it to the map
+						temperaturesLayer[i] = new mapboxgl.Marker(markerElement).setLngLat([lng, lat]);
+						temperaturesLayer[i].addTo(map);
+						i++;
 					} catch (error) {
 						console.error('Error fetching temperature for city:', error);
 					}
 				});
-
-				citiesLayer = true;
 			}
-			citiesLayerVisible = !citiesLayerVisible;
-			console.log('Cities layer toggled:', { citiesLayerVisible, citiesLayer });
+			temperaturesLayerVisible = !temperaturesLayerVisible;
+			console.log('Cities layer toggled:', { citiesLayerVisible: temperaturesLayerVisible, citiesLayer: temperaturesLayer });
 		} catch (error) {
 			console.error('Error toggling cities layer:', error);
 		}
 	}
 
-	export async function toggleWeatherLayer() {
+	export async function toggleHeatGradientLayer() {
 		console.log('toggleWeatherLayer called');
 		if (!map) {
 			console.log('Map not initialized');
@@ -670,9 +631,9 @@ console.log('selectedSites', selectedSites)
 		}
 
 		try {
-			console.log('Current weather layer state:', { weatherLayerVisible, weatherLayer });
+			console.log('Current weather layer state:', { weatherLayerVisible: heatGradientLayerVisible, weatherLayer: heatGradientLayer });
 
-			if (weatherLayerVisible) {
+			if (heatGradientLayerVisible) {
 				console.log('Attempting to remove weather layer');
 				// Check if the layer exists before trying to remove it
 				if (map.getLayer('weather')) {
@@ -684,31 +645,43 @@ console.log('selectedSites', selectedSites)
 					console.log('Removing weather source');
 					map.removeSource('weather');
 				}
-				weatherLayer = null;
+				heatGradientLayer = null;
 			} else {
 				console.log('Attempting to add weather layer');
 				// Wait for the map style to be loaded
 				if (!map.isStyleLoaded()) {
 					console.log('Waiting for style to load');
-					map.once('style.load', () => toggleWeatherLayer());
+					map.once('style.load', () => toggleHeatGradientLayer());
 					return;
 				}
 
 				// Get current map state
 				const zoom = Math.floor(map.getZoom());
 				const center = map.getCenter();
-				
+
 				// Convert lat/lng to tile coordinates
-				const x = Math.floor((center.lng + 180) / 360 * Math.pow(2, zoom));
-				const y = Math.floor((1 - Math.log(Math.tan(center.lat * Math.PI / 180) + 1 / Math.cos(center.lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, zoom));
+				const x = Math.floor(((center.lng + 180) / 360) * Math.pow(2, zoom));
+				const y = Math.floor(
+					((1 -
+						Math.log(
+							Math.tan((center.lat * Math.PI) / 180) + 1 / Math.cos((center.lat * Math.PI) / 180)
+						) /
+							Math.PI) /
+						2) *
+						Math.pow(2, zoom)
+				);
 
 				// Create both template and sample URLs
 				const weatherTileUrl = `https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=${openWeatherMapApiKey}`;
 				const sampleUrl = `https://tile.openweathermap.org/map/temp_new/${zoom}/${x}/${y}.png?appid=${openWeatherMapApiKey}`;
-				
+
 				console.log('Weather tile URL template:', weatherTileUrl);
 				console.log('Sample weather tile URL (current view):', sampleUrl);
-				console.log('Current map state:', { zoom, center: { lat: center.lat, lng: center.lng }, tileCoords: { x, y } });
+				console.log('Current map state:', {
+					zoom,
+					center: { lat: center.lat, lng: center.lng },
+					tileCoords: { x, y }
+				});
 
 				map.addSource('weather', {
 					type: 'raster',
@@ -721,22 +694,25 @@ console.log('selectedSites', selectedSites)
 
 				// Get the first symbol layer ID
 				const layers = map.getStyle().layers;
-				const firstSymbolId = layers.find(layer => layer.type === 'symbol')?.id;
+				const firstSymbolId = layers.find((layer) => layer.type === 'symbol')?.id;
 
 				// Then add the layer before any symbols (so it appears below text but above other layers)
-				map.addLayer({
-					id: 'weather',
-					type: 'raster',
-					source: 'weather',
-					paint: {
-						'raster-opacity': 0.7
-					}
-				}, firstSymbolId); // Insert before first symbol layer to keep text readable
+				map.addLayer(
+					{
+						id: 'weather',
+						type: 'raster',
+						source: 'weather',
+						paint: {
+							'raster-opacity': 0.7
+						}
+					},
+					firstSymbolId
+				); // Insert before first symbol layer to keep text readable
 				console.log('Added weather layer');
-				weatherLayer = true;
+				heatGradientLayer = true;
 			}
-			weatherLayerVisible = !weatherLayerVisible;
-			console.log('Weather layer toggled:', { weatherLayerVisible, weatherLayer });
+			heatGradientLayerVisible = !heatGradientLayerVisible;
+			console.log('Weather layer toggled:', { weatherLayerVisible: heatGradientLayerVisible, weatherLayer: heatGradientLayer });
 		} catch (error) {
 			console.error('Error toggling weather layer:', error);
 		}
@@ -759,22 +735,23 @@ console.log('selectedSites', selectedSites)
 	function setRouteStart(site, popup) {
 		selectedSites = [{ id: site.id, lat: site.latitude, lng: site.longitude }];
 		console.log('Route start set:', selectedSites);
-		
+
 		// Remove the old marker
 		const oldMarker = markers.get(site.id);
 		if (oldMarker) {
 			oldMarker.remove();
 		}
-		
+
 		// Create a new marker with green color
-		const newMarker = new mapboxgl.Marker({ 
+		const newMarker = new mapboxgl.Marker({
 			color: '#4CAF50',
-			className: 'site-pip start'
+			className: 'site-pip start',
+			scale: 0.75
 		})
 			.setLngLat([site.longitude, site.latitude])
 			.setPopup(popup)
 			.addTo(map);
-		
+
 		// Update the markers Map with the new marker
 		markers.set(site.id, newMarker);
 	}
@@ -790,28 +767,47 @@ console.log('selectedSites', selectedSites)
 		if (selectedSites.length === 1) {
 			selectedSites.push({ id: site.id, lat: site.latitude, lng: site.longitude });
 			console.log('Route end set:', selectedSites);
-			
+
 			// Remove the old marker
 			const oldMarker = markers.get(site.id);
 			if (oldMarker) {
 				oldMarker.remove();
 			}
-			
+
 			// Create a new marker with orange color
-			const newMarker = new mapboxgl.Marker({ 
+			const newMarker = new mapboxgl.Marker({
 				color: '#FF9800',
 				className: 'site-pip end'
 			})
 				.setLngLat([site.longitude, site.latitude])
 				.setPopup(popup)
 				.addTo(map);
-			
+
 			// Update the markers Map with the new marker
 			markers.set(site.id, newMarker);
-			
+
 			// Calculate the route
 			calculateRoute(selectedSites[0], selectedSites[1]);
 		}
+	}
+	function getColorForTemperature(temp) {
+		const colorMap = [
+			{ maxTemp: -40 },
+			{ maxTemp: -30 },
+			{ maxTemp: -20 },
+			{ maxTemp: -10 },
+			{ maxTemp: 0 },
+			{ maxTemp: 10 },
+			{ maxTemp: 20 },
+			{ maxTemp: 30 },
+			{ maxTemp: 40 }
+		];
+		console.log('Temp:', temp);
+		console.log('Color map:', colorMap);
+		const match = colorMap.find((entry) => temp <= entry.maxTemp);
+		console.log('Color match:', match.maxTemp.toString());
+
+		return match ? match.maxTemp.toString() : 'na'; // Default color
 	}
 </script>
 
@@ -822,8 +818,8 @@ console.log('selectedSites', selectedSites)
 	on:manageSites={handleManageSites}
 	on:openSettings={handleOpenSettings}
 	on:switchLayer={switchLayer}
-	on:toggleWeather={toggleWeatherLayer}
-	on:toggleCities={toggleCitiesLayer}
+	on:toggleHeatGradient={toggleHeatGradientLayer}
+	on:toggleTemperatures={toggleTemperaturesLayer}
 />
 <SitesPanel bind:isOpen={isSitesPanelOpen} {map} />
 
@@ -849,8 +845,6 @@ console.log('selectedSites', selectedSites)
 	:global(.leaflet-popup.dark .leaflet-popup-content) {
 		color: rgb(229 231 235 / var(--tw-text-opacity));
 	}
-
-
 
 	:global(.mapboxgl-popup-content) {
 		padding: 10px 15px;
@@ -904,4 +898,60 @@ console.log('selectedSites', selectedSites)
 		padding: 0 4px;
 	}
 
+	:global(.temperature-badge) {
+		font-size: 11px;
+		display: inline-block;
+		text-align: center;
+	}
+	:global(.location) {
+		color: white;
+		background-color: #aaaaaa;
+		padding: 5px 5px 5px 8px;
+		border-radius: 15px 0 0 15px;
+	}
+	:global(.temperature) {
+		color: white;
+		background-color: #777777;
+		padding: 5px 8px 5px 5px;
+		border-radius: 0 15px 15px 0;
+	}
+
+	:global(.temp-below-40) {
+		background: #ff3038;
+	}
+
+	:global(.temp-below-30) {
+		background: #f56048;
+	}
+
+	:global(.temp-below-20) {
+		background: #fbaa1b;
+	}
+
+	:global(.temp-below-10) {
+		background: #e8d024;
+	}
+
+	:global(.temp-below-0) {
+		background: #60bdfa;
+	}
+
+	:global(.temp-below--10) {
+		background: #1c71f2;
+	}
+
+	:global(.temp-below--20) {
+		background: #0c51f2;
+	}
+	:global(.temp-below--30) {
+		background: #1122dd;
+	}
+
+	:global(.temp-below--40) {
+		background: #1122aa;
+	}
+
+	:global(.temp-below-na) {
+		background: gray;
+	}
 </style>
