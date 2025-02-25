@@ -94,7 +94,7 @@
 						<p>No locations saved yet</p>
 					</div>
 				{:else}
-					<div class="divide-y">
+					<div class="divide-y divide-gray-200 dark:divide-gray-700">
 						{#each $campSitesStore as site}
 							<div class="px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700">
 								<div class="flex items-center justify-between">
