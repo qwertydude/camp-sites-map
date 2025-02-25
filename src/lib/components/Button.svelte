@@ -16,7 +16,7 @@
     primary: 'rounded-md bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white focus:ring-2 focus:ring-offset-2',
     secondary: 'rounded-md bg-gray-600 hover:bg-gray-700 dark:bg-gray-500 dark:hover:bg-gray-600 text-white focus:ring-2 focus:ring-offset-2',
     icon: 'rounded-md bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200',
-    menu: 'w-full p-3 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200',
+    menu: `${fullWidth ? 'w-full' : ''} p-3 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200`,
     'route-start': 'rounded-md bg-blue-500 hover:bg-blue-600 text-white px-2 py-1',
     'route-end': 'rounded-md bg-blue-500 hover:bg-blue-600 text-white px-2 py-1',
     'icon-blue': 'p-1 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-500 bg-transparent',
