@@ -4,6 +4,10 @@
   export let disabled = false;
   export let type = 'button';
   export let icon = '';
+  export let iconColor = 'text-gray-700 dark:text-gray-200';
+  export let iconBackground = 'bg-transparent';
+  export let iconSelectedColor = 'checked:text-blue-600 dark:checked:text-blue-500';
+  export let iconSelectedBackground = 'checked:bg-blue-600 dark:checked:bg-blue-500';
   export let iconPosition = 'left'; // left, right
   export let fullWidth = false;
   export let title = '';
@@ -17,10 +21,6 @@
     secondary: 'rounded-md bg-gray-600 hover:bg-gray-700 dark:bg-gray-500 dark:hover:bg-gray-600 text-white focus:ring-2 focus:ring-offset-2',
     icon: 'rounded-md bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200',
     menu: `${fullWidth ? 'w-full' : ''} p-3 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200`,
-    'route-start': 'rounded-md bg-blue-500 hover:bg-blue-600 text-white px-2 py-1',
-    'route-end': 'rounded-md bg-blue-500 hover:bg-blue-600 text-white px-2 py-1',
-    'icon-blue': 'p-1 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-500 bg-transparent',
-    'icon-red': 'p-1 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-500 bg-transparent'
   };
   
   const OLDsizeClasses = {
@@ -48,6 +48,10 @@
     ${fullWidth ? 'w-full' : ''}
     ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
     ${className}
+    ${iconColor}
+    ${iconBackground}
+    ${iconSelectedColor}
+    ${iconSelectedBackground}
   `;
 </script>
 

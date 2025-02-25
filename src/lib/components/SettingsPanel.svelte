@@ -20,7 +20,7 @@
   }
 </script>
 
-<div class="fixed inset-y-0 left-0 w-80 shadow-lg transform transition-transform duration-300 ease-in-out z-50 
+<div class="fixed inset-y-0 left-0 w-64 shadow-lg transform transition-transform duration-300 ease-in-out z-50 
   {isOpen ? 'translate-x-0' : '-translate-x-full'}
   bg-white dark:bg-gray-800 
   text-gray-900 dark:text-gray-100">
@@ -29,7 +29,7 @@
     <div class="px-4 py-3 border-b flex items-center justify-between 
       bg-gray-50 dark:bg-gray-700 
       border-gray-200 dark:border-gray-600">
-      <h2 class="text-lg font-semibold">Settings</h2>
+      <h2 class="text-md font-semibold">Settings</h2>
       <Button
         variant="icon"
         size="sm"
@@ -46,19 +46,19 @@
           <div class="theme-button-bar">
             <Button
               variant="icon"
-              size="md"
+              size="sm"
               icon="fa-solid fa-sun"
               on:click={() => settings.changeTheme('light')}
             />
             <Button
               variant="icon"
-              size="md"
+              size="sm"
               icon="fa-solid fa-moon"
               on:click={() => settings.changeTheme('dark')}
             />
             <Button
               variant="icon"
-              size="md"
+              size="sm"
               icon="fa-solid fa-desktop"
               on:click={() => settings.changeTheme('system')}
             />
@@ -68,7 +68,11 @@
         <div class="space-y-2">
           <h3 class="font-medium text-gray-700 dark:text-gray-300">Zoom Levels</h3>
           <div>
-            <label for="default-zoom" class="block text-sm text-gray-600 dark:text-gray-400">Default Zoom</label>
+            <label for="default-zoom" class="block text-sm text-gray-800 dark:text-gray-200">Default Zoom:&nbsp;
+              <span class="text-sm text-gray-500 dark:text-gray-400">
+              {$settings.app.defaultZoomLevel}
+            </span>
+            </label>
             <input 
               id="default-zoom"
               type="range" 
@@ -82,13 +86,14 @@
                 appearance-none 
                 cursor-pointer"
             />
-            <span class="text-sm text-gray-500 dark:text-gray-400">
-              {$settings.app.defaultZoomLevel}
-            </span>
           </div>
 
           <div>
-            <label for="focus-zoom" class="block text-sm text-gray-600 dark:text-gray-400">Focus Zoom</label>
+            <label for="focus-zoom" class="block text-sm text-gray-800 dark:text-gray-200">Focus Zoom:&nbsp;
+              <span class="text-sm text-gray-500 dark:text-gray-400">
+              {$settings.app.focusZoomLevel}
+            </span>
+            </label>
             <input 
               id="focus-zoom"
               type="range" 
@@ -102,9 +107,6 @@
                 appearance-none 
                 cursor-pointer"
             />
-            <span class="text-sm text-gray-500 dark:text-gray-400">
-              {$settings.app.focusZoomLevel}
-            </span>
           </div>
         </div>
       </div>

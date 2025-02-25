@@ -54,7 +54,7 @@
 		}
 	}
 
-	async function handleCurrentLocation() {
+	async function gotoCurrentLocation() {
 		await getCurrentLocation(map, $settings);
 	}
 </script>
@@ -73,8 +73,8 @@
 					<Button
 						variant="icon"
 						size="sm"
-						on:click={handleCurrentLocation}
-						title="Get current location"
+						on:click={gotoCurrentLocation}
+						title="Go to current location"
 						icon="fa-solid fa-location-crosshairs"
 					/>
 					<Button
@@ -116,14 +116,16 @@
 											on:click={() => focusOnSite(site)}
 											title="Focus on site"
 											icon="fa-solid fa-location-dot"
-										/>
+											iconColor="text-blue-600 dark:text-blue-500"
+											/>
 										<Button
 											variant="icon-red"
 											size="sm"
 											on:click={() => deleteSite(site)}
 											title="Delete site"
 											icon="fa-solid fa-trash"
-										/>
+											iconColor="text-red-600 dark:text-red-500"
+											/>
 									</div>
 								</div>
 							</div>

@@ -42,7 +42,7 @@
       variant="menu"
       on:click={gotoCurrentLocation}
       title="Go to current location"
-      icon="fa-solid fa-house-user"
+      icon="fa-solid fa-location-crosshairs"
     />
     <Button
       variant="menu"
