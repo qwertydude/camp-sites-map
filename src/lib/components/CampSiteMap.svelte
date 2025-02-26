@@ -37,7 +37,7 @@
 	let dialogVisible = false;
 	let dialogContent = '';
 	let dialogTitle = 'Route Information';
-	let dialogPosition = { top: '50%', left: '50%' };
+	let dialogPosition = { top: '100px', left: '100px' };
 	
 
 	/**
@@ -468,7 +468,7 @@
 				dialogVisible = true;
 				dialogContent = getRouteInfoTemplate(travelMode, routes);
 				dialogTitle = 'Route Information';
-				dialogPosition = { top: '50%', left: '50%' };
+				dialogPosition = { top: '100px', left: '100px' };
 
 				// Change existing markers for start and end points with appropriate colors
 				if (startMarker) {
