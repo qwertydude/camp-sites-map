@@ -9,6 +9,7 @@
 	import HamburgerMenu from '$lib/components/HamburgerMenu.svelte';
 	import SitesPanel from '$lib/components/SitesPanel.svelte';
 	import SettingsPanel from '$lib/components/SettingsPanel.svelte';
+	import FloatingDialog from '$lib/components/FloatingDialog.svelte';
 	import mapboxgl from 'mapbox-gl';
 	import 'mapbox-gl/dist/mapbox-gl.css';
 
@@ -33,6 +34,11 @@
 	let currentStyle = 'mapbox://styles/mapbox/streets-v12'; // Default style
 	let isOpen = false;
 	let popups = [];
+	let dialogVisible = false;
+	let dialogContent = '';
+	let dialogTitle = 'Route Information';
+	let dialogPosition = { top: '50%', left: '50%' };
+	
 
 	/**
 	 * Returns a template for the route information popup.
@@ -74,8 +80,6 @@
 			</div>
 		`;
 	}
-	let startMarker;
-	let endMarker;
 
 	/**
 	 * Initializes the map with the given position.
@@ -427,8 +431,9 @@
 			if (currentRouteLayer) {
 				// Add click handler to the route
 				currentRouteLayer.on('click', async (e) => {
-					const popupContent = document.createElement('div');
-					popupContent.innerHTML = getRouteInfoTemplate(travelMode, routes);
+					dialogVisible = true;
+					dialogContent = getRouteInfoTemplate(travelMode, routes);
+					dialogPosition = { top: `${e.point.y}px`, left: `${e.point.x}px` };
 
 					// Add click handlers for the travel mode buttons after popup is added to DOM
 					setTimeout(() => {
@@ -440,9 +445,6 @@
 							});
 						});
 					}, 0);
-
-					// Create and open the popup
-					new mapboxgl.Popup({className: $settings.app.theme+'-theme'}).setLngLat(e.lngLat).setDOMContent(popupContent).addTo(map);
 				});
 
 				// Zoom to the route when generated
@@ -462,39 +464,11 @@
 					durationString = `${minutes} min${minutes !== 1 ? 's' : ''}`;
 				}
 
-				// Show the route information in a popup
-				//routes = routeDDList.join('<br>');
-
-				const popupContent = document.createElement('div');
-				popupContent.innerHTML = getRouteInfoTemplate(travelMode, routes);
-
-				// Add event listener to the popup content
-				popupContent.addEventListener('click', async (event) => {
-					if (event.target.classList.contains('route-link')) {
-						const index = event.target.dataset.index;
-						console.log('Clicked route index:', index);
-						currentRouteLayer.remove();
-						currentRouteLayer = await drawRoute(map, data.routes[index].geometry);
-						map.fitBounds(currentRouteLayer.getBounds());
-					}
-				});
-
-				// Add event listeners to the buttons
-				const buttons = popupContent.querySelectorAll('.travel-mode-btn');
-				buttons.forEach((button) => {
-					button.addEventListener('click', () => {
-						const mode = button.dataset.mode;
-						console.log('Setting travel mode to:', mode);
-						setTravelMode(mode);
-					});
-				});
-
-				// Create and open the popup
-
-				new mapboxgl.Popup({className: $settings.app.theme+'-theme'})
-					.setLngLat([(start.lng + end.lng) / 2,(start.lat + end.lat) / 2])
-					.setDOMContent(popupContent)
-					.addTo(map);
+				// Show the route information in a FloatingDialog
+				dialogVisible = true;
+				dialogContent = getRouteInfoTemplate(travelMode, routes);
+				dialogTitle = 'Route Information';
+				dialogPosition = { top: '50%', left: '50%' };
 
 				// Change existing markers for start and end points with appropriate colors
 				if (startMarker) {
@@ -845,6 +819,14 @@
 <SitesPanel bind:isOpen={isSitesPanelOpen} {map} />
 
 <SettingsPanel bind:isOpen={isSettingsPanelOpen} />
+
+<FloatingDialog
+	bind:isVisible={dialogVisible}
+	title={dialogTitle}
+	content={dialogContent}
+	position={dialogPosition}
+	onClose={() => dialogVisible = false}
+/>
 
 <style>
 	.map-container {
