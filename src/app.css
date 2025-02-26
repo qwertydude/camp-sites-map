@@ -139,38 +139,45 @@ textarea.site-input {
     margin-top: 0.5rem;
 }
 
-.confirm-btn, .cancel-btn {
-    padding: 0.5rem 1rem;
+.popup-buttons button {
     border-radius: 0.375rem;
+    padding: 0.5rem 1rem;
     font-weight: 500;
-    border: none;
     cursor: pointer;
+    border: none;
 }
 
-.confirm-btn {
+.popup-buttons .start-route {
     background-color: rgb(37 99 235); /* bg-blue-600 */
     color: white;
 }
 
-:root[class~="dark"] .confirm-btn {
-    background-color: rgb(29 78 216); /* bg-blue-700 */
-}
-
-:root[class~="dark"] .confirm-btn:hover {
+.popup-buttons .start-route:hover {
     background-color: rgb(30 64 175); /* bg-blue-800 */
 }
 
-.cancel-btn {
+.popup-buttons .end-route {
     background-color: rgb(229 231 235); /* bg-gray-200 */
     color: rgb(17 24 39); /* text-gray-900 */
 }
 
-:root[class~="dark"] .cancel-btn {
-    background-color: rgb(75 85 99); /* bg-gray-600 */
-    color: rgb(229 231 235); /* text-gray-200 */
+.popup-buttons .end-route:hover {
+    background-color: rgb(107 114 128); /* bg-gray-500 */
 }
 
-:root[class~="dark"] .cancel-btn:hover {
+:root[class~="dark"] .popup-buttons .start-route {
+    background-color: rgb(29 78 216); /* bg-blue-700 */
+}
+
+:root[class~="dark"] .popup-buttons .start-route:hover {
+    background-color: rgb(30 64 175); /* bg-blue-800 */
+}
+
+:root[class~="dark"] .popup-buttons .end-route {
+    background-color: rgb(75 85 99); /* bg-gray-600 */
+}
+
+:root[class~="dark"] .popup-buttons .end-route:hover {
     background-color: rgb(107 114 128); /* bg-gray-500 */
 }
 
