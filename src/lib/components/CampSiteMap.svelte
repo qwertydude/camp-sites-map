@@ -38,7 +38,8 @@
 	let dialogContent = '';
 	let dialogTitle = 'Route Information';
 	let dialogPosition = { top: '100px', left: '100px' };
-	
+	let startMarker;
+	let endMarker;
 
 	/**
 	 * Returns a template for the route information popup.

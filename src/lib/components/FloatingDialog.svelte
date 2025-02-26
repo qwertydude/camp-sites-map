@@ -78,19 +78,22 @@
 
 {#if isVisible}
 <div 
-    class="floating-dialog" 
+    class="floating-dialog bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-lg" 
     bind:this={dialogElement}
     on:mousedown={handleMouseDown}
     style="top: {position.top}; left: {position.left};"
+    role="dialog"
+    aria-labelledby="dialog-title"
+    aria-modal="true"
 >
     <div class="dialog-header">
         <div class="drag-handle">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M3,15H21V13H3V15M3,19H21V17H3V19M3,11H21V9H3V11M3,5V7H21V5H3Z" />
             </svg>
         </div>
-        <h3>{title}</h3>
-        <button on:click={onClose} class="close-btn">×</button>
+        <h3 id="dialog-title">{title}</h3>
+        <button on:click={onClose} class="close-btn" aria-label="Close dialog">×</button>
     </div>
     <div class="dialog-content">
         {@html content}
@@ -102,7 +105,6 @@
     .floating-dialog {
         position: fixed;
         transform: translate(0, 0);
-        background: white;
         border: 1px solid #ccc;
         border-radius: 8px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
