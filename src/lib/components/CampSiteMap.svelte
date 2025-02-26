@@ -152,7 +152,7 @@
 				const currentZoom = map.getZoom();
 				if (currentZoom < 14) {
 					new mapboxgl.Popup({
-						className: 'dark:bg-gray-800 dark:text-gray-100 p-5'
+						className: $settings.app.theme+'-theme'
 					})
 						.setLngLat(point)
 						.setHTML(
@@ -188,7 +188,7 @@
 
 				// Create and show the popup
 				const popup = new mapboxgl.Popup({
-					className: 'dark:bg-gray-800 dark:text-gray-100',
+					className: $settings.app.theme+'-theme',
 					maxWidth: '300px'
 				})
 					.setLngLat(point)
@@ -261,7 +261,7 @@
 			el.innerHTML = '<i class="fa-solid fa-location-dot text-3xl drop-shadow-md site-pip"></i>';
 
 			// Create an empty popup first
-			const popup = new mapboxgl.Popup();
+			const popup = new mapboxgl.Popup({ className: $settings.app.theme+'-theme' });
 
 			const marker = new mapboxgl.Marker({ color: 'blue', className: 'site-pip', scale: 0.65 })
 				.setLngLat([site.longitude, site.latitude])
@@ -421,87 +421,94 @@
 
 			// Draw the new route
 			currentRouteLayer = await drawRoute(map, data.routes[0].geometry);
+			console.log('currentRouteLayer:', currentRouteLayer);
 
-			// Add click handler to the route
-			currentRouteLayer.on('click', async (e) => {
+			// Check if currentRouteLayer is defined
+			if (currentRouteLayer) {
+				// Add click handler to the route
+				currentRouteLayer.on('click', async (e) => {
+					const popupContent = document.createElement('div');
+					popupContent.innerHTML = getRouteInfoTemplate(travelMode, routes);
+
+					// Add click handlers for the travel mode buttons after popup is added to DOM
+					setTimeout(() => {
+						document.querySelectorAll('.travel-mode-btn').forEach((btn) => {
+							btn.addEventListener('click', (event) => {
+								const mode = event.currentTarget.dataset.mode;
+								travelMode = mode;
+								calculateRoute(start, end);
+							});
+						});
+					}, 0);
+
+					// Create and open the popup
+					new mapboxgl.Popup({className: $settings.app.theme+'-theme'}).setLngLat(e.lngLat).setDOMContent(popupContent).addTo(map);
+				});
+
+				// Zoom to the route when generated
+				map.fitBounds(currentRouteLayer.getBounds());
+
+				// Calculate distance in kilometers
+				const distanceKm = (data.routes[0].distance / 1000).toFixed(1);
+				const durationInMinutes = Math.round(data.routes[0].duration / 60); // Convert seconds to minutes
+				const hours = Math.floor(durationInMinutes / 60);
+				const minutes = durationInMinutes % 60;
+
+				// Format the duration string
+				let durationString;
+				if (hours > 0) {
+					durationString = `${hours} hr${hours > 1 ? 's' : ''} ${minutes} min${minutes !== 1 ? 's' : ''}`;
+				} else {
+					durationString = `${minutes} min${minutes !== 1 ? 's' : ''}`;
+				}
+
+				// Show the route information in a popup
+				//routes = routeDDList.join('<br>');
+
 				const popupContent = document.createElement('div');
 				popupContent.innerHTML = getRouteInfoTemplate(travelMode, routes);
 
-				// Add click handlers for the travel mode buttons after popup is added to DOM
-				setTimeout(() => {
-					document.querySelectorAll('.travel-mode-btn').forEach((btn) => {
-						btn.addEventListener('click', (event) => {
-							const mode = event.currentTarget.dataset.mode;
-							travelMode = mode;
-							calculateRoute(start, end);
-						});
+				// Add event listener to the popup content
+				popupContent.addEventListener('click', async (event) => {
+					if (event.target.classList.contains('route-link')) {
+						const index = event.target.dataset.index;
+						console.log('Clicked route index:', index);
+						currentRouteLayer.remove();
+						currentRouteLayer = await drawRoute(map, data.routes[index].geometry);
+						map.fitBounds(currentRouteLayer.getBounds());
+					}
+				});
+
+				// Add event listeners to the buttons
+				const buttons = popupContent.querySelectorAll('.travel-mode-btn');
+				buttons.forEach((button) => {
+					button.addEventListener('click', () => {
+						const mode = button.dataset.mode;
+						console.log('Setting travel mode to:', mode);
+						setTravelMode(mode);
 					});
-				}, 0);
+				});
 
 				// Create and open the popup
-				new mapboxgl.Popup().setLngLat(e.lngLat).setDOMContent(popupContent).addTo(map);
-			});
 
-			// Zoom to the route when generated
-			map.fitBounds(currentRouteLayer.getBounds());
+				new mapboxgl.Popup({className: $settings.app.theme+'-theme'})
+					.setLngLat([(start.lng + end.lng) / 2,(start.lat + end.lat) / 2])
+					.setDOMContent(popupContent)
+					.addTo(map);
 
-			// Calculate distance in kilometers
-			const distanceKm = (data.routes[0].distance / 1000).toFixed(1);
-			const durationInMinutes = Math.round(data.routes[0].duration / 60); // Convert seconds to minutes
-			const hours = Math.floor(durationInMinutes / 60);
-			const minutes = durationInMinutes % 60;
-
-			// Format the duration string
-			let durationString;
-			if (hours > 0) {
-				durationString = `${hours} hr${hours > 1 ? 's' : ''} ${minutes} min${minutes !== 1 ? 's' : ''}`;
-			} else {
-				durationString = `${minutes} min${minutes !== 1 ? 's' : ''}`;
-			}
-
-			// Show the route information in a popup
-			//routes = routeDDList.join('<br>');
-
-			const popupContent = document.createElement('div');
-			popupContent.innerHTML = getRouteInfoTemplate(travelMode, routes);
-
-			// Add event listener to the popup content
-			popupContent.addEventListener('click', async (event) => {
-				if (event.target.classList.contains('route-link')) {
-					const index = event.target.dataset.index;
-					console.log('Clicked route index:', index);
-					currentRouteLayer.remove();
-					currentRouteLayer = await drawRoute(map, data.routes[index].geometry);
-					map.fitBounds(currentRouteLayer.getBounds());
+				// Change existing markers for start and end points with appropriate colors
+				if (startMarker) {
+					startMarker.setIcon(document.createElement('div'));
 				}
-			});
-
-			// Add event listeners to the buttons
-			const buttons = popupContent.querySelectorAll('.travel-mode-btn');
-			buttons.forEach((button) => {
-				button.addEventListener('click', () => {
-					const mode = button.dataset.mode;
-					console.log('Setting travel mode to:', mode);
-					setTravelMode(mode);
-				});
-			});
-
-			// Create and open the popup
-			new mapboxgl.Popup()
-				.setLngLat([(start.lat + end.lat) / 2, (start.lng + end.lng) / 2])
-				.setDOMContent(popupContent)
-				.addTo(map);
-
-			// Change existing markers for start and end points with appropriate colors
-			if (startMarker) {
-				startMarker.setIcon(document.createElement('div'));
-			}
-			if (endMarker) {
-				endMarker.setIcon(document.createElement('div'));
+				if (endMarker) {
+					endMarker.setIcon(document.createElement('div'));
+				}
+			} else {
+				console.error('Failed to create route layer');
 			}
 		} catch (error) {
 			console.error('Error calculating route:', error);
-			alert('Unable to calculate route. Please try again.');
+			//			alert('Unable to calculate route. Please try again.');
 		}
 	}
 

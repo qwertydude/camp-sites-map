@@ -79,7 +79,7 @@ export async function drawRoute(map, routeGeometry) {
   });
 
   // Add the line layer to the map
-  map.addLayer({
+  const routeLayer = map.addLayer({
     id: 'route-layer',
     type: 'line',
     source: 'route',
@@ -93,4 +93,6 @@ export async function drawRoute(map, routeGeometry) {
       'line-opacity': 0.7
     }
   });
+
+  return routeLayer;
 }
