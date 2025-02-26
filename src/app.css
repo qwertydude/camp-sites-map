@@ -117,13 +117,22 @@ textarea.site-input {
     border: none;
 }
 
-.popup-buttons.start-route .route-btn:after {
-    content:"Start route here";
+.popup-buttons.start-route .route-btn.start-route {
+    display:inline-block;
+}
+.popup-buttons.start-route .route-btn.end-route {
+    display:none;
 }
 
-.popup-buttons.end-route .route-btn:after {
-    content:"End route here";
+.popup-buttons.end-route .route-btn.end-route:after {
+    display: inline-block;
 }
+
+.popup-buttons.end-route .route-btn.start-route:after {
+    display: none;
+}
+
+
 
 
 

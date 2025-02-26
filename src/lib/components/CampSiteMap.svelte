@@ -179,9 +179,9 @@
 						class="site-input dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"></textarea>
 						<div class="popup-buttons">
 						<button id="confirm-add" 
-							class="btn route-btn" data-variant="route-start" data-site-id="${site.id}"></button>
+							class="btn confirm-btn ">Add Site</button>
 						<button id="cancel-add" 
-							class="cancel-btn dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">Cancel</button>
+							class="btn cancel-btn ">Cancel</button>
 						</div>
 					</div>
 					`;
@@ -253,33 +253,15 @@
 		markers.clear();
 
 		// Add new markers
+		// In your updateMarkers function, modify how you create popups:
+
 		sites.forEach((site) => {
 			const el = document.createElement('div');
 			el.className = 'site-pip-container';
 			el.innerHTML = '<i class="fa-solid fa-location-dot text-3xl drop-shadow-md site-pip"></i>';
-			console.log('selectedSites', selectedSites);
-			const popup = new mapboxgl.Popup({
-				className: $settings.app.theme === 'dark' ? 'dark' : ''
-			}).setHTML(
-				`
-							<div class="popup-content">
-							${site.name ? `<h3>${site.name}</h3>` : ''}
-							${site.description ? `<p>${site.description}</p>` : ''}
-							<div class="popup-buttons start-route">
-								${
-									selectedSites.length === 0 || selectedSites[0].id !== site.id
-										? `<button class="btn route-btn" data-variant="route-start" data-site-id="${site.id}"></button>`
-										: ''
-								}
-								${
-									selectedSites.length === 1 && selectedSites[0].id === site.id
-										? `<button class="btn route-btn" data-variant="route-end" data-site-id="${site.id}"></button>`
-										: ''
-								}
-							</div>
-						</div>
-					`
-			);
+
+			// Create an empty popup first
+			const popup = new mapboxgl.Popup();
 
 			const marker = new mapboxgl.Marker({ color: 'blue', className: 'site-pip', scale: 0.65 })
 				.setLngLat([site.longitude, site.latitude])
@@ -288,40 +270,45 @@
 
 			markers.set(site.id, marker);
 
-			popup.on('open', (marker) => {
-				console.log('Popup opened for site:', site.name);
-				const startRoute = document.querySelector('.start-route');
-				const endRoute = document.querySelector('.end-route');
+			// Set the popup content dynamically when it opens
+			popup.on('open', () => {
+				// Determine if this should be a start or end button based on current selectedSites
+				const isStartButton = selectedSites.length === 0 || selectedSites.length === 2;
 
-				console.log(startRoute, endRoute);
-				// Add click handlers
-				if (startRoute) {
-					startRoute.addEventListener('click', () => {
-						console.log('Start route button clicked');
-						// Remove start-route class from all popups
-						const allPopups = document.querySelectorAll('.popup-buttons.start-route');
-						allPopups.forEach(popup => {
-							popup.classList.remove('start-route');
-							popup.classList.add('end-route');
+				const popupHTML = `
+    <div class="popup-content bg-gray-100 dark:bg-gray-700">
+      ${site.name ? `<h3 class="text-gray-800 dark:text-gray-100">${site.name}</h3>` : ''}
+      ${site.description ? `<p class="text-gray-800 dark:text-gray-100">${site.description}</p>` : ''}
+      <div class="popup-buttons">
+        <button class="btn route-btn" id="route-action-btn-${site.id}">
+          ${isStartButton ? 'Start Route' : 'End Route'}
+        </button>
+      </div>
+    </div>
+    `;
+
+				// Set the HTML content
+				popup.setHTML(popupHTML);
+
+				// Add the event listener after the popup content is set
+				setTimeout(() => {
+					const button = document.getElementById(`route-action-btn-${site.id}`);
+					if (button) {
+						button.addEventListener('click', () => {
+							if (isStartButton) {
+								setRouteStart(site, popup);
+							} else {
+								setRouteEnd(site, popup);
+							}
+							// Close the popup after action
+							popup.remove();
 						});
-						setRouteStart(site, popup);
-					});
-				}
-				if (endRoute) {
-					endRoute.addEventListener('click', () => {
-						console.log('End route button clicked');
-						// Remove end-route class from all popups
-						const allPopups = document.querySelectorAll('.popup-buttons.end-route');
-						allPopups.forEach(popup => {
-							popup.classList.remove('end-route');
-							popup.classList.add('start-route');
-						});
-						setRouteEnd(site, popup);
-					});
-				}
+					}
+				}, 0);
 			});
 		});
 	}
+
 	onMount(async () => {
 		if (!browser) return;
 
@@ -576,7 +563,10 @@
 		}
 
 		try {
-			console.log('Current cities layer state:', { citiesLayerVisible: temperaturesLayerVisible, citiesLayer: temperaturesLayer });
+			console.log('Current cities layer state:', {
+				citiesLayerVisible: temperaturesLayerVisible,
+				citiesLayer: temperaturesLayer
+			});
 
 			if (temperaturesLayerVisible) {
 				console.log('Removing temperature markers');
@@ -631,7 +621,10 @@
 				});
 			}
 			temperaturesLayerVisible = !temperaturesLayerVisible;
-			console.log('Cities layer toggled:', { citiesLayerVisible: temperaturesLayerVisible, citiesLayer: temperaturesLayer });
+			console.log('Cities layer toggled:', {
+				citiesLayerVisible: temperaturesLayerVisible,
+				citiesLayer: temperaturesLayer
+			});
 		} catch (error) {
 			console.error('Error toggling cities layer:', error);
 		}
@@ -645,7 +638,10 @@
 		}
 
 		try {
-			console.log('Current weather layer state:', { weatherLayerVisible: heatGradientLayerVisible, weatherLayer: heatGradientLayer });
+			console.log('Current weather layer state:', {
+				weatherLayerVisible: heatGradientLayerVisible,
+				weatherLayer: heatGradientLayer
+			});
 
 			if (heatGradientLayerVisible) {
 				console.log('Attempting to remove weather layer');
@@ -726,7 +722,10 @@
 				heatGradientLayer = true;
 			}
 			heatGradientLayerVisible = !heatGradientLayerVisible;
-			console.log('Weather layer toggled:', { weatherLayerVisible: heatGradientLayerVisible, weatherLayer: heatGradientLayer });
+			console.log('Weather layer toggled:', {
+				weatherLayerVisible: heatGradientLayerVisible,
+				weatherLayer: heatGradientLayer
+			});
 		} catch (error) {
 			console.error('Error toggling weather layer:', error);
 		}
@@ -790,8 +789,9 @@
 
 			// Create a new marker with orange color
 			const newMarker = new mapboxgl.Marker({
-				color: '#FF9800',
-				className: 'site-pip end'
+				color: '#FF4400',
+				className: 'site-pip end',
+				scale: 0.65
 			})
 				.setLngLat([site.longitude, site.latitude])
 				.setPopup(popup)
