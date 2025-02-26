@@ -18,31 +18,7 @@ body {
     z-index: 0;
 }
 
-.leaflet-control-container .leaflet-top,
-.leaflet-control-container .leaflet-bottom {
-    z-index: 999;
-}
 
-/* Dark mode overrides for Leaflet components */
-:root[class~="dark"] .leaflet-popup-content-wrapper,
-:root[class~="dark"] .leaflet-popup-tip {
-    background-color: rgb(31 41 55); /* bg-gray-800 */
-    color: rgb(243 244 246); /* text-gray-100 */
-}
-
-:root[class~="dark"] .leaflet-container {
-    background: rgb(17 24 39); /* bg-gray-900 */
-}
-
-:root[class~="dark"] .leaflet-bar a {
-    background-color: rgb(31 41 55); /* bg-gray-800 */
-    color: rgb(243 244 246); /* text-gray-100 */
-    border-color: rgb(75 85 99); /* border-gray-600 */
-}
-
-:root[class~="dark"] .leaflet-bar a:hover {
-    background-color: rgb(55 65 81); /* bg-gray-700 */
-}
 
 .site-pip i {
     color:#3498db;
@@ -62,13 +38,7 @@ body {
     border-color: white;
 }
 
-.button-label.start:after {
-    content:"Start route here";
-}
 
-.button-label.end:after {
-    content:"End route here";
-}
 
 
 /* .travel-mode-btn i {
@@ -141,45 +111,21 @@ textarea.site-input {
 
 .popup-buttons button {
     border-radius: 0.375rem;
-    padding: 0.5rem 1rem;
+    padding: 3px 8px;
     font-weight: 500;
     cursor: pointer;
     border: none;
 }
 
-.popup-buttons .start-route {
-    background-color: rgb(37 99 235); /* bg-blue-600 */
-    color: white;
+.popup-buttons.start-route .route-btn:after {
+    content:"Start route here";
 }
 
-.popup-buttons .start-route:hover {
-    background-color: rgb(30 64 175); /* bg-blue-800 */
+.popup-buttons.end-route .route-btn:after {
+    content:"End route here";
 }
 
-.popup-buttons .end-route {
-    background-color: rgb(229 231 235); /* bg-gray-200 */
-    color: rgb(17 24 39); /* text-gray-900 */
-}
 
-.popup-buttons .end-route:hover {
-    background-color: rgb(107 114 128); /* bg-gray-500 */
-}
-
-:root[class~="dark"] .popup-buttons .start-route {
-    background-color: rgb(29 78 216); /* bg-blue-700 */
-}
-
-:root[class~="dark"] .popup-buttons .start-route:hover {
-    background-color: rgb(30 64 175); /* bg-blue-800 */
-}
-
-:root[class~="dark"] .popup-buttons .end-route {
-    background-color: rgb(75 85 99); /* bg-gray-600 */
-}
-
-:root[class~="dark"] .popup-buttons .end-route:hover {
-    background-color: rgb(107 114 128); /* bg-gray-500 */
-}
 
 /* User location marker */
 .user-location-marker {
@@ -217,4 +163,7 @@ textarea.site-input {
     100% { transform: rotate(360deg); }
 }
 
-/* Removed unused fade-out class */
+/* GLOBAL STYLES */
+.btn {
+    @apply bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 rounded-md px-4 py-2 transition-colors duration-200;
+}

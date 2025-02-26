@@ -179,7 +179,7 @@
 						class="site-input dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"></textarea>
 						<div class="popup-buttons">
 						<button id="confirm-add" 
-							class="confirm-btn dark:bg-blue-700 dark:hover:bg-blue-800">Add Site</button>
+							class="btn route-btn" data-variant="route-start" data-site-id="${site.id}"></button>
 						<button id="cancel-add" 
 							class="cancel-btn dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">Cancel</button>
 						</div>
@@ -265,15 +265,15 @@
 							<div class="popup-content">
 							${site.name ? `<h3>${site.name}</h3>` : ''}
 							${site.description ? `<p>${site.description}</p>` : ''}
-							<div class="popup-buttons">
+							<div class="popup-buttons start-route">
 								${
 									selectedSites.length === 0 || selectedSites[0].id !== site.id
-										? `<button class="route-btn start-route" data-variant="route-start" data-site-id="${site.id}">Start: ${site.name}</button>`
+										? `<button class="btn route-btn" data-variant="route-start" data-site-id="${site.id}"></button>`
 										: ''
 								}
 								${
 									selectedSites.length === 1 && selectedSites[0].id === site.id
-										? `<button class="route-btn end-route" data-variant="route-end" data-site-id="${site.id}">End: ${site.name}</button>`
+										? `<button class="btn route-btn" data-variant="route-end" data-site-id="${site.id}"></button>`
 										: ''
 								}
 							</div>
@@ -298,12 +298,24 @@
 				if (startRoute) {
 					startRoute.addEventListener('click', () => {
 						console.log('Start route button clicked');
+						// Remove start-route class from all popups
+						const allPopups = document.querySelectorAll('.popup-buttons.start-route');
+						allPopups.forEach(popup => {
+							popup.classList.remove('start-route');
+							popup.classList.add('end-route');
+						});
 						setRouteStart(site, popup);
 					});
 				}
 				if (endRoute) {
 					endRoute.addEventListener('click', () => {
 						console.log('End route button clicked');
+						// Remove end-route class from all popups
+						const allPopups = document.querySelectorAll('.popup-buttons.end-route');
+						allPopups.forEach(popup => {
+							popup.classList.remove('end-route');
+							popup.classList.add('start-route');
+						});
 						setRouteEnd(site, popup);
 					});
 				}
