@@ -72,12 +72,25 @@ export async function getCurrentLocation(map, settings) {
 }
 
 export async function drawRoute(map, routeGeometry) {
-  const routeLayer = L.geoJSON(routeGeometry, {
-    style: {
-      color: '#4A90E2',
-      weight: 5,
-      opacity: 0.7
+  // Create a new source for the route
+  map.addSource('route', {
+    type: 'geojson',
+    data: routeGeometry
+  });
+
+  // Add the line layer to the map
+  map.addLayer({
+    id: 'route-layer',
+    type: 'line',
+    source: 'route',
+    layout: {
+      'line-cap': 'round',
+      'line-join': 'round'
+    },
+    paint: {
+      'line-color': '#4A90E2',
+      'line-width': 5,
+      'line-opacity': 0.7
     }
-  }).addTo(map);
-  return routeLayer;
+  });
 }
