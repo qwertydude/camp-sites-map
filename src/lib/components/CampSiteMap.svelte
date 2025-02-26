@@ -258,9 +258,11 @@
 			el.className = 'site-pip-container';
 			el.innerHTML = '<i class="fa-solid fa-location-dot text-3xl drop-shadow-md site-pip"></i>';
 			console.log('selectedSites', selectedSites);
-			const popup = new mapboxgl.Popup().setHTML(
+			const popup = new mapboxgl.Popup({
+				className: $settings.app.theme === 'dark' ? 'dark' : ''
+			}).setHTML(
 				`
-							<div class="popup-content ${$settings.app.theme === 'dark' ? 'dark' : ''}">
+							<div class="popup-content">
 							${site.name ? `<h3>${site.name}</h3>` : ''}
 							${site.description ? `<p>${site.description}</p>` : ''}
 							<div class="popup-buttons">
