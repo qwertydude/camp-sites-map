@@ -448,7 +448,16 @@
 				});
 
 				// Zoom to the route when generated
-				map.fitBounds(currentRouteLayer.getBounds());
+				if (currentRouteLayer && currentRouteLayer.getBounds) {
+					// Add padding to the bounds for better visibility
+					map.fitBounds(currentRouteLayer.getBounds(), {
+						padding: 50, // Add 50px padding around the route
+						maxZoom: 15, // Limit maximum zoom level
+						duration: 1000 // Smooth animation duration in milliseconds
+					});
+				} else {
+					console.warn('Could not zoom to route: currentRouteLayer or getBounds method is undefined');
+				}
 
 				// Calculate distance in kilometers
 				const distanceKm = (data.routes[0].distance / 1000).toFixed(1);
