@@ -1,4 +1,4 @@
-import { settings } from './stores/settings';
+import { settings } from './stores/settingsStore';
 
 function applyTheme(theme) {
     if (typeof window === 'undefined') return;
@@ -24,7 +24,7 @@ settings.subscribe(state => {
 // Watch for system theme changes
 if (typeof window !== 'undefined') {
     const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    darkModeMediaQuery.addEventListener('change', (e) => {
+    darkModeMediaQuery.addEventListener('change', () => {
         applyTheme(currentTheme);
     });
 }
