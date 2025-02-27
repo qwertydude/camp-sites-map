@@ -47,6 +47,10 @@
 	let startLocationName = '';
 	let endLocationName = '';
 
+	const DEFAULT_LAT = -36.114858138524454;
+	const DEFAULT_LNG = 146.8884086608887;
+	const DEFAULT_STYLE = 'mapbox://styles/mapbox/streets-v12';
+
 	/**
 	 * Returns a template for the route information popup.
 	 * @param {string} mode - The travel mode.
@@ -102,160 +106,125 @@
 	async function initializeMap(position = null) {
 		if (!browser) return;
 
-		console.log('initializeMap called');
 		const mapElement = document.getElementById('map');
-		console.log('Map element dimensions:', mapElement?.getBoundingClientRect());
+		const { startLat, startLng } = getStartCoordinates(position);
 
 		try {
-			// Use user location if available, otherwise default to Wodonga
-			const startLat = position ? position.coords.latitude : -36.114858138524454;
-			const startLng = position ? position.coords.longitude : 146.8884086608887;
-
-			console.log('Creating map instance at:', { startLat, startLng });
-
 			if (!map) {
-				map = new mapboxgl.Map({
-					container: 'map',
-					style: currentStyle,
-					projection: 'equirectangular',
-					center: [startLng, startLat],
-					zoom: $settings.app.defaultZoomLevel
-				});
-
-				console.log('Map created in CampSiteMap:', map);
-				dispatch('mapInit', map);
-				console.log('Map dispatched');
-
-				// Add navigation controls
-				map.addControl(
-					new mapboxgl.NavigationControl({
-						position: 'top-right'
-					})
-				);
-
-				// Add geolocate control
-				const geolocateControl = new mapboxgl.GeolocateControl({
-					positionOptions: {
-						enableHighAccuracy: true
-					},
-					trackUserLocation: true
-				});
-				map.addControl(geolocateControl);
-
-				// Add user location marker if we have it
-				if (position) {
-					console.log('Adding user location marker');
-					const el = document.createElement('div');
-					el.className = 'user-location';
-					el.style.backgroundColor = '#4A90E2';
-					el.style.width = '12px';
-					el.style.height = '12px';
-					el.style.borderRadius = '50%';
-					el.style.border = '2px solid white';
-
-					new mapboxgl.Marker(el).setLngLat([startLng, startLat]).addTo(map);
-				}
+				map = createMapInstance(startLat, startLng);
+				addMapControls(map);
+				addUserLocationMarker(map, position);
+				addMapClickHandler(map);
+				initializeCampSitesStore();
 			}
-			// Add map click handler
-			map.on('click', async (e) => {
-				const point = e.lngLat;
-				console.log('Map clicked at:', point);
-
-				// Check if command/ctrl key is pressed
-				if (!e.originalEvent.metaKey && !e.originalEvent.ctrlKey) {
-					return; // Do nothing if command/ctrl is not pressed
-				}
-
-				const currentZoom = map.getZoom();
-				if (currentZoom < 14) {
-					new mapboxgl.Popup({
-						className: $settings.app.theme+'-theme'
-					})
-						.setLngLat(point)
-						.setHTML(
-							'<div class="add-site-popup dark:bg-gray-800 dark:text-gray-100">' +
-								'<p>Please zoom in closer to add a camp site (zoom level must be 14 or greater)</p>' +
-								'<p>Current zoom level: ' +
-								Math.floor(currentZoom) +
-								'</p>' +
-								'<p>Tip: Use Cmd/Ctrl + Click to add a site</p>' +
-								'</div>'
-						)
-						.addTo(map);
-					return;
-				}
-
-				// Create a popup for input
-				const popupContent = document.createElement('div');
-				popupContent.innerHTML = `
-					<div class="add-site-popup dark:bg-gray-800 dark:text-gray-100">
-						<h3 class="dark:text-gray-200">Add New Camp Site</h3>
-						<input type="text" id="site-title" placeholder="Site Title" 
-						class="site-input dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
-						<textarea id="site-description" placeholder="Site Description" 
-						class="site-input dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"></textarea>
-						<div class="popup-buttons">
-						<button id="confirm-add" 
-							class="btn confirm-btn ">Add Site</button>
-						<button id="cancel-add" 
-							class="btn cancel-btn ">Cancel</button>
-						</div>
-					</div>
-					`;
-
-				// Create and show the popup
-				const popup = new mapboxgl.Popup({
-					className: $settings.app.theme+'-theme',
-					maxWidth: '300px'
-				})
-					.setLngLat(point)
-					.setDOMContent(popupContent)
-					.addTo(map);
-
-				// Handle form submission
-				popupContent.querySelector('#confirm-add').addEventListener('click', async () => {
-					const title = popupContent.querySelector('#site-title').value.trim();
-					const description = popupContent.querySelector('#site-description').value.trim();
-
-					if (title) {
-						const newSite = await campSitesStore.addSite({
-							name: title,
-							description: description || '',
-							latitude: point.lat,
-							longitude: point.lng
-						});
-
-						if (newSite) {
-							popup.remove();
-						} else {
-							alert('Error adding camp site. Please try again.');
-						}
-					} else {
-						alert('Please enter a title for the camp site');
-					}
-				});
-
-				// Handle cancellation
-				popupContent.querySelector('#cancel-add').addEventListener('click', () => {
-					popup.remove();
-				});
-			});
-
-			// Initialize the store
-			let unsubscribe;
-			unsubscribe = campSitesStore.initialize();
-
-			// Wait for map to load before adding markers
-			map.on('load', () => {
-				campSitesStore.subscribe((sites) => {
-					updateMarkers(sites);
-				});
-			});
-
-			console.log('Map initialization complete');
 		} catch (error) {
 			console.error('Error initializing map:', error);
 		}
+	}
+
+	function getStartCoordinates(position) {
+		return {
+			startLat: position ? position.coords.latitude : DEFAULT_LAT,
+			startLng: position ? position.coords.longitude : DEFAULT_LNG
+		};
+	}
+
+	function createMapInstance(lat, lng) {
+		const mapInstance = new mapboxgl.Map({
+			container: 'map',
+			style: currentStyle,
+			projection: 'equirectangular',
+			center: [lng, lat],
+			zoom: $settings.app.defaultZoomLevel
+		});
+		dispatch('mapInit', mapInstance);
+		return mapInstance;
+	}
+
+	function addMapControls(mapInstance) {
+		mapInstance.addControl(new mapboxgl.NavigationControl({ position: 'top-right' }));
+		const geolocateControl = new mapboxgl.GeolocateControl({ positionOptions: { enableHighAccuracy: true }, trackUserLocation: true });
+		mapInstance.addControl(geolocateControl);
+	}
+
+	function addUserLocationMarker(mapInstance, position) {
+		if (position) {
+			const el = document.createElement('div');
+			el.className = 'user-location';
+			el.style.backgroundColor = '#4A90E2';
+			el.style.width = '12px';
+			el.style.height = '12px';
+			el.style.borderRadius = '50%';
+			el.style.border = '2px solid white';
+			new mapboxgl.Marker(el).setLngLat([position.coords.longitude, position.coords.latitude]).addTo(mapInstance);
+		}
+	}
+
+	function addMapClickHandler(mapInstance) {
+		mapInstance.on('click', async (e) => {
+			const point = e.lngLat;
+			if (!e.originalEvent.metaKey && !e.originalEvent.ctrlKey) return;
+			handleMapClick(mapInstance, point);
+		});
+	}
+
+	function handleMapClick(mapInstance, point) {
+		const currentZoom = mapInstance.getZoom();
+		if (currentZoom < 14) {
+			showZoomInPopup(mapInstance, point, currentZoom);
+			return;
+		}
+		showAddSitePopup(mapInstance, point);
+	}
+
+	function showZoomInPopup(mapInstance, point, currentZoom) {
+		new mapboxgl.Popup({ className: $settings.app.theme + '-theme' })
+			.setLngLat(point)
+			.setHTML(`<div class="add-site-popup dark:bg-gray-800 dark:text-gray-100">
+				<p>Please zoom in closer to add a camp site (zoom level must be 14 or greater)</p>
+				<p>Current zoom level: ${Math.floor(currentZoom)}</p>
+				<p>Tip: Use Cmd/Ctrl + Click to add a site</p>
+			</div>`)
+			.addTo(mapInstance);
+	}
+
+	function showAddSitePopup(mapInstance, point) {
+		const popupContent = document.createElement('div');
+		popupContent.innerHTML = `
+			<div class="add-site-popup dark:bg-gray-800 dark:text-gray-100">
+				<h3 class="dark:text-gray-200">Add New Camp Site</h3>
+				<input type="text" id="site-title" placeholder="Site Title" class="site-input dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
+				<textarea id="site-description" placeholder="Site Description" class="site-input dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"></textarea>
+				<div class="popup-buttons">
+					<button id="confirm-add" class="btn confirm-btn">Add Site</button>
+					<button id="cancel-add" class="btn cancel-btn">Cancel</button>
+				</div>
+			</div>
+		`;
+
+		const popup = new mapboxgl.Popup({ className: $settings.app.theme + '-theme', maxWidth: '300px' })
+			.setLngLat(point)
+			.setDOMContent(popupContent)
+			.addTo(mapInstance);
+
+		popupContent.querySelector('#confirm-add').addEventListener('click', async () => {
+			const title = popupContent.querySelector('#site-title').value.trim();
+			const description = popupContent.querySelector('#site-description').value.trim();
+			if (title) {
+				const newSite = await campSitesStore.addSite({ name: title, description: description || '', latitude: point.lat, longitude: point.lng });
+				if (newSite) popup.remove();
+				else alert('Error adding camp site. Please try again.');
+			} else alert('Please enter a title for the camp site');
+		});
+
+		popupContent.querySelector('#cancel-add').addEventListener('click', () => popup.remove());
+	}
+
+	function initializeCampSitesStore() {
+		let unsubscribe = campSitesStore.initialize();
+		map.on('load', () => {
+			campSitesStore.subscribe((sites) => updateMarkers(sites));
+		});
 	}
 
 	/**
