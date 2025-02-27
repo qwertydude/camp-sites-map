@@ -532,6 +532,43 @@
 	}
 
 	/**
+	 * Resets existing routes and markers
+	 */
+	function resetRouteAndMarkers() {
+		// Clear existing route if any
+		if (currentRouteLayer) {
+			currentRouteLayer.remove();
+			currentRouteLayer = null;
+		}
+
+		// Close dialog if open
+		dialogVisible = false;
+		
+		// Reset route data
+		data = null;
+		activeRouteIndex = 0;
+		startLocationName = '';
+		endLocationName = '';
+		
+		// Reset start and end points
+		start = null;
+		end = null;
+		
+		// Reset selected sites and their markers
+		if (selectedSites.length > 0) {
+			// Store the IDs before clearing the array
+			const sitesToReset = [...selectedSites];
+			selectedSites = [];
+			
+			// Refresh all markers from the campSitesStore
+			campSitesStore.update(sites => {
+				updateMarkers(sites);
+				return sites;
+			});
+		}
+	}
+
+	/**
 	 * Sets the travel mode to the given mode.
 	 * @param {string} mode - The travel mode (foot, bike, or car).
 	 */
@@ -607,6 +644,9 @@
 	 * @param {Object} popup - The popup object associated with the marker.
 	 */
 	function setRouteStart(site, popup) {
+		// Reset existing routes and markers when starting a new route
+		resetRouteAndMarkers();
+		
 		selectedSites = [{ id: site.id, lat: site.latitude, lng: site.longitude }];
 		startLocationName = site.name || 'Start Location';
 		console.log('Route start set:', selectedSites);
@@ -802,7 +842,7 @@
 						Math.log(
 							Math.tan((center.lat * Math.PI) / 180) + 1 / Math.cos((center.lat * Math.PI) / 180)
 						) /
-							Math.PI) /
+						Math.PI) /
 						2) *
 						Math.pow(2, zoom)
 				);
