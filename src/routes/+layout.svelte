@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import { settings } from '$lib/stores/settings';
+  import { settings } from '$lib/stores/settingsStore';
   import "../app.css";
 
   let { children } = $props();

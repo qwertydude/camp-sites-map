@@ -1,6 +1,6 @@
 <script>
-	import { campSitesStore } from '$lib/stores/campSites';
-	import { settings } from '$lib/stores/settings.js';
+	import { campSitesStore } from '$lib/stores/campSitesStore';
+	import { settings } from '$lib/stores/settingsStore.js';
 	import { getCurrentLocation } from '$lib/utils.js';
 	import Button from './Button.svelte';
 

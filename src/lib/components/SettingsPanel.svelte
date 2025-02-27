@@ -1,5 +1,5 @@
 <script>
-  import { settings } from '$lib/stores/settings.js';
+  import { settings } from '$lib/stores/settingsStore.js';
   import Button from './Button.svelte';
     
   export let isOpen = false;

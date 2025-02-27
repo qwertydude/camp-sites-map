@@ -2,7 +2,7 @@
 	import { onMount, createEventDispatcher, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
 	import mapboxgl from 'mapbox-gl';
-	import { settings } from '$lib/stores/settings.js';
+	import { settings } from '$lib/stores/settingsStore.js';
 	import { campSitesStore } from '$lib/stores/campSitesStore.js';
 	import { 
 		start, end, startLocationName, endLocationName, 

@@ -1,6 +1,6 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-  import { settings } from '$lib/stores/settings.js';
+  import { settings } from '$lib/stores/settingsStore.js';
   import { getCurrentLocation } from '$lib/utils.js';
   import Button from './Button.svelte';
 
