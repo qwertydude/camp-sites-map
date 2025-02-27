@@ -1,5 +1,5 @@
 <script>
-    import { onMount, onDestroy } from 'svelte';
+    import { onMount, onDestroy, createEventDispatcher } from 'svelte';
     import { browser } from '$app/environment';
     
     export let title = "Route Information";
@@ -8,6 +8,8 @@
     export let onClose = () => { isVisible = false; };
     export let position = { top: '50%', left: '50%' };
 
+    const dispatch = createEventDispatcher();
+    
     // Handle drag functionality
     let isDragging = false;
     let dragOffset = { x: 0, y: 0 };
@@ -60,6 +62,20 @@
             }
         }
     }
+    
+    function handleContentClick(e) {
+        // Check if a travel mode button was clicked
+        if (e.target.classList.contains('travel-mode-btn')) {
+            const mode = e.target.dataset.mode;
+            dispatch('modeChange', { mode });
+        }
+        
+        // Check if a route link was clicked
+        if (e.target.classList.contains('route-link')) {
+            const index = e.target.dataset.index;
+            dispatch('routeSelect', { index: parseInt(index) });
+        }
+    }
 
     onMount(() => {
         if (browser) {
@@ -95,7 +111,7 @@
         <h3 id="dialog-title">{title}</h3>
         <button on:click={onClose} class="close-btn" aria-label="Close dialog">×</button>
     </div>
-    <div class="dialog-content">
+    <div class="dialog-content" on:click={handleContentClick}>
         {@html content}
     </div>
 </div>

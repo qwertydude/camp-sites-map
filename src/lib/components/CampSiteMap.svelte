@@ -40,6 +40,9 @@
 	let dialogPosition = { top: '100px', left: '100px' };
 	let startMarker;
 	let endMarker;
+	let start;
+	let end;
+	let data;
 
 	/**
 	 * Returns a template for the route information popup.
@@ -393,18 +396,28 @@
 	 * @param {Object} start - The start point object containing latitude and longitude.
 	 * @param {Object} end - The end point object containing latitude and longitude.
 	 */
-	async function calculateRoute(start, end) {
+	async function calculateRoute(startPoint, endPoint) {
+		// Store the start and end points for later use
+		start = startPoint;
+		end = endPoint;
+
+		// Clear existing route if any
+		if (currentRouteLayer) {
+			currentRouteLayer.remove();
+			currentRouteLayer = null;
+		}
+
 		const mapboxProfile = {
 			foot: 'walking',
 			bike: 'cycling',
 			car: 'driving'
 		}[travelMode];
 
-		const url = `https://api.mapbox.com/directions/v5/mapbox/${mapboxProfile}/${start.lng},${start.lat};${end.lng},${end.lat}?alternatives=true&geometries=geojson&access_token=${mapboxToken}`;
+		const url = `https://api.mapbox.com/directions/v5/mapbox/${mapboxProfile}/${startPoint.lng},${startPoint.lat};${endPoint.lng},${endPoint.lat}?alternatives=true&geometries=geojson&access_token=${mapboxToken}`;
 
 		try {
 			const response = await fetch(url);
-			const data = await response.json();
+			data = await response.json();
 			const routesCount = data.routes.length;
 			const routeDDList = data.routes.map((route, index) => {
 				return `<a href="#" class="route-link" data-index="${index}">Route ${index + 1}: ${Math.round(route.distance / 1000, 1)} km - ${Math.round(route.duration / 60, 1)} min</a>`;
@@ -836,8 +849,25 @@
 	content={dialogContent}
 	position={dialogPosition}
 	onClose={() => dialogVisible = false}
+	on:modeChange={(e) => {
+		travelMode = e.detail.mode;
+		calculateRoute(start, end);
+	}}
+	on:routeSelect={(e) => {
+		const index = e.detail.index;
+		if (currentRouteLayer && data && data.routes && data.routes[index]) {
+			currentRouteLayer.remove();
+			drawRoute(map, data.routes[index].geometry).then(layer => {
+				currentRouteLayer = layer;
+				map.fitBounds(currentRouteLayer.getBounds(), {
+					padding: 50,
+					maxZoom: 15,
+					duration: 1000
+				});
+			});
+		}
+	}}
 />
-
 <style>
 	.map-container {
 		width: 100%;
