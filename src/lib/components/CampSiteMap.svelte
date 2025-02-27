@@ -556,81 +556,16 @@
 	}
 
 	/**
-	 * Sets the start point for a route.
-	 * Also updates the popup for the current marker.
-	 * @param {Object} site - The site object containing id, latitude, and longitude.
-	 * @param {Object} popup - The popup object associated with the marker.
+	 * Sets the travel mode to the given mode.
+	 * @param {string} mode - The travel mode (foot, bike, or car).
 	 */
-	function handleSetStart(site, popup) {
-		// Reset existing routes and markers when starting a new route
-		resetRouteAndMarkers();
-		
-		// Now set the new start point
-		selectedSites = [{ id: site.id, lat: site.latitude, lng: site.longitude }];
-		$startLocationName = site.name || 'Start Location';
-		console.log('Route start set:', selectedSites);
+	function handleTravelModeChange(mode) {
+		$travelMode = mode;
+		// Reset to the first route when changing travel mode
+		$activeRouteIndex = 0;
 
-		// Remove the old marker
-		const oldMarker = markers.get(site.id);
-		if (oldMarker) {
-			oldMarker.remove();
-		}
-
-		// Create a new marker with green color
-		const newMarker = new mapboxgl.Marker({
-			color: '#4CAF50',
-			className: 'site-pip start',
-			scale: 0.65
-		})
-			.setLngLat([site.longitude, site.latitude])
-			.setPopup(popup)
-			.addTo(map);
-
-		// Update the markers Map with the new marker
-		markers.set(site.id, newMarker);
-
-		// Store the start point
-		$start = { lat: site.latitude, lng: site.longitude };
-	}
-
-	/**
-	 * Sets the end point for a route.
-	 * Also updates the popup for the current marker.
-	 * @param {Object} site - The site object containing id, latitude, and longitude.
-	 * @param {Object} popup - The popup object associated with the marker.
-	 */
-	function handleSetEnd(site, popup) {
-		if (selectedSites.length === 1) {
-			selectedSites.push({ id: site.id, lat: site.latitude, lng: site.longitude });
-			$endLocationName = site.name || 'End Location';
-			console.log('Route end set:', selectedSites);
-
-			// Remove the old marker
-			const oldMarker = markers.get(site.id);
-			if (oldMarker) {
-				oldMarker.remove();
-			}
-
-			// Create a new marker with red color
-			const newMarker = new mapboxgl.Marker({
-				color: '#F44336',
-				className: 'site-pip end',
-				scale: 0.65
-			})
-				.setLngLat([site.longitude, site.latitude])
-				.setPopup(popup)
-				.addTo(map);
-
-			// Update the markers Map with the new marker
-			markers.set(site.id, newMarker);
-
-			// Store the end point
-			$end = { lat: site.latitude, lng: site.longitude };
-
-			// Calculate the route
+		if ($start && $end) {
 			calculateRoute($start, $end);
-		} else {
-			console.error('Cannot set end point without a start point');
 		}
 	}
 
@@ -831,16 +766,81 @@
 	}
 
 	/**
-	 * Sets the travel mode to the given mode.
-	 * @param {string} mode - The travel mode (foot, bike, or car).
+	 * Sets the start point for a route.
+	 * Also updates the popup for the current marker.
+	 * @param {Object} site - The site object containing id, latitude, and longitude.
+	 * @param {Object} popup - The popup object associated with the marker.
 	 */
-	function setTravelMode(mode) {
-		$travelMode = mode;
-		// Reset to the first route when changing travel mode
-		$activeRouteIndex = 0;
+	function handleSetStart(site, popup) {
+		// Reset existing routes and markers when starting a new route
+		resetRouteAndMarkers();
+		
+		// Now set the new start point
+		selectedSites = [{ id: site.id, lat: site.latitude, lng: site.longitude }];
+		$startLocationName = site.name || 'Start Location';
+		console.log('Route start set:', selectedSites);
 
-		if ($start && $end) {
+		// Remove the old marker
+		const oldMarker = markers.get(site.id);
+		if (oldMarker) {
+			oldMarker.remove();
+		}
+
+		// Create a new marker with green color
+		const newMarker = new mapboxgl.Marker({
+			color: '#4CAF50',
+			className: 'site-pip start',
+			scale: 0.65
+		})
+			.setLngLat([site.longitude, site.latitude])
+			.setPopup(popup)
+			.addTo(map);
+
+		// Update the markers Map with the new marker
+		markers.set(site.id, newMarker);
+
+		// Store the start point
+		$start = { lat: site.latitude, lng: site.longitude };
+	}
+
+	/**
+	 * Sets the end point for a route.
+	 * Also updates the popup for the current marker.
+	 * @param {Object} site - The site object containing id, latitude, and longitude.
+	 * @param {Object} popup - The popup object associated with the marker.
+	 */
+	function handleSetEnd(site, popup) {
+		if (selectedSites.length === 1) {
+			selectedSites.push({ id: site.id, lat: site.latitude, lng: site.longitude });
+			$endLocationName = site.name || 'End Location';
+			console.log('Route end set:', selectedSites);
+
+			// Remove the old marker
+			const oldMarker = markers.get(site.id);
+			if (oldMarker) {
+				oldMarker.remove();
+			}
+
+			// Create a new marker with red color
+			const newMarker = new mapboxgl.Marker({
+				color: '#F44336',
+				className: 'site-pip end',
+				scale: 0.65
+			})
+				.setLngLat([site.longitude, site.latitude])
+				.setPopup(popup)
+				.addTo(map);
+
+			// Update the markers Map with the new marker
+			markers.set(site.id, newMarker);
+
+			// Store the end point
+			$end = { lat: site.latitude, lng: site.longitude };
+
+			// Calculate the route
 			calculateRoute($start, $end);
+		} else {
+			console.error('Cannot set end point without a start point');
 		}
 	}
 
@@ -940,8 +940,7 @@
 	position={$dialogPosition}
 	onClose={() => $dialogVisible = false}
 	on:modeChange={(e) => {
-		$travelMode = e.detail.mode;
-		calculateRoute($start, $end);
+		handleTravelModeChange(e.detail.mode);
 	}}
 	on:routeSelect={(e) => {
 		const index = e.detail.index;
