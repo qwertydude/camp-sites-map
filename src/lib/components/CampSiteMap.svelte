@@ -297,10 +297,10 @@
       ${site.name ? `<h3 class="text-gray-800 dark:text-gray-100">${site.name}</h3>` : ''}
       ${site.description ? `<p class="text-gray-800 dark:text-gray-100">${site.description}</p>` : ''}
       <div class="popup-buttons">
-        <button class="btn route-btn" id="route-action-btn-${site.id}">
-          ${isStartButton ? 'Start Route' : 'End Route'}
-        </button>
-      </div>
+									<Button size="sm" class="route-btn" id="route-action-btn-${site.id}">
+										${isStartButton ? 'Start Route' : 'End Route'}
+									</Button>
+        </div>
     </div>
     `;
 
@@ -561,9 +561,9 @@
 								${siteData.name ? `<h3 class="text-gray-800 dark:text-gray-100">${siteData.name}</h3>` : ''}
 								${siteData.description ? `<p class="text-gray-800 dark:text-gray-100">${siteData.description}</p>` : ''}
 								<div class="popup-buttons">
-									<button class="btn route-btn" id="route-action-btn-${siteData.id}">
+									<Button size="sm" class="route-btn" id="route-action-btn-${siteData.id}">
 										${isStartButton ? 'Start Route' : 'End Route'}
-									</button>
+									</Button>
 								</div>
 							</div>
 							`;

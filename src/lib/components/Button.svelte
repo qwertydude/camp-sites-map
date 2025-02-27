@@ -1,6 +1,6 @@
 <script>
   export let variant = 'default'; // default, primary, secondary, icon, menu, route-start, route-end, icon-blue, icon-red
-  export let size = 'md'; // sm, md, lg
+  export let size = 'sm'; // sm, md, lg
   export let disabled = false;
   export let type = 'button';
   export let icon = '';
@@ -26,13 +26,13 @@
     menu: `${fullWidth ? 'w-full' : ''} p-3 bg-transparent `,
   };
   
-  const OLDsizeClasses = {
+  const sizeClasses = {
     sm: 'px-2 py-1 text-sm',
     md: 'px-4 py-2',
     lg: 'px-6 py-3 text-lg'
   };
 
-  const sizeClasses = {
+  const oldsizeClasses = {
     sm: 'text-sm',
     md: '',
     lg: 'text-lg'
