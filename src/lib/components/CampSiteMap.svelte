@@ -401,133 +401,93 @@
 	});
 
 	/**
-	 * Calculates the route between the given start and end points.
-	 * @param {Object} start - The start point object containing latitude and longitude.
-	 * @param {Object} end - The end point object containing latitude and longitude.
+	 * Calculates a route between two points.
+	 * @param {Object} startPoint - The start point with lat and lng properties.
+	 * @param {Object} endPoint - The end point with lat and lng properties.
 	 */
 	async function calculateRoute(startPoint, endPoint) {
+		if (!startPoint || !endPoint || !startPoint.lat || !startPoint.lng || !endPoint.lat || !endPoint.lng) {
+			console.error('Invalid start or end point for route calculation', { startPoint, endPoint });
+			return;
+		}
+
 		// Store the start and end points for later use
 		start = startPoint;
 		end = endPoint;
 
-		// Clear existing route if any
-		if (currentRouteLayer) {
-			currentRouteLayer.remove();
-			currentRouteLayer = null;
-		}
-
-		const mapboxProfile = {
-			foot: 'walking',
-			bike: 'cycling',
-			car: 'driving'
-		}[travelMode];
-
-		const url = `https://api.mapbox.com/directions/v5/mapbox/${mapboxProfile}/${startPoint.lng},${startPoint.lat};${endPoint.lng},${endPoint.lat}?alternatives=true&geometries=geojson&access_token=${mapboxToken}`;
-
 		try {
-			const response = await fetch(url);
-			data = await response.json();
-			const routesCount = data.routes.length;
-			const routeDDList = data.routes.map((route, index) => {
-				const isActive = index === activeRouteIndex;
-				return `<a href="#" class="route-link ${isActive ? 'active-route' : ''}" data-index="${index}">
-					Route ${index + 1}: ${Math.round(route.distance / 1000, 1)} km - ${Math.round(route.duration / 60, 1)} min
-				</a>`;
-			});
-
-			let routes = routeDDList.join('');
-			console.log('routeDDList:', routeDDList);
-			console.log('typeof routeDDList:', typeof routeDDList);
-			console.log('Is routeDDList an array?', Array.isArray(routeDDList));
-
-			if (routesCount === 0) {
-				throw new Error('No routes found');
-			}
-			console.log('data:', data);
-			// Clear existing route
+			// Reset active route index to 0 when calculating a new route
+			activeRouteIndex = 0;
+			
+			// Clear existing route if any
 			if (currentRouteLayer) {
 				currentRouteLayer.remove();
+				currentRouteLayer = null;
 			}
 
-			// Draw the new route
-			currentRouteLayer = await drawRoute(map, data.routes[activeRouteIndex].geometry);
-			console.log('currentRouteLayer:', currentRouteLayer);
+			const mapboxProfile = {
+				foot: 'walking',
+				bike: 'cycling',
+				car: 'driving'
+			}[travelMode];
 
-			// Check if currentRouteLayer is defined
-			if (currentRouteLayer) {
-				// Add click handler to the route
-				currentRouteLayer.on('click', async (e) => {
+			const url = `https://api.mapbox.com/directions/v5/mapbox/${mapboxProfile}/${startPoint.lng},${startPoint.lat};${endPoint.lng},${endPoint.lat}?alternatives=true&geometries=geojson&access_token=${mapboxToken}`;
+
+			try {
+				const response = await fetch(url);
+				data = await response.json();
+				
+				if (!data || !data.routes || data.routes.length === 0) {
+					throw new Error('No routes found');
+				}
+				
+				const routesCount = data.routes.length;
+				const routeDDList = data.routes.map((route, index) => {
+					const isActive = index === activeRouteIndex;
+					return `<a href="#" class="route-link ${isActive ? 'active-route' : ''}" data-index="${index}">
+						Route ${index + 1}: ${Math.round(route.distance / 1000, 1)} km - ${Math.round(route.duration / 60, 1)} min
+					</a>`;
+				});
+
+				let routes = routeDDList.join('');
+				console.log('routeDDList:', routeDDList);
+				console.log('typeof routeDDList:', typeof routeDDList);
+				console.log('Is routeDDList an array?', Array.isArray(routeDDList));
+
+				if (routesCount === 0) {
+					throw new Error('No routes found');
+				}
+				console.log('data:', data);
+				
+				// Draw the new route
+				currentRouteLayer = await drawRoute(map, data.routes[activeRouteIndex].geometry);
+				console.log('currentRouteLayer:', currentRouteLayer);
+
+				// Check if currentRouteLayer is defined
+				if (currentRouteLayer) {
+					// Add click handler to the route
+					currentRouteLayer.on('click', async (e) => {
+						dialogVisible = true;
+						dialogContent = getRouteInfoTemplate(travelMode, routes, activeRouteIndex);
+						dialogTitle = 'Route Information';
+						dialogPosition = { top: `${e.point.y}px`, left: `${e.point.x}px` };
+					});
+
+					// Zoom to fit the route
+					zoomToRouteBounds(currentRouteLayer);
+
+					// Show the route information in a RouteInfoDialog
 					dialogVisible = true;
 					dialogContent = getRouteInfoTemplate(travelMode, routes, activeRouteIndex);
 					dialogTitle = 'Route Information';
-					dialogPosition = { top: `${e.point.y}px`, left: `${e.point.x}px` };
-
-					// Add click handlers for the travel mode buttons after popup is added to DOM
-					setTimeout(() => {
-						document.querySelectorAll('.travel-mode-btn').forEach((btn) => {
-							btn.addEventListener('click', (event) => {
-								const mode = event.currentTarget.dataset.mode;
-								travelMode = mode;
-								calculateRoute(start, end);
-							});
-						});
-					}, 0);
-
-					// Change existing markers for start and end points with appropriate colors
-					if (startMarker) {
-						startMarker.setIcon(document.createElement('div'));
-					}
-					if (endMarker) {
-						endMarker.setIcon(document.createElement('div'));
-					}
-				});
-
-				zoomToRouteBounds(currentRouteLayer);
-
-				// Calculate distance in kilometers
-				const distanceKm = (data.routes[activeRouteIndex].distance / 1000).toFixed(1);
-				const durationInMinutes = Math.round(data.routes[activeRouteIndex].duration / 60); // Convert seconds to minutes
-				const hours = Math.floor(durationInMinutes / 60);
-				const minutes = durationInMinutes % 60;
-
-				// Format the duration string
-				let durationString;
-				if (hours > 0) {
-					durationString = `${hours} hr${hours > 1 ? 's' : ''} ${minutes} min${minutes !== 1 ? 's' : ''}`;
-				} else {
-					durationString = `${minutes} min${minutes !== 1 ? 's' : ''}`;
+					dialogPosition = { top: '50%', left: '50%' };
 				}
-
-				// Show the route information in a RouteInfoDialog
-				dialogVisible = true;
-				dialogContent = getRouteInfoTemplate(travelMode, routes, activeRouteIndex);
-				dialogTitle = 'Route Information';
-				dialogPosition = { top: '100px', left: '100px' };
-
-				// Add event handlers for travel mode buttons when dialog is initially shown
-				setTimeout(() => {
-					document.querySelectorAll('.travel-mode-btn').forEach((btn) => {
-						btn.addEventListener('click', (event) => {
-							const mode = event.currentTarget.dataset.mode;
-							travelMode = mode;
-							calculateRoute(start, end);
-						});
-					});
-				}, 0);
-
-				// Change existing markers for start and end points with appropriate colors
-				if (startMarker) {
-					startMarker.setIcon(document.createElement('div'));
-				}
-				if (endMarker) {
-					endMarker.setIcon(document.createElement('div'));
-				}
-			} else {
-				console.error('Failed to create route layer');
+			} catch (error) {
+				console.error('Error fetching route:', error);
+				throw error;
 			}
 		} catch (error) {
 			console.error('Error calculating route:', error);
-			//			alert('Unable to calculate route. Please try again.');
 		}
 	}
 
@@ -911,8 +871,8 @@
 		// Reset to the first route when changing travel mode
 		activeRouteIndex = 0;
 
-		if (selectedSites.length === 2) {
-			calculateRoute(selectedSites[0], selectedSites[1]);
+		if (start && end) {
+			calculateRoute(start, end);
 		}
 	}
 
