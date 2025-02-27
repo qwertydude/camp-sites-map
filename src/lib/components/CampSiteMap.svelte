@@ -475,17 +475,7 @@
 					}
 				});
 
-				// Zoom to the route when generated
-				if (currentRouteLayer && currentRouteLayer.getBounds) {
-					// Add padding to the bounds for better visibility
-					map.fitBounds(currentRouteLayer.getBounds(), {
-						padding: 50, // Add 50px padding around the route
-						maxZoom: 15, // Limit maximum zoom level
-						duration: 1000 // Smooth animation duration in milliseconds
-					});
-				} else {
-					console.warn('Could not zoom to route: currentRouteLayer or getBounds method is undefined');
-				}
+				zoomToRouteBounds(currentRouteLayer);
 
 				// Calculate distance in kilometers
 				const distanceKm = (data.routes[activeRouteIndex].distance / 1000).toFixed(1);
@@ -577,6 +567,24 @@
 			}
 		});
 	}
+
+	/**
+	 * Zooms the map to fit the route bounds
+	 * @param {Object} routeLayer - The route layer object with getBounds method
+	 */
+	function zoomToRouteBounds(routeLayer) {
+		if (routeLayer && routeLayer.getBounds) {
+			// Add padding to the bounds for better visibility
+			map.fitBounds(routeLayer.getBounds(), {
+				padding: 50, // Add 50px padding around the route
+				maxZoom: 15, // Limit maximum zoom level
+				duration: 1000 // Smooth animation duration in milliseconds
+			});
+		} else {
+			console.warn('Could not zoom to route: routeLayer or getBounds method is undefined');
+		}
+	}
+
 	/**
 	 * Handles the manage sites button click.
 	 */
@@ -584,6 +592,83 @@
 		isSitesPanelOpen = true;
 	}
 
+	/**
+	 * Initializes the route start with the given site.
+	 * Updates the selected sites and changes the marker color to green.
+	 * Also updates the popup for the current marker.
+	 * @param {Object} site - The site object containing id, latitude, and longitude.
+	 * @param {Object} popup - The popup object associated with the marker.
+	 */
+	function setRouteStart(site, popup) {
+		selectedSites = [{ id: site.id, lat: site.latitude, lng: site.longitude }];
+		console.log('Route start set:', selectedSites);
+
+		// Remove the old marker
+		const oldMarker = markers.get(site.id);
+		if (oldMarker) {
+			oldMarker.remove();
+		}
+
+		// Create a new marker with green color
+		const newMarker = new mapboxgl.Marker({
+			color: '#4CAF50',
+			className: 'site-pip start',
+			scale: 0.65
+		})
+			.setLngLat([site.longitude, site.latitude])
+			.setPopup(popup)
+			.addTo(map);
+
+		// Update the markers Map with the new marker
+		markers.set(site.id, newMarker);
+	}
+
+	/**
+	 * Initializes the route end with the given site.
+	 * Updates the selected sites and changes the marker color to orange.
+	 * Also updates the popup for the current marker.
+	 * @param {Object} site - The site object containing id, latitude, and longitude.
+	 * @param {Object} popup - The popup object associated with the marker.
+	 */
+	function setRouteEnd(site, popup) {
+		if (selectedSites.length === 1) {
+			selectedSites.push({ id: site.id, lat: site.latitude, lng: site.longitude });
+			console.log('Route end set:', selectedSites);
+
+			// Remove the old marker
+			const oldMarker = markers.get(site.id);
+			if (oldMarker) {
+				oldMarker.remove();
+			}
+
+			// Create a new marker with orange color
+			const newMarker = new mapboxgl.Marker({
+				color: '#FF4400',
+				className: 'site-pip end',
+				scale: 0.65
+			})
+				.setLngLat([site.longitude, site.latitude])
+				.setPopup(popup)
+				.addTo(map);
+
+			// Update the markers Map with the new marker
+			markers.set(site.id, newMarker);
+
+			// Calculate the route
+			calculateRoute(selectedSites[0], selectedSites[1]);
+		}
+	}
+
+	/**
+	 * Handles the open settings button click.
+	 */
+	function handleOpenSettings() {
+		isSettingsPanelOpen = true;
+	}
+
+	/**
+	 * Toggles the temperatures layer on the map.
+	 */
 	export async function toggleTemperaturesLayer() {
 		console.log('toggleTemperaturesLayer called');
 		if (!map) {
@@ -659,6 +744,9 @@
 		}
 	}
 
+	/**
+	 * Toggles the heat gradient layer on the map.
+	 */
 	export async function toggleHeatGradientLayer() {
 		console.log('toggleWeatherLayer called');
 		if (!map) {
@@ -761,78 +849,10 @@
 	}
 
 	/**
-	 * Handles the open settings button click.
+	 * Returns the color for the given temperature.
+	 * @param {number} temp - The temperature value.
+	 * @returns {string} The color class for the temperature.
 	 */
-	function handleOpenSettings() {
-		isSettingsPanelOpen = true;
-	}
-
-	/**
-	 * Initializes the route start with the given site.
-	 * Updates the selected sites and changes the marker color to green.
-	 * Also updates the popup for the current marker.
-	 * @param {Object} site - The site object containing id, latitude, and longitude.
-	 * @param {Object} popup - The popup object associated with the marker.
-	 */
-	function setRouteStart(site, popup) {
-		selectedSites = [{ id: site.id, lat: site.latitude, lng: site.longitude }];
-		console.log('Route start set:', selectedSites);
-
-		// Remove the old marker
-		const oldMarker = markers.get(site.id);
-		if (oldMarker) {
-			oldMarker.remove();
-		}
-
-		// Create a new marker with green color
-		const newMarker = new mapboxgl.Marker({
-			color: '#4CAF50',
-			className: 'site-pip start',
-			scale: 0.65
-		})
-			.setLngLat([site.longitude, site.latitude])
-			.setPopup(popup)
-			.addTo(map);
-
-		// Update the markers Map with the new marker
-		markers.set(site.id, newMarker);
-	}
-
-	/**
-	 * Initializes the route end with the given site.
-	 * Updates the selected sites and changes the marker color to orange.
-	 * Also updates the popup for the current marker.
-	 * @param {Object} site - The site object containing id, latitude, and longitude.
-	 * @param {Object} popup - The popup object associated with the marker.
-	 */
-	function setRouteEnd(site, popup) {
-		if (selectedSites.length === 1) {
-			selectedSites.push({ id: site.id, lat: site.latitude, lng: site.longitude });
-			console.log('Route end set:', selectedSites);
-
-			// Remove the old marker
-			const oldMarker = markers.get(site.id);
-			if (oldMarker) {
-				oldMarker.remove();
-			}
-
-			// Create a new marker with orange color
-			const newMarker = new mapboxgl.Marker({
-				color: '#FF4400',
-				className: 'site-pip end',
-				scale: 0.65
-			})
-				.setLngLat([site.longitude, site.latitude])
-				.setPopup(popup)
-				.addTo(map);
-
-			// Update the markers Map with the new marker
-			markers.set(site.id, newMarker);
-
-			// Calculate the route
-			calculateRoute(selectedSites[0], selectedSites[1]);
-		}
-	}
 	function getColorForTemperature(temp) {
 		const colorMap = [
 			{ maxTemp: -40 },
@@ -875,6 +895,7 @@
 	position={dialogPosition}
 	onClose={() => dialogVisible = false}
 	on:modeChange={(e) => {
+		activeRouteIndex = 0; // Reset to first route when changing travel mode
 		travelMode = e.detail.mode;
 		calculateRoute(start, end);
 	}}
@@ -885,15 +906,9 @@
 			currentRouteLayer.remove();
 			drawRoute(map, data.routes[index].geometry).then(layer => {
 				currentRouteLayer = layer;
-				
+				zoomToRouteBounds(currentRouteLayer);
 				// Update the dialog content to reflect the new active route
 				dialogContent = getRouteInfoTemplate(travelMode, routes, activeRouteIndex);
-				
-				map.fitBounds(currentRouteLayer.getBounds(), {
-					padding: 50,
-					maxZoom: 15,
-					duration: 1000
-				});
 			});
 		}
 	}}
