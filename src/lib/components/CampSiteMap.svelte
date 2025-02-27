@@ -275,9 +275,9 @@
 					if (button) {
 						button.addEventListener('click', () => {
 							if (isStartButton) {
-								setStart(site, popup);
+								handleSetStart(site, popup);
 							} else {
-								setEnd(site, popup);
+								handleSetEnd(site, popup);
 							}
 							// Close the popup after action
 							popup.remove();
@@ -539,9 +539,9 @@
 								if (button) {
 									button.addEventListener('click', () => {
 										if (isStartButton) {
-											setStart(siteData, popup);
+											handleSetStart(siteData, popup);
 										} else {
-											setEnd(siteData, popup);
+											handleSetEnd(siteData, popup);
 										}
 										// Close the popup after action
 										popup.remove();
@@ -556,19 +556,18 @@
 	}
 
 	/**
-	 * Initializes the route start with the given site.
-	 * Updates the selected sites and changes the marker color to green.
+	 * Sets the start point for a route.
 	 * Also updates the popup for the current marker.
 	 * @param {Object} site - The site object containing id, latitude, and longitude.
 	 * @param {Object} popup - The popup object associated with the marker.
 	 */
-	function setStart(site, popup) {
+	function handleSetStart(site, popup) {
 		// Reset existing routes and markers when starting a new route
 		resetRouteAndMarkers();
 		
 		// Now set the new start point
 		selectedSites = [{ id: site.id, lat: site.latitude, lng: site.longitude }];
-		startLocationName = site.name || 'Start Location';
+		$startLocationName = site.name || 'Start Location';
 		console.log('Route start set:', selectedSites);
 
 		// Remove the old marker
@@ -589,19 +588,21 @@
 
 		// Update the markers Map with the new marker
 		markers.set(site.id, newMarker);
+
+		// Store the start point
+		$start = { lat: site.latitude, lng: site.longitude };
 	}
 
 	/**
-	 * Initializes the route end with the given site.
-	 * Updates the selected sites and changes the marker color to orange.
+	 * Sets the end point for a route.
 	 * Also updates the popup for the current marker.
 	 * @param {Object} site - The site object containing id, latitude, and longitude.
 	 * @param {Object} popup - The popup object associated with the marker.
 	 */
-	function setEnd(site, popup) {
+	function handleSetEnd(site, popup) {
 		if (selectedSites.length === 1) {
 			selectedSites.push({ id: site.id, lat: site.latitude, lng: site.longitude });
-			endLocationName = site.name || 'End Location';
+			$endLocationName = site.name || 'End Location';
 			console.log('Route end set:', selectedSites);
 
 			// Remove the old marker
@@ -610,9 +611,9 @@
 				oldMarker.remove();
 			}
 
-			// Create a new marker with orange color
+			// Create a new marker with red color
 			const newMarker = new mapboxgl.Marker({
-				color: '#FF4400',
+				color: '#F44336',
 				className: 'site-pip end',
 				scale: 0.65
 			})
@@ -623,8 +624,13 @@
 			// Update the markers Map with the new marker
 			markers.set(site.id, newMarker);
 
+			// Store the end point
+			$end = { lat: site.latitude, lng: site.longitude };
+
 			// Calculate the route
-			calculateRoute(selectedSites[0], selectedSites[1]);
+			calculateRoute($start, $end);
+		} else {
+			console.error('Cannot set end point without a start point');
 		}
 	}
 
