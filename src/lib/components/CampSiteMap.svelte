@@ -43,14 +43,16 @@
 	let start;
 	let end;
 	let data;
+	let activeRouteIndex = 0; // Track which route is currently active
 
 	/**
 	 * Returns a template for the route information popup.
-	 * @param {string} mode - The travel mode (foot, bike, or car).
+	 * @param {string} mode - The travel mode.
 	 * @param {string} content - The content to display in the popup.
+	 * @param {number} activeIndex - The index of the active route.
 	 * @returns {string} The HTML template for the popup.
 	 */
-	function getRouteInfoTemplate(mode, content) {
+	function getRouteInfoTemplate(mode, content, activeIndex = 0) {
 		return `
 			<div class="route-info p-2 bg-transparent">
 				<h3 class="font-semibold text-gray-700 dark:text-gray-700 mb-2">Route Information</h3>
@@ -420,7 +422,10 @@
 			data = await response.json();
 			const routesCount = data.routes.length;
 			const routeDDList = data.routes.map((route, index) => {
-				return `<a href="#" class="route-link" data-index="${index}">Route ${index + 1}: ${Math.round(route.distance / 1000, 1)} km - ${Math.round(route.duration / 60, 1)} min</a>`;
+				const isActive = index === activeRouteIndex;
+				return `<a href="#" class="route-link ${isActive ? 'active-route' : ''}" data-index="${index}">
+					${isActive ? '→ ' : ''}Route ${index + 1}: ${Math.round(route.distance / 1000, 1)} km - ${Math.round(route.duration / 60, 1)} min${isActive ? ' (active)' : ''}
+				</a>`;
 			});
 
 			let routes = routeDDList.join('<br>');
@@ -438,7 +443,7 @@
 			}
 
 			// Draw the new route
-			currentRouteLayer = await drawRoute(map, data.routes[0].geometry);
+			currentRouteLayer = await drawRoute(map, data.routes[activeRouteIndex].geometry);
 			console.log('currentRouteLayer:', currentRouteLayer);
 
 			// Check if currentRouteLayer is defined
@@ -446,7 +451,7 @@
 				// Add click handler to the route
 				currentRouteLayer.on('click', async (e) => {
 					dialogVisible = true;
-					dialogContent = getRouteInfoTemplate(travelMode, routes);
+					dialogContent = getRouteInfoTemplate(travelMode, routes, activeRouteIndex);
 					dialogTitle = 'Route Information';
 					dialogPosition = { top: `${e.point.y}px`, left: `${e.point.x}px` };
 
@@ -483,8 +488,8 @@
 				}
 
 				// Calculate distance in kilometers
-				const distanceKm = (data.routes[0].distance / 1000).toFixed(1);
-				const durationInMinutes = Math.round(data.routes[0].duration / 60); // Convert seconds to minutes
+				const distanceKm = (data.routes[activeRouteIndex].distance / 1000).toFixed(1);
+				const durationInMinutes = Math.round(data.routes[activeRouteIndex].duration / 60); // Convert seconds to minutes
 				const hours = Math.floor(durationInMinutes / 60);
 				const minutes = durationInMinutes % 60;
 
@@ -498,7 +503,7 @@
 
 				// Show the route information in a FloatingDialog
 				dialogVisible = true;
-				dialogContent = getRouteInfoTemplate(travelMode, routes);
+				dialogContent = getRouteInfoTemplate(travelMode, routes, activeRouteIndex);
 				dialogTitle = 'Route Information';
 				dialogPosition = { top: '100px', left: '100px' };
 
@@ -876,9 +881,14 @@
 	on:routeSelect={(e) => {
 		const index = e.detail.index;
 		if (currentRouteLayer && data && data.routes && data.routes[index]) {
+			activeRouteIndex = index; // Update the active route index
 			currentRouteLayer.remove();
 			drawRoute(map, data.routes[index].geometry).then(layer => {
 				currentRouteLayer = layer;
+				
+				// Update the dialog content to reflect the new active route
+				dialogContent = getRouteInfoTemplate(travelMode, routes, activeRouteIndex);
+				
 				map.fitBounds(currentRouteLayer.getBounds(), {
 					padding: 50,
 					maxZoom: 15,
