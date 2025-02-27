@@ -9,7 +9,7 @@
 	import HamburgerMenu from '$lib/components/HamburgerMenu.svelte';
 	import SitesPanel from '$lib/components/SitesPanel.svelte';
 	import SettingsPanel from '$lib/components/SettingsPanel.svelte';
-	import FloatingDialog from '$lib/components/FloatingDialog.svelte';
+	import RouteInfoDialog from '$lib/components/RouteInfoDialog.svelte';
 	import mapboxgl from 'mapbox-gl';
 	import 'mapbox-gl/dist/mapbox-gl.css';
 
@@ -498,7 +498,7 @@
 					durationString = `${minutes} min${minutes !== 1 ? 's' : ''}`;
 				}
 
-				// Show the route information in a FloatingDialog
+				// Show the route information in a RouteInfoDialog
 				dialogVisible = true;
 				dialogContent = getRouteInfoTemplate(travelMode, routes, activeRouteIndex);
 				dialogTitle = 'Route Information';
@@ -1003,7 +1003,7 @@
 
 <SettingsPanel bind:isOpen={isSettingsPanelOpen} />
 
-<FloatingDialog
+<RouteInfoDialog
 	bind:isVisible={dialogVisible}
 	title={dialogTitle}
 	content={dialogContent}
@@ -1022,8 +1022,20 @@
 			drawRoute(map, data.routes[index].geometry).then(layer => {
 				currentRouteLayer = layer;
 				zoomToRouteBounds(currentRouteLayer);
+				
+				// Regenerate the route links with the new active index
+				const routeDDList = data.routes.map((route, idx) => {
+					const isActive = idx === activeRouteIndex;
+					return `<a href="#" class="route-link ${isActive ? 'active-route' : ''}" data-index="${idx}">
+						Route ${idx + 1}: ${Math.round(route.distance / 1000, 1)} km - ${Math.round(route.duration / 60, 1)} min
+					</a>`;
+				});
+				
+				// Join the route links
+				const routeLinks = routeDDList.join('');
+				
 				// Update the dialog content to reflect the new active route
-				dialogContent = getRouteInfoTemplate(travelMode, routes, activeRouteIndex);
+				dialogContent = getRouteInfoTemplate(travelMode, routeLinks, activeRouteIndex);
 			});
 		}
 	}}
