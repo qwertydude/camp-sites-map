@@ -2,7 +2,7 @@
 	import { browser } from '$app/environment';
 	import CampSiteMap from '$lib/components/CampSiteMap.svelte';
 	import { onMount } from 'svelte'; 
-	import { settings } from '$lib/stores/settings.js';
+	import { settings } from '$lib/stores/settingsStore.js';
 
 	let mapInstance;
 
