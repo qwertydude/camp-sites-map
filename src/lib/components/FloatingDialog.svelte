@@ -64,15 +64,21 @@
     }
     
     function handleContentClick(e) {
+        console.log('Dialog content clicked:', e.target);
+        console.log('Target classList:', e.target.classList);
+        console.log('Target dataset:', e.target.dataset);
+        
         // Check if a travel mode button was clicked
         if (e.target.classList.contains('travel-mode-btn')) {
             const mode = e.target.dataset.mode;
+            console.log('Travel mode button clicked:', mode);
             dispatch('modeChange', { mode });
         }
         
         // Check if a route link was clicked
         if (e.target.classList.contains('route-link')) {
             const index = e.target.dataset.index;
+            console.log('Route link clicked, index:', index);
             dispatch('routeSelect', { index: parseInt(index) });
         }
     }

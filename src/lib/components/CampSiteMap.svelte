@@ -447,6 +447,7 @@
 				currentRouteLayer.on('click', async (e) => {
 					dialogVisible = true;
 					dialogContent = getRouteInfoTemplate(travelMode, routes);
+					dialogTitle = 'Route Information';
 					dialogPosition = { top: `${e.point.y}px`, left: `${e.point.x}px` };
 
 					// Add click handlers for the travel mode buttons after popup is added to DOM
@@ -459,6 +460,14 @@
 							});
 						});
 					}, 0);
+
+					// Change existing markers for start and end points with appropriate colors
+					if (startMarker) {
+						startMarker.setIcon(document.createElement('div'));
+					}
+					if (endMarker) {
+						endMarker.setIcon(document.createElement('div'));
+					}
 				});
 
 				// Zoom to the route when generated
@@ -492,6 +501,17 @@
 				dialogContent = getRouteInfoTemplate(travelMode, routes);
 				dialogTitle = 'Route Information';
 				dialogPosition = { top: '100px', left: '100px' };
+
+				// Add event handlers for travel mode buttons when dialog is initially shown
+				setTimeout(() => {
+					document.querySelectorAll('.travel-mode-btn').forEach((btn) => {
+						btn.addEventListener('click', (event) => {
+							const mode = event.currentTarget.dataset.mode;
+							travelMode = mode;
+							calculateRoute(start, end);
+						});
+					});
+				}, 0);
 
 				// Change existing markers for start and end points with appropriate colors
 				if (startMarker) {
