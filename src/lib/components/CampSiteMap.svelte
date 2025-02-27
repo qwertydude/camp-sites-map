@@ -556,84 +556,81 @@
 		
 		// Reset selected sites and their markers
 		if (selectedSites.length > 0) {
-			// Store the IDs before clearing the array
+			// Get the IDs of the sites that need to be reset
 			const sitesToReset = [...selectedSites];
+			
+			// Clear selected sites array
 			selectedSites = [];
 			
-			// Refresh all markers from the campSitesStore
-			campSitesStore.update(sites => {
-				updateMarkers(sites);
-				return sites;
+			// Reset each marker individually to blue
+			sitesToReset.forEach(site => {
+				const oldMarker = markers.get(site.id);
+				if (oldMarker) {
+					oldMarker.remove();
+					
+					// Find the site data in the campSitesStore
+					let siteData;
+					campSitesStore.subscribe(sites => {
+						siteData = sites.find(s => s.id === site.id);
+					})();
+					
+					if (siteData) {
+						// Create a new popup
+						const popup = new mapboxgl.Popup({ className: $settings.app.theme+'-theme' });
+						
+						// Create a new blue marker
+						const newMarker = new mapboxgl.Marker({ 
+							color: 'blue', 
+							className: 'site-pip', 
+							scale: 0.65 
+						})
+							.setLngLat([siteData.longitude, siteData.latitude])
+							.setPopup(popup)
+							.addTo(map);
+						
+						// Update the markers Map with the new marker
+						markers.set(site.id, newMarker);
+						
+						// Set the popup content dynamically when it opens
+						popup.on('open', () => {
+							// Determine if this should be a start or end button based on current selectedSites
+							const isStartButton = selectedSites.length === 0 || selectedSites.length === 2;
+							
+							const popupHTML = `
+							<div class="popup-content bg-gray-100 dark:bg-gray-700">
+								${siteData.name ? `<h3 class="text-gray-800 dark:text-gray-100">${siteData.name}</h3>` : ''}
+								${siteData.description ? `<p class="text-gray-800 dark:text-gray-100">${siteData.description}</p>` : ''}
+								<div class="popup-buttons">
+									<button class="btn route-btn" id="route-action-btn-${siteData.id}">
+										${isStartButton ? 'Start Route' : 'End Route'}
+									</button>
+								</div>
+							</div>
+							`;
+							
+							// Set the HTML content
+							popup.setHTML(popupHTML);
+							
+							// Add the event listener after the popup content is set
+							setTimeout(() => {
+								const button = document.getElementById(`route-action-btn-${siteData.id}`);
+								if (button) {
+									button.addEventListener('click', () => {
+										if (isStartButton) {
+											setRouteStart(siteData, popup);
+										} else {
+											setRouteEnd(siteData, popup);
+										}
+										// Close the popup after action
+										popup.remove();
+									});
+								}
+							}, 0);
+						});
+					}
+				}
 			});
 		}
-	}
-
-	/**
-	 * Sets the travel mode to the given mode.
-	 * @param {string} mode - The travel mode (foot, bike, or car).
-	 */
-	function setTravelMode(mode) {
-		travelMode = mode;
-
-		if (selectedSites.length === 2) {
-			calculateRoute(selectedSites[0], selectedSites[1]);
-		}
-	}
-
-	/**
-	 * Switches the map layer to the satellite or street view.
-	 */
-	function switchLayer() {
-		const newStyle =
-			currentStyle === 'mapbox://styles/mapbox/streets-v12'
-				? 'mapbox://styles/mapbox/satellite-streets-v12'
-				: 'mapbox://styles/mapbox/streets-v12';
-
-		// Save the current weather layer state
-		const wasWeatherLayerVisible = heatGradientLayerVisible;
-
-		// Remove weather layer if it exists before style change
-		if (heatGradientLayerVisible) {
-			toggleHeatGradientLayer();
-		}
-
-		map.setStyle(newStyle);
-		currentStyle = newStyle;
-
-		// Re-add markers and weather layer after style change
-		map.once('style.load', () => {
-			// Re-add markers
-			updateMarkers($campSitesStore);
-
-			// Re-add weather layer if it was visible before
-			if (wasWeatherLayerVisible) {
-				toggleHeatGradientLayer();
-			}
-		});
-	}
-
-	/**
-	 * Zooms the map to fit the route bounds
-	 * @param {Object} routeLayer - The route layer object with getBounds method
-	 */
-	function zoomToRouteBounds(routeLayer) {
-		if (routeLayer && routeLayer.getBounds) {
-			// Add padding to the bounds for better visibility
-			map.fitBounds(routeLayer.getBounds(), {
-				padding: 50, // Add 50px padding around the route
-				maxZoom: 15, // Limit maximum zoom level
-				duration: 1000 // Smooth animation duration in milliseconds
-			});
-		} else {
-			console.warn('Could not zoom to route: routeLayer or getBounds method is undefined');
-		}
-	}
-
-	/**
-	 * Handles the manage sites button click.
-	 */
-	function handleManageSites() {
-		isSitesPanelOpen = true;
 	}
 
 	/**
@@ -647,6 +644,7 @@
 		// Reset existing routes and markers when starting a new route
 		resetRouteAndMarkers();
 		
+		// Now set the new start point
 		selectedSites = [{ id: site.id, lat: site.latitude, lng: site.longitude }];
 		startLocationName = site.name || 'Start Location';
 		console.log('Route start set:', selectedSites);
@@ -706,6 +704,13 @@
 			// Calculate the route
 			calculateRoute(selectedSites[0], selectedSites[1]);
 		}
+	}
+
+	/**
+	 * Handles the manage sites button click.
+	 */
+	function handleManageSites() {
+		isSitesPanelOpen = true;
 	}
 
 	/**
@@ -894,6 +899,67 @@
 			});
 		} catch (error) {
 			console.error('Error toggling weather layer:', error);
+		}
+	}
+
+	/**
+	 * Sets the travel mode to the given mode.
+	 * @param {string} mode - The travel mode (foot, bike, or car).
+	 */
+	function setTravelMode(mode) {
+		travelMode = mode;
+
+		if (selectedSites.length === 2) {
+			calculateRoute(selectedSites[0], selectedSites[1]);
+		}
+	}
+
+	/**
+	 * Switches the map layer to the satellite or street view.
+	 */
+	function switchLayer() {
+		const newStyle =
+			currentStyle === 'mapbox://styles/mapbox/streets-v12'
+				? 'mapbox://styles/mapbox/satellite-streets-v12'
+				: 'mapbox://styles/mapbox/streets-v12';
+
+		// Save the current weather layer state
+		const wasWeatherLayerVisible = heatGradientLayerVisible;
+
+		// Remove weather layer if it exists before style change
+		if (heatGradientLayerVisible) {
+			toggleHeatGradientLayer();
+		}
+
+		map.setStyle(newStyle);
+		currentStyle = newStyle;
+
+		// Re-add markers and weather layer after style change
+		map.once('style.load', () => {
+			// Re-add markers
+			updateMarkers($campSitesStore);
+
+			// Re-add weather layer if it was visible before
+			if (wasWeatherLayerVisible) {
+				toggleHeatGradientLayer();
+			}
+		});
+	}
+
+	/**
+	 * Zooms the map to fit the route bounds
+	 * @param {Object} routeLayer - The route layer object with getBounds method
+	 */
+	function zoomToRouteBounds(routeLayer) {
+		if (routeLayer && routeLayer.getBounds) {
+			// Add padding to the bounds for better visibility
+			map.fitBounds(routeLayer.getBounds(), {
+				padding: 50, // Add 50px padding around the route
+				maxZoom: 15, // Limit maximum zoom level
+				duration: 1000 // Smooth animation duration in milliseconds
+			});
+		} else {
+			console.warn('Could not zoom to route: routeLayer or getBounds method is undefined');
 		}
 	}
 
