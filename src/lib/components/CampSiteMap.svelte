@@ -908,6 +908,8 @@
 	 */
 	function setTravelMode(mode) {
 		travelMode = mode;
+		// Reset to the first route when changing travel mode
+		activeRouteIndex = 0;
 
 		if (selectedSites.length === 2) {
 			calculateRoute(selectedSites[0], selectedSites[1]);
@@ -1010,7 +1012,6 @@
 	position={dialogPosition}
 	onClose={() => dialogVisible = false}
 	on:modeChange={(e) => {
-		activeRouteIndex = 0; // Reset to first route when changing travel mode
 		travelMode = e.detail.mode;
 		calculateRoute(start, end);
 	}}
