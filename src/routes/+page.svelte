@@ -21,14 +21,11 @@
 
 <svelte:head>
 	<title>Camp Sites Map</title>
-	<link
-		rel="stylesheet"
-		href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-		integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-		crossorigin=""
-	/>
 </svelte:head>
 
 <main class="relative h-screen w-screen overflow-hidden">
-	<CampSiteMap on:mapInit={handleMapInit} />
+	<CampSiteMap 
+		on:mapInit={handleMapInit} 
+		mapboxToken="pk.eyJ1IjoieW91ci1tYXBib3gtdXNlcm5hbWUiLCJhIjoieW91ci1tYXBib3gtdG9rZW4ifQ.your-mapbox-token-signature" 
+	/>
 </main>

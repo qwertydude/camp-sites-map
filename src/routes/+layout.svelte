@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { settings } from '$lib/stores/settingsStore';
   import "../app.css";
+  import 'mapbox-gl/dist/mapbox-gl.css';
 
   let { children } = $props();
 

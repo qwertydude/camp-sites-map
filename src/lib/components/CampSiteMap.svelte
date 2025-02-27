@@ -17,8 +17,11 @@
 	import RouteInfoDialog from '$lib/components/RouteInfoDialog.svelte';
 	import Button from '$lib/components/Button.svelte';
 
-	export let mapboxToken;
+	export let mapboxToken = 'pk.eyJ1IjoieW91ci1tYXBib3gtdXNlcm5hbWUiLCJhIjoieW91ci1tYXBib3gtdG9rZW4ifQ.your-mapbox-token-signature';
 	export let initialStyle = 'mapbox://styles/mapbox/streets-v12';
+
+	// Set Mapbox access token
+	mapboxgl.accessToken = mapboxToken;
 
 	const dispatch = createEventDispatcher();
 
