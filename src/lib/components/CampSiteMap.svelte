@@ -36,14 +36,8 @@
 	let isAddSiteMode = false;
 	let popups = [];
 
-	// Subscribe to store values
-	let $start, $end, $startLocationName, $endLocationName;
-	let $activeRouteIndex, $routeData, $currentRouteLayer;
-	let $travelMode, $dialogVisible, $dialogContent, $dialogTitle, $dialogPosition;
-	let $hasValidRoute;
-
-	$: $start, $end, $activeRouteIndex, $routeData, $currentRouteLayer, $travelMode, 
-	   $dialogVisible, $dialogContent, $dialogTitle, $dialogPosition;
+	// No need to declare $ variables - Svelte handles this automatically
+	// when using stores with the $ prefix
 
 	const DEFAULT_LAT = -36.114858138524454;
 	const DEFAULT_LNG = 146.8884086608887;
