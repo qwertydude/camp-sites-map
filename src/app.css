@@ -205,8 +205,8 @@ textarea.site-input {
 
 /* Active route styling */
 .active-route {
-    font-weight: bold;
-    color: #2563eb !important;
+    font-weight: normal;
+    color: #258feb !important;
     background-color: rgba(37, 99, 235, 0.1);
     padding: 4px 8px;
     border-radius: 4px;
@@ -222,8 +222,19 @@ textarea.site-input {
     text-decoration: none;
     border-radius: 4px;
     transition: background-color 0.2s ease;
+    font-size: 0.9rem;
 }
 
 .route-link:hover {
     background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Route locations styling */
+.route-locations {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding-bottom: 8px;
+}
+
+.route-locations div {
+    margin-bottom: 4px;
 }

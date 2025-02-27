@@ -44,6 +44,8 @@
 	let end;
 	let data;
 	let activeRouteIndex = 0; // Track which route is currently active
+	let startLocationName = '';
+	let endLocationName = '';
 
 	/**
 	 * Returns a template for the route information popup.
@@ -55,7 +57,12 @@
 	function getRouteInfoTemplate(mode, content, activeIndex = 0) {
 		return `
 			<div class="route-info p-2 bg-transparent">
-				<h3 class="font-semibold text-gray-700 dark:text-gray-700 mb-2">Route Information</h3>
+				<div class="route-locations mb-2">
+					<div class="text-sm font-medium text-gray-700">
+						<span class="text-green-600">${startLocationName} </span>
+						to <span class="text-red-600">${endLocationName}</span>
+					</div>
+				</div>
 				<div class="travel-modes flex gap-2 mt-2 text-lg">
 					<button 
 						class="travel-mode-btn inline-flex items-center justify-center transition-colors duration-200 focus:outline-none rounded-md p-2 
@@ -424,11 +431,11 @@
 			const routeDDList = data.routes.map((route, index) => {
 				const isActive = index === activeRouteIndex;
 				return `<a href="#" class="route-link ${isActive ? 'active-route' : ''}" data-index="${index}">
-					${isActive ? '→ ' : ''}Route ${index + 1}: ${Math.round(route.distance / 1000, 1)} km - ${Math.round(route.duration / 60, 1)} min${isActive ? ' (active)' : ''}
+					Route ${index + 1}: ${Math.round(route.distance / 1000, 1)} km - ${Math.round(route.duration / 60, 1)} min
 				</a>`;
 			});
 
-			let routes = routeDDList.join('<br>');
+			let routes = routeDDList.join('');
 			console.log('routeDDList:', routeDDList);
 			console.log('typeof routeDDList:', typeof routeDDList);
 			console.log('Is routeDDList an array?', Array.isArray(routeDDList));
@@ -601,6 +608,7 @@
 	 */
 	function setRouteStart(site, popup) {
 		selectedSites = [{ id: site.id, lat: site.latitude, lng: site.longitude }];
+		startLocationName = site.name || 'Start Location';
 		console.log('Route start set:', selectedSites);
 
 		// Remove the old marker
@@ -633,6 +641,7 @@
 	function setRouteEnd(site, popup) {
 		if (selectedSites.length === 1) {
 			selectedSites.push({ id: site.id, lat: site.latitude, lng: site.longitude });
+			endLocationName = site.name || 'End Location';
 			console.log('Route end set:', selectedSites);
 
 			// Remove the old marker
