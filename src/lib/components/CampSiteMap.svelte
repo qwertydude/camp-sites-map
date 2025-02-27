@@ -1,51 +1,49 @@
 <script>
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount, createEventDispatcher, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
-	import { campSitesStore } from '$lib/stores/campSites';
-	import { createEventDispatcher } from 'svelte';
-	import { getCurrentLocation } from '$lib/utils';
-	import { drawRoute } from '$lib/utils';
+	import mapboxgl from 'mapbox-gl';
 	import { settings } from '$lib/stores/settings.js';
+	import { campSitesStore } from '$lib/stores/campSitesStore.js';
+	import { 
+		start, end, startLocationName, endLocationName, 
+		activeRouteIndex, routeData, currentRouteLayer,
+		travelMode, dialogVisible, dialogContent, dialogTitle, 
+		dialogPosition, hasValidRoute, resetRoute, setStart, 
+		setEnd, setTravelMode, showRouteDialog, hideRouteDialog 
+	} from '$lib/stores/routeStore.js';
 	import HamburgerMenu from '$lib/components/HamburgerMenu.svelte';
 	import SitesPanel from '$lib/components/SitesPanel.svelte';
 	import SettingsPanel from '$lib/components/SettingsPanel.svelte';
 	import RouteInfoDialog from '$lib/components/RouteInfoDialog.svelte';
-	import mapboxgl from 'mapbox-gl';
-	import 'mapbox-gl/dist/mapbox-gl.css';
+	import Button from '$lib/components/Button.svelte';
+
+	export let mapboxToken;
+	export let initialStyle = 'mapbox://styles/mapbox/streets-v12';
 
 	const dispatch = createEventDispatcher();
-	const mapboxToken = import.meta.env.PUBLIC_MAPBOX_ACCESS_TOKEN;
-	const openWeatherMapApiKey = import.meta.env.PUBLIC_OPENWEATHER_API_KEY;
-	mapboxgl.accessToken = mapboxToken;
 
 	let map;
 	let markers = new Map(); // Store markers with site IDs
-	let isAddSiteMode = false;
 	let selectedSites = [];
 	let heatGradientLayerVisible = false;
 	let heatGradientLayer = null;
 	let temperaturesLayerVisible = false;
 	let temperaturesLayer = [];
-	let currentRouteLayer;
-	let travelMode = 'foot';
+	let currentStyle = initialStyle;
 	let isMenuOpen = true;
 	let isSitesPanelOpen = false;
 	let isSettingsPanelOpen = false;
-	let currentStyle = 'mapbox://styles/mapbox/streets-v12'; // Default style
-	let isOpen = false;
+	let isAddSiteMode = false;
 	let popups = [];
-	let dialogVisible = false;
-	let dialogContent = '';
-	let dialogTitle = 'Route Information';
-	let dialogPosition = { top: '100px', left: '100px' };
-	let startMarker;
-	let endMarker;
-	let start;
-	let end;
-	let data;
-	let activeRouteIndex = 0; // Track which route is currently active
-	let startLocationName = '';
-	let endLocationName = '';
+
+	// Subscribe to store values
+	let $start, $end, $startLocationName, $endLocationName;
+	let $activeRouteIndex, $routeData, $currentRouteLayer;
+	let $travelMode, $dialogVisible, $dialogContent, $dialogTitle, $dialogPosition;
+	let $hasValidRoute;
+
+	$: $start, $end, $activeRouteIndex, $routeData, $currentRouteLayer, $travelMode, 
+	   $dialogVisible, $dialogContent, $dialogTitle, $dialogPosition;
 
 	const DEFAULT_LAT = -36.114858138524454;
 	const DEFAULT_LNG = 146.8884086608887;
@@ -54,47 +52,44 @@
 	/**
 	 * Returns a template for the route information popup.
 	 * @param {string} mode - The travel mode.
-	 * @param {string} content - The content to display in the popup.
+	 * @param {string} routes - The HTML for the routes.
 	 * @param {number} activeIndex - The index of the active route.
-	 * @returns {string} The HTML template for the popup.
+	 * @returns {string} The HTML template.
 	 */
-	function getRouteInfoTemplate(mode, content, activeIndex = 0) {
+	function getRouteInfoTemplate(mode, routes, activeIndex) {
+		const modeIcons = {
+			foot: 'fa-solid fa-person-walking',
+			bike: 'fa-solid fa-bicycle',
+			car: 'fa-solid fa-car'
+		};
+
 		return `
-			<div class="route-info p-2 bg-transparent">
-				<div class="route-locations mb-2">
-					<div class="text-sm font-medium text-gray-700">
-						<span class="text-green-600">${startLocationName} </span>
-						to <span class="text-red-600">${endLocationName}</span>
-					</div>
-				</div>
-				<div class="travel-modes flex gap-2 mt-2 text-lg">
-					<button 
-						class="travel-mode-btn inline-flex items-center justify-center transition-colors duration-200 focus:outline-none rounded-md p-2 
-						${mode === 'foot' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200'}"
-						data-mode="foot"
-						title="Walking"
-					>
-						<i class="fa-solid fa-person-walking"></i>
-					</button>
-					<button 
-						class="travel-mode-btn inline-flex items-center justify-center transition-colors duration-200 focus:outline-none rounded-md p-2
-						${mode === 'bike' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200'}"
-						data-mode="bike"
-						title="Cycling"
-					>
-						<i class="fa-solid fa-bicycle"></i>
-					</button>
-					<button 
-						class="travel-mode-btn inline-flex items-center justify-center transition-colors duration-200 focus:outline-none rounded-md p-2
-						${mode === 'car' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200'}"
-						data-mode="car"
-						title="Driving"
-					>
-						<i class="fa-solid fa-car"></i>
-					</button>
-				</div>
-				<p class="text-gray-700 dark:text-gray-700">${content}</p>
+		<div class="route-info">
+			<div class="travel-modes">
+				<a href="#" class="travel-mode-btn ${mode === 'foot' ? 'active' : ''}" data-mode="foot">
+					<i class="${modeIcons.foot}"></i>
+					<span>Walk</span>
+				</a>
+				<a href="#" class="travel-mode-btn ${mode === 'bike' ? 'active' : ''}" data-mode="bike">
+					<i class="${modeIcons.bike}"></i>
+					<span>Bike</span>
+				</a>
+				<a href="#" class="travel-mode-btn ${mode === 'car' ? 'active' : ''}" data-mode="car">
+					<i class="${modeIcons.car}"></i>
+					<span>Drive</span>
+				</a>
 			</div>
+			<div class="route-details">
+				<div class="route-endpoints">
+					<div class="start-point">${$startLocationName}</div>
+					<div class="route-arrow">→</div>
+					<div class="end-point">${$endLocationName}</div>
+				</div>
+				<div class="route-options">
+					${routes}
+				</div>
+			</div>
+		</div>
 		`;
 	}
 
@@ -239,8 +234,6 @@
 		markers.clear();
 
 		// Add new markers
-		// In your updateMarkers function, modify how you create popups:
-
 		sites.forEach((site) => {
 			const el = document.createElement('div');
 			el.className = 'site-pip-container';
@@ -282,9 +275,9 @@
 					if (button) {
 						button.addEventListener('click', () => {
 							if (isStartButton) {
-								setRouteStart(site, popup);
+								setStart(site, popup);
 							} else {
-								setRouteEnd(site, popup);
+								setEnd(site, popup);
 							}
 							// Close the popup after action
 							popup.remove();
@@ -381,38 +374,38 @@
 		}
 
 		// Store the start and end points for later use
-		start = startPoint;
-		end = endPoint;
+		$start = startPoint;
+		$end = endPoint;
 
 		try {
 			// Reset active route index to 0 when calculating a new route
-			activeRouteIndex = 0;
+			$activeRouteIndex = 0;
 			
 			// Clear existing route if any
-			if (currentRouteLayer) {
-				currentRouteLayer.remove();
-				currentRouteLayer = null;
+			if ($currentRouteLayer) {
+				$currentRouteLayer.remove();
+				$currentRouteLayer = null;
 			}
 
 			const mapboxProfile = {
 				foot: 'walking',
 				bike: 'cycling',
 				car: 'driving'
-			}[travelMode];
+			}[$travelMode];
 
 			const url = `https://api.mapbox.com/directions/v5/mapbox/${mapboxProfile}/${startPoint.lng},${startPoint.lat};${endPoint.lng},${endPoint.lat}?alternatives=true&geometries=geojson&access_token=${mapboxToken}`;
 
 			try {
 				const response = await fetch(url);
-				data = await response.json();
+				$routeData = await response.json();
 				
-				if (!data || !data.routes || data.routes.length === 0) {
+				if (!$routeData || !$routeData.routes || $routeData.routes.length === 0) {
 					throw new Error('No routes found');
 				}
 				
-				const routesCount = data.routes.length;
-				const routeDDList = data.routes.map((route, index) => {
-					const isActive = index === activeRouteIndex;
+				const routesCount = $routeData.routes.length;
+				const routeDDList = $routeData.routes.map((route, index) => {
+					const isActive = index === $activeRouteIndex;
 					return `<a href="#" class="route-link ${isActive ? 'active-route' : ''}" data-index="${index}">
 						Route ${index + 1}: ${Math.round(route.distance / 1000, 1)} km - ${Math.round(route.duration / 60, 1)} min
 					</a>`;
@@ -426,30 +419,30 @@
 				if (routesCount === 0) {
 					throw new Error('No routes found');
 				}
-				console.log('data:', data);
+				console.log('routeData:', $routeData);
 				
 				// Draw the new route
-				currentRouteLayer = await drawRoute(map, data.routes[activeRouteIndex].geometry);
-				console.log('currentRouteLayer:', currentRouteLayer);
+				$currentRouteLayer = await drawRoute(map, $routeData.routes[$activeRouteIndex].geometry);
+				console.log('currentRouteLayer:', $currentRouteLayer);
 
 				// Check if currentRouteLayer is defined
-				if (currentRouteLayer) {
+				if ($currentRouteLayer) {
 					// Add click handler to the route
-					currentRouteLayer.on('click', async (e) => {
-						dialogVisible = true;
-						dialogContent = getRouteInfoTemplate(travelMode, routes, activeRouteIndex);
-						dialogTitle = 'Route Information';
-						dialogPosition = { top: `${e.point.y}px`, left: `${e.point.x}px` };
+					$currentRouteLayer.on('click', async (e) => {
+						$dialogVisible = true;
+						$dialogContent = getRouteInfoTemplate($travelMode, routes, $activeRouteIndex);
+						$dialogTitle = 'Route Information';
+						$dialogPosition = { top: `${e.point.y}px`, left: `${e.point.x}px` };
 					});
 
 					// Zoom to fit the route
-					zoomToRouteBounds(currentRouteLayer);
+					zoomToRouteBounds($currentRouteLayer);
 
 					// Show the route information in a RouteInfoDialog
-					dialogVisible = true;
-					dialogContent = getRouteInfoTemplate(travelMode, routes, activeRouteIndex);
-					dialogTitle = 'Route Information';
-					dialogPosition = { top: '50%', left: '50%' };
+					$dialogVisible = true;
+					$dialogContent = getRouteInfoTemplate($travelMode, routes, $activeRouteIndex);
+					$dialogTitle = 'Route Information';
+					$dialogPosition = { top: '50%', left: '50%' };
 				}
 			} catch (error) {
 				console.error('Error fetching route:', error);
@@ -465,17 +458,17 @@
 	 */
 	function resetRouteAndMarkers() {
 		// Clear existing route if any
-		if (currentRouteLayer) {
-			currentRouteLayer.remove();
-			currentRouteLayer = null;
+		if ($currentRouteLayer) {
+			$currentRouteLayer.remove();
+			$currentRouteLayer = null;
 		}
 
 		// Close dialog if open
-		dialogVisible = false;
+		$dialogVisible = false;
 		
 		// Reset route data
-		data = null;
-		activeRouteIndex = 0;
+		$routeData = null;
+		$activeRouteIndex = 0;
 		startLocationName = '';
 		endLocationName = '';
 		
@@ -546,9 +539,9 @@
 								if (button) {
 									button.addEventListener('click', () => {
 										if (isStartButton) {
-											setRouteStart(siteData, popup);
+											setStart(siteData, popup);
 										} else {
-											setRouteEnd(siteData, popup);
+											setEnd(siteData, popup);
 										}
 										// Close the popup after action
 										popup.remove();
@@ -569,7 +562,7 @@
 	 * @param {Object} site - The site object containing id, latitude, and longitude.
 	 * @param {Object} popup - The popup object associated with the marker.
 	 */
-	function setRouteStart(site, popup) {
+	function setStart(site, popup) {
 		// Reset existing routes and markers when starting a new route
 		resetRouteAndMarkers();
 		
@@ -605,7 +598,7 @@
 	 * @param {Object} site - The site object containing id, latitude, and longitude.
 	 * @param {Object} popup - The popup object associated with the marker.
 	 */
-	function setRouteEnd(site, popup) {
+	function setEnd(site, popup) {
 		if (selectedSites.length === 1) {
 			selectedSites.push({ id: site.id, lat: site.latitude, lng: site.longitude });
 			endLocationName = site.name || 'End Location';
@@ -836,12 +829,12 @@
 	 * @param {string} mode - The travel mode (foot, bike, or car).
 	 */
 	function setTravelMode(mode) {
-		travelMode = mode;
+		$travelMode = mode;
 		// Reset to the first route when changing travel mode
-		activeRouteIndex = 0;
+		$activeRouteIndex = 0;
 
-		if (start && end) {
-			calculateRoute(start, end);
+		if ($start && $end) {
+			calculateRoute($start, $end);
 		}
 	}
 
@@ -935,27 +928,27 @@
 <SettingsPanel bind:isOpen={isSettingsPanelOpen} />
 
 <RouteInfoDialog
-	bind:isVisible={dialogVisible}
-	title={dialogTitle}
-	content={dialogContent}
-	position={dialogPosition}
-	onClose={() => dialogVisible = false}
+	bind:isVisible={$dialogVisible}
+	title={$dialogTitle}
+	content={$dialogContent}
+	position={$dialogPosition}
+	onClose={() => $dialogVisible = false}
 	on:modeChange={(e) => {
-		travelMode = e.detail.mode;
-		calculateRoute(start, end);
+		$travelMode = e.detail.mode;
+		calculateRoute($start, $end);
 	}}
 	on:routeSelect={(e) => {
 		const index = e.detail.index;
-		if (currentRouteLayer && data && data.routes && data.routes[index]) {
-			activeRouteIndex = index; // Update the active route index
-			currentRouteLayer.remove();
-			drawRoute(map, data.routes[index].geometry).then(layer => {
-				currentRouteLayer = layer;
-				zoomToRouteBounds(currentRouteLayer);
+		if ($currentRouteLayer && $routeData && $routeData.routes && $routeData.routes[index]) {
+			$activeRouteIndex = index; // Update the active route index
+			$currentRouteLayer.remove();
+			drawRoute(map, $routeData.routes[index].geometry).then(layer => {
+				$currentRouteLayer = layer;
+				zoomToRouteBounds($currentRouteLayer);
 				
 				// Regenerate the route links with the new active index
-				const routeDDList = data.routes.map((route, idx) => {
-					const isActive = idx === activeRouteIndex;
+				const routeDDList = $routeData.routes.map((route, idx) => {
+					const isActive = idx === $activeRouteIndex;
 					return `<a href="#" class="route-link ${isActive ? 'active-route' : ''}" data-index="${idx}">
 						Route ${idx + 1}: ${Math.round(route.distance / 1000, 1)} km - ${Math.round(route.duration / 60, 1)} min
 					</a>`;
@@ -965,7 +958,7 @@
 				const routeLinks = routeDDList.join('');
 				
 				// Update the dialog content to reflect the new active route
-				dialogContent = getRouteInfoTemplate(travelMode, routeLinks, activeRouteIndex);
+				$dialogContent = getRouteInfoTemplate($travelMode, routeLinks, $activeRouteIndex);
 			});
 		}
 	}}
