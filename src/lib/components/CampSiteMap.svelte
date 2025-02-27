@@ -463,90 +463,20 @@
 		// Reset route data
 		$routeData = null;
 		$activeRouteIndex = 0;
-		startLocationName = '';
-		endLocationName = '';
+		$startLocationName = '';
+		$endLocationName = '';
 		
 		// Reset start and end points
-		start = null;
-		end = null;
+		$start = null;
+		$end = null;
 		
 		// Reset selected sites and their markers
-		if (selectedSites.length > 0) {
-			// Get the IDs of the sites that need to be reset
-			const sitesToReset = [...selectedSites];
-			
-			// Clear selected sites array
-			selectedSites = [];
-			
-			// Reset each marker individually to blue
-			sitesToReset.forEach(site => {
-				const oldMarker = markers.get(site.id);
-				if (oldMarker) {
-					oldMarker.remove();
-					
-					// Find the site data in the campSitesStore
-					let siteData;
-					campSitesStore.subscribe(sites => {
-						siteData = sites.find(s => s.id === site.id);
-					})();
-					
-					if (siteData) {
-						// Create a new popup
-						const popup = new mapboxgl.Popup({ className: $settings.app.theme+'-theme' });
-						
-						// Create a new blue marker
-						const newMarker = new mapboxgl.Marker({ 
-							color: 'blue', 
-							className: 'site-pip', 
-							scale: 0.65 
-						})
-							.setLngLat([siteData.longitude, siteData.latitude])
-							.setPopup(popup)
-							.addTo(map);
-						
-						// Update the markers Map with the new marker
-						markers.set(site.id, newMarker);
-						
-						// Set the popup content dynamically when it opens
-						popup.on('open', () => {
-							// Determine if this should be a start or end button based on current selectedSites
-							const isStartButton = selectedSites.length === 0 || selectedSites.length === 2;
-							
-							const popupHTML = `
-							<div class="popup-content bg-gray-100 dark:bg-gray-700">
-								${siteData.name ? `<h3 class="text-gray-800 dark:text-gray-100">${siteData.name}</h3>` : ''}
-								${siteData.description ? `<p class="text-gray-800 dark:text-gray-100">${siteData.description}</p>` : ''}
-								<div class="popup-buttons">
-									<Button size="sm" class="route-btn" id="route-action-btn-${siteData.id}">
-										${isStartButton ? 'Start Route' : 'End Route'}
-									</Button>
-								</div>
-							</div>
-							`;
-							
-							// Set the HTML content
-							popup.setHTML(popupHTML);
-							
-							// Add the event listener after the popup content is set
-							setTimeout(() => {
-								const button = document.getElementById(`route-action-btn-${siteData.id}`);
-								if (button) {
-									button.addEventListener('click', () => {
-										if (isStartButton) {
-											handleSetStart(siteData, popup);
-										} else {
-											handleSetEnd(siteData, popup);
-										}
-										// Close the popup after action
-										popup.remove();
-									});
-								}
-							}, 0);
-						});
-					}
-				}
-			});
-		}
+		selectedSites = [];
+		
+		// Update markers to default state
+		campSitesStore.subscribe((sites) => {
+			updateMarkers(sites);
+		});
 	}
 
 	/**
